@@ -10,11 +10,9 @@ interface LoadingSpinnerProps {
 export default function LoadingSpinner({ className, size = 24, fullPage = false }: LoadingSpinnerProps) {
   const spinner = (
     <div className={cn('flex items-center justify-center', className)}>
-      <StarIcon
-        size={size}
-        className="text-glow-navy animate-spin"
-        style={{ animationDuration: '2s' } as React.CSSProperties}
-      />
+      <span className="animate-spin inline-flex" style={{ animationDuration: '2s' }}>
+        <StarIcon size={size} className="text-glow-navy" />
+      </span>
     </div>
   )
 
