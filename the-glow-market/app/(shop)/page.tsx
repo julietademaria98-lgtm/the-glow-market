@@ -5,7 +5,7 @@ import EditorialBanner from '@/components/home/EditorialBanner'
 import CoursesSection from '@/components/home/CoursesSection'
 import type { Producto, Curso } from '@/types'
 
-export const revalidate = 3600 // revalidar cada hora
+export const revalidate = 3600
 
 async function getHomeData() {
   const supabase = await createClient()
@@ -38,7 +38,9 @@ export default async function HomePage() {
   return (
     <main>
       <HeroSection />
-      {productos.length > 0 && <ProductsSlider productos={productos} />}
+      <div id="productos">
+        {productos.length > 0 && <ProductsSlider productos={productos} />}
+      </div>
       <EditorialBanner />
       {cursos.length > 0 && <CoursesSection cursos={cursos} />}
     </main>
