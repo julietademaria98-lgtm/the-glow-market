@@ -74,8 +74,9 @@ h1, h2, h3, h4, h5 {
     @apply font-montserrat text-xs tracking-[0.2em] uppercase text-glow-navy/60;
   }
 
-  .nav-link {
-    @apply font-montserrat text-xs tracking-[0.2em] uppercase text-glow-navy hover:opacity-60 transition-opacity duration-300;
+    .nav-link {
+    @apply font-montserrat text-xs font-semibold tracking-[0.2em] uppercase text-glow-navy hover:opacity-60 transition-opacity duration-300;
+  
   }
 
   .product-card-container {
