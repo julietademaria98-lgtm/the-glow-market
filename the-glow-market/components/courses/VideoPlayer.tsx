@@ -27,6 +27,15 @@ export default function VideoPlayer({ lessonId, title }: VideoPlayerProps) {
 
   const controlsTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  // Fullscreen change listener
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement)
+    }
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange)
+  }, [])
+
   // Fetch signed URL
   useEffect(() => {
     setLoading(true)
@@ -156,17 +165,14 @@ export default function VideoPlayer({ lessonId, title }: VideoPlayerProps) {
           if (!videoRef.current) return
           setDuration(videoRef.current.duration)
         }}
-        onFullscreenChange={() => setIsFullscreen(!!document.fullscreenElement)}
         onClick={togglePlay}
       />
 
-      {/* Controls overlay */}
       <div
         className={`absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/70 via-transparent to-transparent transition-opacity duration-300 ${
           showControls ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        {/* Progress bar */}
         <div
           ref={progressRef}
           className="mx-4 mb-3 h-1 bg-white/20 cursor-pointer group/progress"
@@ -180,7 +186,6 @@ export default function VideoPlayer({ lessonId, title }: VideoPlayerProps) {
           </div>
         </div>
 
-        {/* Controls row */}
         <div className="flex items-center gap-4 px-4 pb-4">
           <button
             onClick={togglePlay}
