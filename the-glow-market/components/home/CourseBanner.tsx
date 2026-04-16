@@ -7,10 +7,9 @@ import Link from 'next/link'
 export default function CourseBanner() {
   return (
     <section
-      className="relative w-full overflow-hidden flex items-center"
-      style={{ minHeight: '500px', height: '90vh', maxHeight: '800px', backgroundColor: '#192149' }}
+      className="relative w-full overflow-hidden bg-[#E9E2DA] flex items-center"
+      style={{ minHeight: '500px', height: '90vh', maxHeight: '800px' }}
     >
-      {/* Texto — 50% izquierdo */}
       <motion.div
         initial={{ opacity: 0, x: -30 }}
         whileInView={{ opacity: 1, x: 0 }}
@@ -24,7 +23,7 @@ export default function CourseBanner() {
             style={{
               fontSize: '11px',
               letterSpacing: '0.3em',
-              color: 'rgba(233, 226, 218, 0.6)',
+              color: 'rgba(25, 33, 73, 0.6)',
               marginBottom: '20px',
             }}
           >
@@ -35,7 +34,7 @@ export default function CourseBanner() {
             className="font-cormorant"
             style={{
               fontSize: 'clamp(36px, 4vw, 52px)',
-              color: '#E9E2DA',
+              color: '#192149',
               fontWeight: 400,
               lineHeight: 1.1,
             }}
@@ -47,7 +46,7 @@ export default function CourseBanner() {
             style={{
               width: '60px',
               height: '1px',
-              backgroundColor: 'rgba(233, 226, 218, 0.3)',
+              backgroundColor: 'rgba(25, 33, 73, 0.3)',
               margin: '28px 0',
             }}
           />
@@ -57,7 +56,7 @@ export default function CourseBanner() {
             style={{
               fontSize: '14px',
               fontWeight: 300,
-              color: 'rgba(233, 226, 218, 0.8)',
+              color: 'rgba(25, 33, 73, 0.8)',
               lineHeight: 1.7,
             }}
           >
@@ -72,19 +71,19 @@ export default function CourseBanner() {
                 fontSize: '12px',
                 letterSpacing: '0.25em',
                 padding: '16px 40px',
-                border: '1.5px solid #E9E2DA',
+                border: '1.5px solid #192149',
                 background: 'transparent',
-                color: '#E9E2DA',
+                color: '#192149',
                 borderRadius: '0',
                 cursor: 'pointer',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#E9E2DA'
-                e.currentTarget.style.color = '#192149'
+                e.currentTarget.style.background = '#192149'
+                e.currentTarget.style.color = '#ffffff'
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent'
-                e.currentTarget.style.color = '#E9E2DA'
+                e.currentTarget.style.color = '#192149'
               }}
             >
               Explorar Cursos
@@ -93,7 +92,6 @@ export default function CourseBanner() {
         </div>
       </motion.div>
 
-      {/* Imagen PNG — 50% derecho */}
       <motion.div
         initial={{ opacity: 0, x: 30 }}
         whileInView={{ opacity: 1, x: 0 }}
