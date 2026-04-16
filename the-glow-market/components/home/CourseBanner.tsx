@@ -16,8 +16,8 @@ export default function CourseBanner() {
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute inset-y-0 left-0 flex flex-col justify-center z-10"
-        style={{ padding: '60px', maxWidth: '480px' }}
+        className="absolute inset-y-0 left-0 flex flex-col justify-center z-10 w-[50%]"
+        style={{ padding: '60px', maxWidth: '480px', margin: '0 auto' }}
       >
         <span
           className="font-montserrat uppercase"
