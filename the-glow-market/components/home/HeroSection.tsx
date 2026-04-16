@@ -1,25 +1,21 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Link from 'next/link'
 import StarIcon from '@/components/ui/StarIcon'
 import Button from '@/components/ui/Button'
 
 export default function HeroSection() {
   return (
     <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden bg-glow-navy">
-      {/* Background image / overlay */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `url('/hero-bg.jpg')`,
+          backgroundImage: `url('/images/hero-bg.jpg')`,
         }}
       />
-      <div className="absolute inset-0 bg-glow-dark/50" />
+      <div className="absolute inset-0" style={{ backgroundColor: 'rgba(25, 33, 73, 0.45)' }} />
 
-      {/* Content */}
       <div className="relative z-10 flex flex-col items-center text-center px-6 gap-6 md:gap-8">
-        {/* Pre-title */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -33,7 +29,6 @@ export default function HeroSection() {
           <StarIcon size={10} className="text-glow-blush" />
         </motion.div>
 
-        {/* Logo principal */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -48,7 +43,6 @@ export default function HeroSection() {
           </h1>
         </motion.div>
 
-        {/* Tagline */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -58,22 +52,22 @@ export default function HeroSection() {
           Own Your Glow
         </motion.p>
 
-        {/* CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1 }}
           className="mt-4"
         >
-          <Link href="/productos">
-            <Button variant="outline-white" size="lg">
-              Explorar Colección
-            </Button>
-          </Link>
+          <Button
+            variant="outline-white"
+            size="lg"
+            onClick={() => document.getElementById('productos')?.scrollIntoView({ behavior: 'smooth' })}
+          >
+            Explorar Colección
+          </Button>
         </motion.div>
       </div>
 
-      {/* Scroll indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
