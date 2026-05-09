@@ -9,28 +9,24 @@ const modulos = [
     numero: '01',
     titulo: 'Preparación de Piel',
     subtitulo: 'Rutina esencial para un buen maquillaje',
-    descripcion: 'Doble limpieza, hidratación y preparación de labios. La base de todo buen makeup.',
     claim: 'No se trata de hacer más pasos. Se trata de hacer los correctos.',
   },
   {
     numero: '02',
     titulo: 'Base y Corrector',
     subtitulo: 'Piel uniforme, natural y bien trabajada',
-    descripcion: 'Cómo elegir el tono correcto, técnicas de aplicación y el uso estratégico del corrector.',
     claim: 'Una buena piel no se tapa, se equilibra.',
   },
   {
     numero: '03',
     titulo: 'Makeup Express',
     subtitulo: 'Resolver el look diario con pocos productos',
-    descripcion: 'Bronzer, máscara de pestañas y labial. Un maquillaje completo en minutos.',
     claim: 'Con solo 3 productos podés resolver tu maquillaje diario.',
   },
   {
     numero: '04',
     titulo: 'Transformación a Noche',
     subtitulo: 'Elevar el maquillaje sin empezar de cero',
-    descripcion: 'Intensificación de ojos, delineado, labios protagonistas e iluminación estratégica.',
     claim: 'No empezás de cero. Elevás lo que ya tenés.',
   },
 ]
@@ -45,7 +41,6 @@ export default function CourseModulesSection() {
   const bg = isInView ? navy : cream
   const text = isInView ? cream : navy
   const textMuted = isInView ? 'rgba(233,226,218,0.5)' : 'rgba(25,33,73,0.5)'
-  const textFaint = isInView ? 'rgba(233,226,218,0.08)' : 'rgba(25,33,73,0.08)'
   const border = isInView ? 'rgba(233,226,218,0.3)' : navy
 
   return (
@@ -102,10 +97,10 @@ export default function CourseModulesSection() {
               borderBottom: i < 2 ? `1px solid ${border}` : 'none',
             }}
           >
-            {/* Número decorativo */}
+            {/* Número decorativo — mismo color que el texto */}
             <span
               className="font-cormorant select-none absolute top-6 right-8"
-              style={{ fontSize: 'clamp(60px, 8vw, 90px)', color: text, opacity: 0.08, lineHeight: 1 }}
+              style={{ fontSize: 'clamp(60px, 8vw, 90px)', color: text, opacity: 0.25, lineHeight: 1 }}
             >
               {modulo.numero}
             </span>
@@ -124,23 +119,24 @@ export default function CourseModulesSection() {
                 {modulo.titulo}
               </h3>
               <p
-                className="font-montserrat text-[10px] tracking-[0.2em] uppercase mb-4"
+                className="font-montserrat text-[10px] tracking-[0.2em] uppercase mb-6"
                 style={{ color: textMuted }}
               >
                 {modulo.subtitulo}
               </p>
-              <p
-                className="font-cormorant mb-4 leading-relaxed"
-                style={{ fontSize: '17px', color: text, opacity: 0.8 }}
+
+              {/* Quote */}
+              <div
+                className="border-l-2 pl-4"
+                style={{ borderColor: text }}
               >
-                {modulo.descripcion}
-              </p>
-              <p
-                className="font-cormorant italic"
-                style={{ fontSize: '15px', color: textMuted }}
-              >
-                "{modulo.claim}"
-              </p>
+                <p
+                  className="font-cormorant italic"
+                  style={{ fontSize: 'clamp(17px, 1.8vw, 22px)', color: text, opacity: 0.85, lineHeight: 1.5 }}
+                >
+                  "{modulo.claim}"
+                </p>
+              </div>
             </div>
           </motion.div>
         ))}
