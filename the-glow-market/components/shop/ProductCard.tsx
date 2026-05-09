@@ -41,20 +41,23 @@ export default function ProductCard({ producto, index = 0 }: ProductCardProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.7, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
-      className="group product-card-container"
+      className="group"
     >
       <Link href={`/productos/${producto.slug}`} className="block">
         {/* Image container */}
-        <div className="relative aspect-square overflow-hidden bg-white">
+        <div
+          className="relative overflow-hidden"
+          style={{ aspectRatio: '3 / 4', backgroundColor: '#F2F0EC' }}
+        >
           <Image
             src={mainImage}
             alt={producto.nombre}
             fill
-            className="object-cover product-card-image transition-opacity duration-500"
+            className="object-cover transition-opacity duration-500"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
           {hoverImage && (
@@ -74,14 +77,14 @@ export default function ProductCard({ producto, index = 0 }: ProductCardProps) {
             </div>
           )}
 
-          {/* Add to cart — slide from bottom */}
+          {/* Add to cart — aparece en hover */}
           <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]">
             <button
               onClick={handleAddToCart}
               className={`w-full py-3 font-montserrat text-[10px] tracking-[0.2em] uppercase transition-colors duration-300 ${
                 added
-                  ? 'bg-glow-royal text-white'
-                  : 'bg-glow-navy text-white hover:bg-glow-blue'
+                  ? 'bg-glow-navy/80 text-white'
+                  : 'bg-white/90 text-glow-navy hover:bg-glow-navy hover:text-white'
               }`}
             >
               {added ? '✓ Agregado' : 'Agregar al carrito'}
@@ -89,23 +92,23 @@ export default function ProductCard({ producto, index = 0 }: ProductCardProps) {
           </div>
         </div>
 
-        {/* Product info */}
-        <div className="mt-3 space-y-1">
-          <h3 className="font-cormorant text-base md:text-lg text-glow-navy tracking-wide leading-tight">
+        {/* Product info — nombre izquierda, precio derecha */}
+        <div className="flex items-baseline justify-between mt-3 px-0.5">
+          <h3 className="font-montserrat text-[11px] tracking-[0.15em] uppercase text-glow-navy">
             {producto.nombre}
           </h3>
-          <div className="flex items-baseline gap-2">
+          <div className="flex items-baseline gap-2 shrink-0 ml-2">
             {producto.precio_oferta ? (
               <>
-                <span className="font-montserrat text-sm font-medium text-glow-navy">
+                <span className="font-montserrat text-[11px] text-glow-navy">
                   {formatPrice(Number(producto.precio_oferta))}
                 </span>
-                <span className="font-montserrat text-xs text-glow-navy/40 line-through">
+                <span className="font-montserrat text-[10px] text-glow-navy/40 line-through">
                   {formatPrice(Number(producto.precio))}
                 </span>
               </>
             ) : (
-              <span className="font-montserrat text-sm font-medium text-glow-navy">
+              <span className="font-montserrat text-[11px] text-glow-navy">
                 {formatPrice(Number(producto.precio))}
               </span>
             )}
