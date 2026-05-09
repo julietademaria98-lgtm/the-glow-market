@@ -29,7 +29,7 @@ export default function ProductsSlider({ productos }: ProductsSliderProps) {
             className="font-montserrat uppercase text-glow-navy tracking-[0.2em]"
             style={{ fontSize: 'clamp(18px, 2vw, 22px)' }}
           >
-            Nueva Colección
+            HIGHLIGHTS
           </span>
           <StarIcon size={12} className="text-glow-navy" />
         </motion.div>
@@ -96,7 +96,7 @@ function MejuriCard({ producto, index }: { producto: Producto; index: number }) 
               src={mainImage}
               alt={producto.nombre}
               fill
-              className="object-contain p-6"
+              className="object-cover"
               sizes="(max-width: 768px) 50vw, 25vw"
             />
           )}
