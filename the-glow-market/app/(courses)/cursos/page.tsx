@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import CourseCard from '@/components/courses/CourseCard'
-import StarIcon from '@/components/ui/StarIcon'
+import Image from 'next/image'
 import type { Curso } from '@/types'
 import Link from 'next/link'
 
@@ -30,29 +30,50 @@ export default async function CursosPage() {
   const [cursos, testimonios] = await Promise.all([getCursos(), getTestimonios()])
 
   return (
-    <main className="min-h-screen bg-glow-cream pt-24">
-      <div className="max-w-[1200px] mx-auto px-6 py-12">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <StarIcon size={10} className="text-glow-navy" />
-            <span className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-navy/60">
-              Formación Online
-            </span>
-            <StarIcon size={10} className="text-glow-navy" />
-          </div>
-          <h1 className="font-cormorant text-5xl md:text-6xl text-glow-navy font-light tracking-wide mb-4">
-            Cursos Online
-          </h1>
-          <p className="font-montserrat text-sm text-glow-navy/60 max-w-md mx-auto leading-relaxed">
-            Aprendé a brillar con The Glow Market
-          </p>
-        </div>
+    <main className="min-h-screen bg-glow-navy">
 
-        {/* Courses grid */}
+      {/* HEADER */}
+      <div className="max-w-[1200px] mx-auto px-6 pt-36 pb-16">
+        <div className="flex flex-col md:flex-row items-center md:items-end gap-8 md:gap-16">
+          
+          {/* Logo circular */}
+          <div className="shrink-0">
+            <Image
+              src="/images/Recurso 20Iso (1).png"
+              alt="The Glow Market"
+              width={200}
+              height={200}
+              className="w-32 md:w-48 lg:w-56 object-contain opacity-90"
+            />
+          </div>
+
+          {/* Título */}
+          <div>
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-white/40" style={{ fontSize: '10px' }}>+</span>
+              <span className="font-montserrat text-[10px] tracking-[0.4em] uppercase text-white/40">
+                Formación Exclusiva
+              </span>
+              <span className="text-white/40" style={{ fontSize: '10px' }}>+</span>
+            </div>
+            <h1
+              className="font-cormorant text-white font-light leading-none mb-4"
+              style={{ fontSize: 'clamp(52px, 10vw, 120px)', letterSpacing: '0.05em' }}
+            >
+              Cursos Online
+            </h1>
+            <p className="font-cormorant italic text-white/50" style={{ fontSize: 'clamp(18px, 2vw, 26px)' }}>
+              Sponsored by CLARINS
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* COURSES GRID */}
+      <div className="max-w-[1200px] mx-auto px-6 pb-20">
         {cursos.length === 0 ? (
           <div className="text-center py-20">
-            <p className="font-cormorant text-2xl text-glow-navy/40">
+            <p className="font-cormorant text-2xl text-white/40">
               Próximamente nuevos cursos
             </p>
           </div>
@@ -65,22 +86,22 @@ export default async function CursosPage() {
         )}
 
         {/* Already a student */}
-        <div className="text-center mt-16 py-10 border-t border-glow-navy/10">
-          <p className="font-montserrat text-sm text-glow-navy/50 mb-3">
+        <div className="text-center mt-16 py-10 border-t border-white/10">
+          <p className="font-montserrat text-sm text-white/30 mb-3">
             ¿Ya sos alumna?
           </p>
           <Link
             href="/login"
-            className="font-montserrat text-xs tracking-[0.2em] uppercase text-glow-navy border-b border-glow-navy/30 hover:border-glow-navy pb-0.5 transition-colors"
+            className="font-montserrat text-xs tracking-[0.2em] uppercase text-white/60 border-b border-white/20 hover:text-white hover:border-white pb-0.5 transition-colors"
           >
             Ingresar a mi curso →
           </Link>
         </div>
       </div>
 
-      {/* TESTIMONIOS — solo si hay */}
+      {/* TESTIMONIOS */}
       {testimonios.length > 0 && (
-        <div className="bg-glow-navy py-20 px-6 mt-8">
+        <div className="border-t border-white/10 py-20 px-6">
           <div className="max-w-[1200px] mx-auto">
             <div className="text-center mb-14">
               <p className="font-montserrat text-[10px] tracking-[0.4em] uppercase text-white/40 mb-3">
@@ -91,10 +112,9 @@ export default async function CursosPage() {
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/10">
+            <div className={`grid grid-cols-1 gap-px bg-white/10 ${testimonios.length === 1 ? 'md:grid-cols-1 max-w-lg mx-auto' : testimonios.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'}`}>
               {testimonios.map((t: any) => (
                 <div key={t.id} className="bg-glow-navy p-8 md:p-10 flex flex-col gap-6">
-                  {/* Estrellas */}
                   <div className="flex gap-1">
                     {[...Array(5)].map((_, s) => (
                       <svg key={s} width="14" height="14" viewBox="0 0 24 24" fill="#E9E2DA" opacity="0.7">
@@ -102,13 +122,9 @@ export default async function CursosPage() {
                       </svg>
                     ))}
                   </div>
-
-                  {/* Quote */}
                   <p className="font-cormorant italic text-white/80 leading-relaxed flex-1" style={{ fontSize: 'clamp(17px, 1.8vw, 21px)' }}>
                     "{t.texto}"
                   </p>
-
-                  {/* Persona */}
                   <div className="border-t border-white/10 pt-5">
                     <p className="font-cormorant text-white" style={{ fontSize: '18px' }}>
                       {t.nombre_publico}
@@ -120,6 +136,7 @@ export default async function CursosPage() {
           </div>
         </div>
       )}
+
     </main>
   )
 }
