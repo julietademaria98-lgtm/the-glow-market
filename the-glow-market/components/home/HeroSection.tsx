@@ -10,8 +10,7 @@ export default function HeroSection() {
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `url('/images/PORTADA1.PNG')`,
-        }}
+backgroundImage: `url('/images/PORTADA1.png')`,        }}
       />
       <div className="absolute inset-0" style={{ backgroundColor: 'rgba(25, 33, 73, 0.35)' }} />
 
