@@ -3,7 +3,6 @@ import HeroSection from '@/components/home/HeroSection'
 import SplitSection from '@/components/home/SplitSection'
 import ProductsSlider from '@/components/home/ProductsSlider'
 import CoursesSection from '@/components/home/CoursesSection'
-import CourseModulesSection from '@/components/home/CourseModulesSection'
 import type { Producto, Curso } from '@/types'
 
 export const revalidate = 3600
@@ -43,7 +42,6 @@ export default async function HomePage() {
       <div id="productos">
         {productos.length > 0 && <ProductsSlider productos={productos} />}
       </div>
-      <CourseModulesSection />
       {cursos.length > 0 && <CoursesSection cursos={cursos} />}
     </main>
   )
