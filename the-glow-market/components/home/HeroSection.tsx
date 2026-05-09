@@ -1,16 +1,15 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 import StarIcon from '@/components/ui/StarIcon'
 
 export default function HeroSection() {
   return (
     <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden bg-glow-navy">
-      {/* Background image / overlay */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-backgroundImage: `url('/images/PORTADA1.png')`,        }}
+        style={{ backgroundImage: `url('/images/PORTADA1.png')` }}
       />
       <div className="absolute inset-0" style={{ backgroundColor: 'rgba(25, 33, 73, 0.35)' }} />
 
@@ -21,13 +20,14 @@ backgroundImage: `url('/images/PORTADA1.png')`,        }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
         >
-          <h1 className="font-cormorant text-white font-light leading-none select-none">
-            <span className="block text-4xl md:text-6xl lg:text-7xl tracking-[0.3em]">THE</span>
-            <span className="block text-6xl md:text-9xl lg:text-[140px] tracking-[0.15em] font-normal -mt-2 md:-mt-4">
-              GLOW
-            </span>
-            <span className="block text-4xl md:text-6xl lg:text-7xl tracking-[0.3em]">MARKET</span>
-          </h1>
+          <Image
+            src="/images/Recurso 21Logo (1).png"
+            alt="The Glow Market"
+            width={600}
+            height={300}
+            className="w-[280px] md:w-[420px] lg:w-[560px] object-contain"
+            priority
+          />
         </motion.div>
 
         <motion.p
