@@ -1,6 +1,7 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, useInView } from 'framer-motion'
+import { useRef } from 'react'
 import Link from 'next/link'
 
 const modulos = [
@@ -35,93 +36,142 @@ const modulos = [
 ]
 
 export default function CourseModulesSection() {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, amount: 0.25 })
+
+  const cream = '#E9E2DA'
+  const navy = '#192149'
+
+  const bg = isInView ? navy : cream
+  const text = isInView ? cream : navy
+  const textMuted = isInView ? 'rgba(233,226,218,0.5)' : 'rgba(25,33,73,0.5)'
+  const textFaint = isInView ? 'rgba(233,226,218,0.08)' : 'rgba(25,33,73,0.08)'
+  const border = isInView ? 'rgba(233,226,218,0.3)' : navy
+
   return (
-    <section className="bg-glow-cream py-20 px-6">
-      <div className="max-w-[1200px] mx-auto">
-
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+    <motion.section
+      ref={ref}
+      animate={{ backgroundColor: bg }}
+      transition={{ duration: 1, ease: 'easeInOut' }}
+      className="w-full py-20 px-6 md:px-10"
+    >
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+        className="text-center mb-14"
+      >
+        <p
+          className="font-montserrat text-[10px] tracking-[0.4em] uppercase mb-3"
+          style={{ color: textMuted }}
         >
-          <p className="font-montserrat text-xs tracking-[0.3em] uppercase text-glow-navy/50 mb-4">
-            Curso Online
-          </p>
-          <h2 className="font-cormorant text-glow-navy font-light mb-4"
-            style={{ fontSize: 'clamp(32px, 5vw, 56px)' }}>
-            De Día a Noche
-          </h2>
-          <p className="font-montserrat text-glow-navy/60 text-xs tracking-[0.2em] uppercase">
-            Método de Piel + Makeup Real
-          </p>
-          <div className="w-16 h-px bg-glow-navy/30 mx-auto mt-8" />
-        </motion.div>
-
-        {/* Grid de módulos */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-px" style={{ backgroundColor: '#192149' }}>
-          {modulos.map((modulo, i) => (
-            <motion.div
-              key={modulo.numero}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: i * 0.1 }}
-              className="bg-glow-cream p-10 flex flex-col gap-4"
-            >
-              <span className="font-cormorant text-glow-navy/20 font-light"
-                style={{ fontSize: 'clamp(48px, 6vw, 72px)', lineHeight: 1 }}>
-                {modulo.numero}
-              </span>
-              <div>
-                <h3 className="font-cormorant text-glow-navy font-light mb-1"
-                  style={{ fontSize: 'clamp(20px, 2.5vw, 28px)' }}>
-                  {modulo.titulo}
-                </h3>
-                <p className="font-montserrat text-glow-navy/60 uppercase tracking-[0.15em]"
-                  style={{ fontSize: '10px' }}>
-                  {modulo.subtitulo}
-                </p>
-              </div>
-              <p className="font-montserrat text-glow-navy/70 leading-relaxed"
-                style={{ fontSize: '12px' }}>
-                {modulo.descripcion}
-              </p>
-              <p className="font-cormorant italic text-glow-navy/50"
-                style={{ fontSize: '15px' }}>
-                "{modulo.claim}"
-              </p>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mt-14"
+          Curso Online
+        </p>
+        <h2
+          className="font-cormorant font-light"
+          style={{ fontSize: 'clamp(28px, 4vw, 48px)', color: text }}
         >
-          <Link
-            href="/cursos"
-            className="font-montserrat uppercase inline-block"
+          De Día a Noche
+        </h2>
+        <p
+          className="font-cormorant italic mt-1"
+          style={{ fontSize: 'clamp(18px, 2.5vw, 28px)', color: textMuted }}
+        >
+          Método de Piel + Makeup Real
+        </p>
+        <div className="w-12 h-px mx-auto mt-6" style={{ backgroundColor: textMuted }} />
+      </motion.div>
+
+      {/* Grid de módulos */}
+      <div
+        className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2"
+        style={{ border: `1px solid ${border}` }}
+      >
+        {modulos.map((modulo, i) => (
+          <motion.div
+            key={modulo.numero}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: i * 0.1 }}
+            className="relative p-8 md:p-10"
             style={{
-              fontSize: '11px',
-              letterSpacing: '0.25em',
-              padding: '16px 48px',
-              backgroundColor: '#192149',
-              color: '#ffffff',
-              borderRadius: '0',
+              borderRight: i % 2 === 0 ? `1px solid ${border}` : 'none',
+              borderBottom: i < 2 ? `1px solid ${border}` : 'none',
             }}
           >
-            Quiero el Curso
-          </Link>
-        </motion.div>
+            {/* Número decorativo */}
+            <span
+              className="font-cormorant select-none absolute top-6 right-8"
+              style={{ fontSize: 'clamp(60px, 8vw, 90px)', color: text, opacity: 0.08, lineHeight: 1 }}
+            >
+              {modulo.numero}
+            </span>
 
+            <div className="relative z-10">
+              <p
+                className="font-montserrat text-[9px] tracking-[0.3em] uppercase mb-2"
+                style={{ color: textMuted }}
+              >
+                Módulo {modulo.numero}
+              </p>
+              <h3
+                className="font-cormorant font-light mb-1"
+                style={{ fontSize: 'clamp(22px, 2.5vw, 30px)', color: text }}
+              >
+                {modulo.titulo}
+              </h3>
+              <p
+                className="font-montserrat text-[10px] tracking-[0.2em] uppercase mb-4"
+                style={{ color: textMuted }}
+              >
+                {modulo.subtitulo}
+              </p>
+              <p
+                className="font-cormorant mb-4 leading-relaxed"
+                style={{ fontSize: '17px', color: text, opacity: 0.8 }}
+              >
+                {modulo.descripcion}
+              </p>
+              <p
+                className="font-cormorant italic"
+                style={{ fontSize: '15px', color: textMuted }}
+              >
+                "{modulo.claim}"
+              </p>
+            </div>
+          </motion.div>
+        ))}
       </div>
-    </section>
+
+      {/* CTA */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, delay: 0.4 }}
+        className="flex justify-center mt-12"
+      >
+        <Link
+          href="/cursos"
+          className="font-montserrat uppercase"
+          style={{
+            fontSize: '11px',
+            letterSpacing: '0.25em',
+            padding: '16px 48px',
+            display: 'inline-block',
+            backgroundColor: isInView ? cream : navy,
+            color: isInView ? navy : cream,
+            transition: 'opacity 0.3s ease',
+          }}
+          onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '0.75' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '1' }}
+        >
+          Quiero el Curso
+        </Link>
+      </motion.div>
+    </motion.section>
   )
 }
