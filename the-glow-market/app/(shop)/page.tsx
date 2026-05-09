@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import HeroSection from '@/components/home/HeroSection'
-import CourseBanner from '@/components/home/CourseBanner'
+import SplitSection from '@/components/home/SplitSection'
 import ProductsSlider from '@/components/home/ProductsSlider'
 import EditorialBanner from '@/components/home/EditorialBanner'
 import CoursesSection from '@/components/home/CoursesSection'
@@ -39,7 +39,7 @@ export default async function HomePage() {
   return (
     <main>
       <HeroSection />
-      <CourseBanner />
+      <SplitSection />
       <div id="productos">
         {productos.length > 0 && <ProductsSlider productos={productos} />}
       </div>
