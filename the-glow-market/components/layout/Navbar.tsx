@@ -22,20 +22,19 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  const linkClass = `font-montserrat font-semibold text-[11px] tracking-[0.15em] uppercase transition-colors duration-300`
+
   return (
     <>
-      <nav
-        className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-          solid ? 'bg-glow-cream shadow-sm' : 'bg-transparent'
-        }`}
-      >
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${solid ? 'bg-glow-cream shadow-sm' : 'bg-transparent'}`}>
         <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
+
           {/* LEFT LINKS — desktop */}
           <div className="hidden md:flex gap-8">
-            <Link href="/productos" className={`nav-link transition-colors duration-300 ${!solid ? 'text-white/90 hover:text-white' : ''}`}>
+            <Link href="/productos" className={`${linkClass} ${!solid ? 'text-white/90 hover:text-white' : 'text-glow-navy hover:opacity-60'}`}>
               Market
             </Link>
-            <Link href="/cursos" className={`nav-link transition-colors duration-300 ${!solid ? 'text-white/90 hover:text-white' : ''}`}>
+            <Link href="/cursos" className={`${linkClass} ${!solid ? 'text-white/90 hover:text-white' : 'text-glow-navy hover:opacity-60'}`}>
               Cursos Online
             </Link>
           </div>
@@ -43,9 +42,7 @@ export default function Navbar() {
           {/* CENTER LOGO */}
           <Link
             href="/"
-            className={`absolute left-1/2 -translate-x-1/2 whitespace-nowrap transition-all duration-500 ${
-              solid ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
-            }`}
+            className={`absolute left-1/2 -translate-x-1/2 whitespace-nowrap transition-all duration-500 ${solid ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}
           >
             <span className="font-cormorant text-xl md:text-2xl tracking-widest text-glow-navy font-light select-none">
               THE{' '}
@@ -56,7 +53,7 @@ export default function Navbar() {
 
           {/* RIGHT ACTIONS — desktop */}
           <div className="hidden md:flex gap-6 items-center">
-            <Link href="/carrito" className={`relative nav-link transition-colors duration-300 ${!solid ? 'text-white/90 hover:text-white' : ''}`}>
+            <Link href="/carrito" className={`relative ${linkClass} ${!solid ? 'text-white/90 hover:text-white' : 'text-glow-navy hover:opacity-60'}`}>
               Carrito
               {itemCount > 0 && (
                 <span className="absolute -top-2 -right-4 bg-glow-navy text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-montserrat">
@@ -64,14 +61,14 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
-            <Link href="/login" className={`nav-link transition-colors duration-300 ${!solid ? 'text-white/90 hover:text-white' : ''}`}>
+            <Link href="/login" className={`${linkClass} ${!solid ? 'text-white/90 hover:text-white' : 'text-glow-navy hover:opacity-60'}`}>
               Mi Cuenta
             </Link>
           </div>
 
           {/* MOBILE: carrito + hamburger */}
           <div className="flex md:hidden items-center gap-4 ml-auto">
-            <Link href="/carrito" className="relative nav-link">
+            <Link href="/carrito" className={`relative ${linkClass} text-glow-navy`}>
               Carrito
               {itemCount > 0 && (
                 <span className="absolute -top-2 -right-4 bg-glow-navy text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-montserrat">
@@ -79,11 +76,7 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="text-glow-navy p-1"
-              aria-label="Menú"
-            >
+            <button onClick={() => setMenuOpen(!menuOpen)} className="text-glow-navy p-1" aria-label="Menú">
               {menuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
@@ -91,22 +84,12 @@ export default function Navbar() {
       </nav>
 
       {/* MOBILE DRAWER */}
-      <div
-        className={`fixed inset-0 z-40 transition-all duration-500 md:hidden ${
-          menuOpen ? 'visible' : 'invisible'
-        }`}
-      >
+      <div className={`fixed inset-0 z-40 transition-all duration-500 md:hidden ${menuOpen ? 'visible' : 'invisible'}`}>
         <div
-          className={`absolute inset-0 bg-glow-dark/40 transition-opacity duration-500 ${
-            menuOpen ? 'opacity-100' : 'opacity-0'
-          }`}
+          className={`absolute inset-0 bg-glow-dark/40 transition-opacity duration-500 ${menuOpen ? 'opacity-100' : 'opacity-0'}`}
           onClick={() => setMenuOpen(false)}
         />
-        <div
-          className={`absolute top-0 left-0 h-full w-72 bg-glow-cream flex flex-col pt-20 px-8 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-            menuOpen ? 'translate-x-0' : '-translate-x-full'
-          }`}
-        >
+        <div className={`absolute top-0 left-0 h-full w-72 bg-glow-cream flex flex-col pt-20 px-8 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${menuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
           <div className="flex flex-col gap-8">
             <StarIcon size={16} className="text-glow-navy mb-4" />
             {[
@@ -120,7 +103,7 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
-                className="font-cormorant text-2xl text-glow-navy tracking-wide hover:opacity-60 transition-opacity"
+                className="font-montserrat font-semibold text-sm text-glow-navy tracking-widest uppercase hover:opacity-60 transition-opacity"
               >
                 {link.label}
               </Link>
