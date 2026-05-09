@@ -25,20 +25,22 @@ export default function Navbar() {
         }`}
       >
         <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
-          {/* LEFT LINKS — desktop */}
+          {/* LEFT LINKS */}
           <div className="hidden md:flex gap-8">
-            <Link href="/productos" className="nav-link">
-              Tienda
+            <Link href="/productos" className={`nav-link transition-colors duration-300 ${!scrolled ? 'text-white/90 hover:opacity-80' : ''}`}>
+              Market
             </Link>
-            <Link href="/cursos" className="nav-link">
+            <Link href="/cursos" className={`nav-link transition-colors duration-300 ${!scrolled ? 'text-white/90 hover:opacity-80' : ''}`}>
               Cursos Online
             </Link>
           </div>
 
-          {/* CENTER LOGO */}
+          {/* CENTER LOGO — solo visible al scrollear */}
           <Link
             href="/"
-            className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap"
+            className={`absolute left-1/2 -translate-x-1/2 whitespace-nowrap transition-all duration-500 ${
+              scrolled ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
+            }`}
           >
             <span className="font-cormorant text-xl md:text-2xl tracking-widest text-glow-navy font-light select-none">
               THE{' '}
@@ -47,9 +49,9 @@ export default function Navbar() {
             </span>
           </Link>
 
-          {/* RIGHT ACTIONS — desktop */}
+          {/* RIGHT ACTIONS */}
           <div className="hidden md:flex gap-6 items-center">
-            <Link href="/carrito" className="relative nav-link">
+            <Link href="/carrito" className={`relative nav-link transition-colors duration-300 ${!scrolled ? 'text-white/90 hover:opacity-80' : ''}`}>
               Carrito
               {itemCount > 0 && (
                 <span className="absolute -top-2 -right-4 bg-glow-navy text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-montserrat">
@@ -57,12 +59,12 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
-            <Link href="/login" className="nav-link">
+            <Link href="/login" className={`nav-link transition-colors duration-300 ${!scrolled ? 'text-white/90 hover:opacity-80' : ''}`}>
               Mi Cuenta
             </Link>
           </div>
 
-          {/* MOBILE: carrito + hamburger */}
+          {/* MOBILE */}
           <div className="flex md:hidden items-center gap-4 ml-auto">
             <Link href="/carrito" className="relative nav-link">
               Carrito
@@ -74,7 +76,7 @@ export default function Navbar() {
             </Link>
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="text-glow-navy p-1"
+              className={`p-1 ${!scrolled ? 'text-white' : 'text-glow-navy'}`}
               aria-label="Menú"
             >
               {menuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -89,15 +91,12 @@ export default function Navbar() {
           menuOpen ? 'visible' : 'invisible'
         }`}
       >
-        {/* Overlay */}
         <div
           className={`absolute inset-0 bg-glow-dark/40 transition-opacity duration-500 ${
             menuOpen ? 'opacity-100' : 'opacity-0'
           }`}
           onClick={() => setMenuOpen(false)}
         />
-
-        {/* Panel */}
         <div
           className={`absolute top-0 left-0 h-full w-72 bg-glow-cream flex flex-col pt-20 px-8 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
             menuOpen ? 'translate-x-0' : '-translate-x-full'
@@ -107,7 +106,7 @@ export default function Navbar() {
             <StarIcon size={16} className="text-glow-navy mb-4" />
             {[
               { href: '/', label: 'Inicio' },
-              { href: '/productos', label: 'Tienda' },
+              { href: '/productos', label: 'Market' },
               { href: '/cursos', label: 'Cursos Online' },
               { href: '/carrito', label: 'Carrito' },
               { href: '/login', label: 'Mi Cuenta' },
