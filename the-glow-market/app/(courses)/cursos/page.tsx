@@ -56,12 +56,11 @@ export default async function CursosPage() {
               </span>
               <span className="text-white/40" style={{ fontSize: '10px' }}>+</span>
             </div>
-            <h1
-              className="font-cormorant text-white font-light leading-none mb-4"
-              style={{ fontSize: 'clamp(52px, 10vw, 120px)', letterSpacing: '0.05em' }}
-            >
-              Cursos Online
-            </h1>
+            <h1 className="font-cormorant text-white font-light leading-none mb-4 uppercase"
+  style={{ fontSize: 'clamp(36px, 6vw, 80px)', letterSpacing: '0.05em' }}
+>
+  Cursos Online
+</h1>
             <div className="flex items-center gap-3">
               <p className="font-cormorant italic text-white/50" style={{ fontSize: 'clamp(18px, 2vw, 26px)' }}>
                 Sponsored by
