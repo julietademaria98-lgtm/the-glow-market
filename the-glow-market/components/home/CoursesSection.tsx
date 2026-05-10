@@ -44,10 +44,13 @@ export default function CoursesSection({ cursos }: CoursesSectionProps) {
               </span>
               <span className="text-white/40 text-[10px]">+</span>
             </div>
-            <h2 className="font-cormorant text-4xl md:text-5xl lg:text-6xl text-white font-light tracking-wide uppercase">
+            <h2
+              className="font-cormorant text-white font-light leading-none uppercase"
+              style={{ fontSize: 'clamp(36px, 6vw, 80px)', letterSpacing: '0.05em' }}
+            >
               Cursos Online
             </h2>
-            <div className="flex items-center gap-3 mt-2">
+            <div className="flex items-center gap-3 mt-3">
               <p className="font-cormorant italic text-white/50" style={{ fontSize: '20px' }}>
                 Sponsored by
               </p>
