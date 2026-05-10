@@ -47,9 +47,19 @@ export default function CoursesSection({ cursos }: CoursesSectionProps) {
             <h2 className="font-cormorant text-4xl md:text-5xl lg:text-6xl text-white font-light tracking-wide uppercase">
               Cursos Online
             </h2>
-            <p className="font-cormorant italic text-white/50 mt-2" style={{ fontSize: '20px' }}>
-              Sponsored by CLARINS
-            </p>
+            <div className="flex items-center gap-3 mt-2">
+              <p className="font-cormorant italic text-white/50" style={{ fontSize: '20px' }}>
+                Sponsored by
+              </p>
+              <Image
+                src="/images/Clarins.svg.png"
+                alt="Clarins"
+                width={80}
+                height={24}
+                className="object-contain"
+                style={{ filter: 'brightness(0) invert(1)', opacity: 0.5 }}
+              />
+            </div>
           </div>
         </motion.div>
 
