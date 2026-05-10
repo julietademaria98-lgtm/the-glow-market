@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import CourseCard from '@/components/courses/CourseCard'
-import StarIcon from '@/components/ui/StarIcon'
 import type { Curso } from '@/types'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -27,6 +26,7 @@ export default async function CursosPage() {
 
         {/* Header — logo circular + título */}
         <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12 mb-20">
+
           {/* Logo circular */}
           <div className="flex-shrink-0">
             <Image
@@ -38,34 +38,33 @@ export default async function CursosPage() {
             />
           </div>
 
-          {/* Título + sponsored — el div se ajusta al ancho del título */}
-          <div style={{ display: 'inline-flex', flexDirection: 'column', width: 'max-content' }}>
-            {/* Formación Exclusiva — pegado al título */}
+          {/* Título + sponsored — se ajusta al ancho del texto */}
+          <div className="flex flex-col items-start">
+
             <span className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-white/50 mb-1">
               + Formación Exclusiva +
             </span>
 
-            {/* Título principal */}
             <h1
-              className="font-cormorant text-white font-light leading-none uppercase"
-              style={{ fontSize: 'clamp(52px, 8vw, 110px)', letterSpacing: '0.05em' }}
+              className="font-cormorant text-white font-light leading-none uppercase whitespace-nowrap"
+              style={{ fontSize: 'clamp(36px, 6vw, 80px)', letterSpacing: '0.05em' }}
             >
               Cursos Online
             </h1>
 
-            {/* Sponsored by Clarins — mismo ancho que el título */}
-            <div className="flex items-center justify-between w-full mt-3">
+            {/* Sponsored by — mismo ancho que el h1 */}
+            <div className="flex items-center justify-between mt-3" style={{ width: '100%' }}>
               <span
                 className="font-cormorant text-white/70 italic"
-                style={{ fontSize: 'clamp(14px, 2vw, 22px)' }}
+                style={{ fontSize: 'clamp(13px, 1.5vw, 20px)' }}
               >
                 Sponsored by
               </span>
               <Image
                 src="/images/Clarins.svg.png"
                 alt="Clarins"
-                width={90}
-                height={28}
+                width={80}
+                height={24}
                 className="object-contain"
                 style={{ filter: 'brightness(0) invert(1)', opacity: 0.7 }}
               />
