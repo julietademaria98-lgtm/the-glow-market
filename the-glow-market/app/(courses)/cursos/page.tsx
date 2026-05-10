@@ -35,7 +35,7 @@ export default async function CursosPage() {
       {/* HEADER */}
       <div className="max-w-[1200px] mx-auto px-6 pt-36 pb-16">
         <div className="flex flex-col md:flex-row items-center md:items-end gap-8 md:gap-16">
-          
+
           {/* Logo circular */}
           <div className="shrink-0">
             <Image
@@ -62,9 +62,19 @@ export default async function CursosPage() {
             >
               Cursos Online
             </h1>
-            <p className="font-cormorant italic text-white/50" style={{ fontSize: 'clamp(18px, 2vw, 26px)' }}>
-              Sponsored by CLARINS
-            </p>
+            <div className="flex items-center gap-3">
+              <p className="font-cormorant italic text-white/50" style={{ fontSize: 'clamp(18px, 2vw, 26px)' }}>
+                Sponsored by
+              </p>
+              <Image
+                src="/images/Clarins.svg.png"
+                alt="Clarins"
+                width={80}
+                height={24}
+                className="object-contain"
+                style={{ filter: 'brightness(0) invert(1)', opacity: 0.5 }}
+              />
+            </div>
           </div>
         </div>
       </div>
