@@ -24,45 +24,39 @@ export default async function CursosPage() {
     <main className="min-h-screen bg-glow-navy pt-24">
       <div className="max-w-[1400px] mx-auto px-6 py-12">
 
-        {/* Header — igual que CoursesSection en homepage */}
-        <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12 mb-20">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row items-center gap-8 md:gap-10 mb-20">
 
           {/* Logo circular */}
           <div className="flex-shrink-0">
             <Image
               src="/images/Recurso 20Iso (1).png"
               alt="The Glow Market"
-              width={160}
-              height={160}
-              className="object-contain"
+              width={150}
+              height={150}
+              className="object-contain opacity-90"
             />
           </div>
 
           {/* Texto */}
           <div className="flex flex-col items-start">
-            <span className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-white/50 mb-1">
+            <span className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-white/50 mb-2">
               + Formación Exclusiva +
             </span>
-            <h1
-              className="font-cormorant text-white font-light leading-none uppercase"
-              style={{ fontSize: 'clamp(40px, 7vw, 95px)', letterSpacing: '0.05em' }}
-            >
+            <h1 className="font-cormorant text-white font-light leading-none uppercase text-5xl md:text-6xl lg:text-7xl" style={{ letterSpacing: '0.05em' }}>
               Cursos Online
             </h1>
-            <div className="flex items-center gap-3 mt-3">
-              <span
-                className="font-cormorant text-white/70 italic"
-                style={{ fontSize: 'clamp(13px, 1.5vw, 18px)' }}
-              >
+            <div className="flex items-center gap-3 mt-4">
+              <span className="font-cormorant text-white/60 italic text-lg">
                 Sponsored by
               </span>
               <Image
                 src="/images/Clarins.svg.png"
                 alt="Clarins"
-                width={75}
-                height={22}
+                width={72}
+                height={20}
                 className="object-contain"
-                style={{ filter: 'brightness(0) invert(1)', opacity: 0.7 }}
+                style={{ filter: 'brightness(0) invert(1)', opacity: 0.6 }}
               />
             </div>
           </div>
