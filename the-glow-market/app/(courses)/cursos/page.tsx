@@ -26,7 +26,7 @@ export default async function CursosPage() {
       <div className="max-w-[1400px] mx-auto px-6 py-12">
 
         {/* Header — logo circular + título */}
-        <div className="flex flex-col md:flex-row items-center md:items-center gap-8 md:gap-12 mb-20">
+        <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12 mb-20">
           {/* Logo circular */}
           <div className="flex-shrink-0">
             <Image
@@ -38,8 +38,8 @@ export default async function CursosPage() {
             />
           </div>
 
-          {/* Título + sponsored */}
-          <div className="flex flex-col items-start">
+          {/* Título + sponsored — el div se ajusta al ancho del título */}
+          <div style={{ display: 'inline-flex', flexDirection: 'column', width: 'max-content' }}>
             {/* Formación Exclusiva — pegado al título */}
             <span className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-white/50 mb-1">
               + Formación Exclusiva +
