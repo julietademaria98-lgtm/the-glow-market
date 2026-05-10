@@ -24,7 +24,7 @@ export default async function CursosPage() {
     <main className="min-h-screen bg-glow-navy pt-24">
       <div className="max-w-[1400px] mx-auto px-6 py-12">
 
-        {/* Header — logo circular + título */}
+        {/* Header — igual que CoursesSection en homepage */}
         <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12 mb-20">
 
           {/* Logo circular */}
@@ -32,39 +32,35 @@ export default async function CursosPage() {
             <Image
               src="/images/Recurso 20Iso (1).png"
               alt="The Glow Market"
-              width={220}
-              height={220}
+              width={160}
+              height={160}
               className="object-contain"
             />
           </div>
 
-          {/* Título + sponsored — se ajusta al ancho del texto */}
+          {/* Texto */}
           <div className="flex flex-col items-start">
-
             <span className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-white/50 mb-1">
               + Formación Exclusiva +
             </span>
-
             <h1
-              className="font-cormorant text-white font-light leading-none uppercase whitespace-nowrap"
-              style={{ fontSize: 'clamp(36px, 6vw, 80px)', letterSpacing: '0.05em' }}
+              className="font-cormorant text-white font-light leading-none uppercase"
+              style={{ fontSize: 'clamp(40px, 7vw, 95px)', letterSpacing: '0.05em' }}
             >
               Cursos Online
             </h1>
-
-            {/* Sponsored by — mismo ancho que el h1 */}
-            <div className="flex items-center justify-between mt-3" style={{ width: '100%' }}>
+            <div className="flex items-center gap-3 mt-3">
               <span
                 className="font-cormorant text-white/70 italic"
-                style={{ fontSize: 'clamp(13px, 1.5vw, 20px)' }}
+                style={{ fontSize: 'clamp(13px, 1.5vw, 18px)' }}
               >
                 Sponsored by
               </span>
               <Image
                 src="/images/Clarins.svg.png"
                 alt="Clarins"
-                width={80}
-                height={24}
+                width={75}
+                height={22}
                 className="object-contain"
                 style={{ filter: 'brightness(0) invert(1)', opacity: 0.7 }}
               />
@@ -80,7 +76,7 @@ export default async function CursosPage() {
             </p>
           </div>
         ) : (
-          <div className={`grid gap-8 ${cursos.length === 1 ? 'grid-cols-1 max-w-lg' : 'grid-cols-1 md:grid-cols-2'}`}>
+          <div className={`grid gap-8 ${cursos.length === 1 ? 'grid-cols-1 max-w-lg mx-auto' : 'grid-cols-1 md:grid-cols-2'}`}>
             {cursos.map((curso, i) => (
               <CourseCard key={curso.id} curso={curso} index={i} />
             ))}
