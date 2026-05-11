@@ -16,7 +16,7 @@ async function getLessonData(lessonId: string, userId: string) {
   const { data: leccion } = await supabase
     .from('lecciones')
     .select('*, cursos(*)')
-    .eq('id', leccion.id)
+.eq('id', lessonId)
     .single()
 
   if (!leccion) return null
