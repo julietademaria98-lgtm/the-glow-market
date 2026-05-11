@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useCartStore } from '@/store/cartStore'
 import { Menu, X } from 'lucide-react'
 import StarIcon from '@/components/ui/StarIcon'
@@ -10,6 +11,11 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const itemCount = useCartStore((state) => state.itemCount())
+  const pathname = usePathname()
+
+  // En homepage el navbar arranca transparente, en el resto siempre sólido
+  const isHome = pathname === '/'
+  const solid = scrolled || !isHome
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50)
@@ -21,16 +27,16 @@ export default function Navbar() {
     <>
       <nav
         className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-          scrolled ? 'bg-glow-cream shadow-sm' : 'bg-transparent'
+          solid ? 'bg-glow-cream shadow-sm' : 'bg-transparent'
         }`}
       >
         <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
           {/* LEFT LINKS — desktop */}
           <div className="hidden md:flex gap-8">
-            <Link href="/productos" className={`nav-link transition-colors duration-300 ${!scrolled ? 'text-white/90 hover:text-white' : ''}`}>
+            <Link href="/productos" className={`nav-link transition-colors duration-300 ${!solid ? 'text-white/90 hover:text-white' : ''}`}>
               Market
             </Link>
-            <Link href="/cursos" className={`nav-link transition-colors duration-300 ${!scrolled ? 'text-white/90 hover:text-white' : ''}`}>
+            <Link href="/cursos" className={`nav-link transition-colors duration-300 ${!solid ? 'text-white/90 hover:text-white' : ''}`}>
               Cursos Online
             </Link>
           </div>
@@ -39,7 +45,7 @@ export default function Navbar() {
           <Link
             href="/"
             className={`absolute left-1/2 -translate-x-1/2 whitespace-nowrap transition-all duration-500 ${
-              scrolled ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
+              solid ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
             }`}
           >
             <span className="font-cormorant text-xl md:text-2xl tracking-widest text-glow-navy font-light select-none">
@@ -51,7 +57,7 @@ export default function Navbar() {
 
           {/* RIGHT ACTIONS — desktop */}
           <div className="hidden md:flex gap-6 items-center">
-            <Link href="/carrito" className={`relative nav-link transition-colors duration-300 ${!scrolled ? 'text-white/90 hover:text-white' : ''}`}>
+            <Link href="/carrito" className={`relative nav-link transition-colors duration-300 ${!solid ? 'text-white/90 hover:text-white' : ''}`}>
               Carrito
               {itemCount > 0 && (
                 <span className="absolute -top-2 -right-4 bg-glow-navy text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-montserrat">
@@ -59,7 +65,7 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
-            <Link href="/mi-cuenta" className={`nav-link transition-colors duration-300 ${!scrolled ? 'text-white/90 hover:text-white' : ''}`}>
+            <Link href="/mi-cuenta" className={`nav-link transition-colors duration-300 ${!solid ? 'text-white/90 hover:text-white' : ''}`}>
               Mi Cuenta
             </Link>
           </div>
