@@ -6,9 +6,10 @@ import { Play, Pause, Volume2, VolumeX, Maximize, Minimize } from 'lucide-react'
 interface VideoPlayerProps {
   lessonId: string
   title?: string
+  userEmail?: string
 }
 
-export default function VideoPlayer({ lessonId, title }: VideoPlayerProps) {
+export default function VideoPlayer({ lessonId, title, userEmail }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const progressRef = useRef<HTMLDivElement>(null)
@@ -25,7 +26,25 @@ export default function VideoPlayer({ lessonId, title }: VideoPlayerProps) {
   const [currentTime, setCurrentTime] = useState(0)
   const [showControls, setShowControls] = useState(true)
 
-  const controlsTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Posición aleatoria de la marca de agua (cambia cada 30 seg)
+  const [watermarkPos, setWatermarkPos] = useState({ top: '15%', left: '10%' })
+
+  useEffect(() => {
+    const positions = [
+      { top: '10%', left: '8%' },
+      { top: '10%', left: '60%' },
+      { top: '75%', left: '8%' },
+      { top: '75%', left: '60%' },
+      { top: '42%', left: '35%' },
+    ]
+    const randomPos = () => {
+      const pos = positions[Math.floor(Math.random() * positions.length)]
+      setWatermarkPos(pos)
+    }
+    randomPos()
+    const interval = setInterval(randomPos, 30000)
+    return () => clearInterval(interval)
+  }, [])
 
   // Fullscreen change listener
   useEffect(() => {
@@ -35,6 +54,8 @@ export default function VideoPlayer({ lessonId, title }: VideoPlayerProps) {
     document.addEventListener('fullscreenchange', handleFullscreenChange)
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange)
   }, [])
+
+  const controlsTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Fetch signed URL
   useEffect(() => {
@@ -168,11 +189,35 @@ export default function VideoPlayer({ lessonId, title }: VideoPlayerProps) {
         onClick={togglePlay}
       />
 
+      {/* Marca de agua — email de la usuaria */}
+      {userEmail && (
+        <div
+          className="absolute pointer-events-none select-none transition-all duration-1000"
+          style={{ top: watermarkPos.top, left: watermarkPos.left }}
+        >
+          <span
+            style={{
+              fontFamily: 'Arial, sans-serif',
+              fontSize: '11px',
+              color: 'rgba(255,255,255,0.18)',
+              letterSpacing: '0.05em',
+              textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+              userSelect: 'none',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {userEmail}
+          </span>
+        </div>
+      )}
+
+      {/* Controls overlay */}
       <div
         className={`absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/70 via-transparent to-transparent transition-opacity duration-300 ${
           showControls ? 'opacity-100' : 'opacity-0'
         }`}
       >
+        {/* Progress bar */}
         <div
           ref={progressRef}
           className="mx-4 mb-3 h-1 bg-white/20 cursor-pointer group/progress"
@@ -186,6 +231,7 @@ export default function VideoPlayer({ lessonId, title }: VideoPlayerProps) {
           </div>
         </div>
 
+        {/* Controls row */}
         <div className="flex items-center gap-4 px-4 pb-4">
           <button
             onClick={togglePlay}
