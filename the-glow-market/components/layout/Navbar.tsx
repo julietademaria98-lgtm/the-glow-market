@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { useCartStore } from '@/store/cartStore'
 import { Menu, X } from 'lucide-react'
 import StarIcon from '@/components/ui/StarIcon'
@@ -11,9 +10,6 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const itemCount = useCartStore((state) => state.itemCount())
-  const pathname = usePathname()
-  const isHome = pathname === '/'
-  const solid = !isHome || scrolled
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50)
@@ -21,23 +17,20 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const linkClass = `font-montserrat font-semibold text-[11px] tracking-[0.15em] uppercase transition-colors duration-300`
-
   return (
     <>
       <nav
         className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-          solid ? 'bg-glow-cream shadow-sm' : 'bg-transparent'
+          scrolled ? 'bg-glow-cream shadow-sm' : 'bg-transparent'
         }`}
       >
         <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
-
           {/* LEFT LINKS — desktop */}
           <div className="hidden md:flex gap-8">
-            <Link href="/productos" className={`${linkClass} ${!solid ? 'text-white/90 hover:text-white' : 'text-glow-navy hover:text-glow-navy/60'}`}>
+            <Link href="/productos" className={`nav-link transition-colors duration-300 ${!scrolled ? 'text-white/90 hover:text-white' : ''}`}>
               Market
             </Link>
-            <Link href="/cursos" className={`${linkClass} ${!solid ? 'text-white/90 hover:text-white' : 'text-glow-navy hover:text-glow-navy/60'}`}>
+            <Link href="/cursos" className={`nav-link transition-colors duration-300 ${!scrolled ? 'text-white/90 hover:text-white' : ''}`}>
               Cursos Online
             </Link>
           </div>
@@ -46,7 +39,7 @@ export default function Navbar() {
           <Link
             href="/"
             className={`absolute left-1/2 -translate-x-1/2 whitespace-nowrap transition-all duration-500 ${
-              solid ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
+              scrolled ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
             }`}
           >
             <span className="font-cormorant text-xl md:text-2xl tracking-widest text-glow-navy font-light select-none">
@@ -58,7 +51,7 @@ export default function Navbar() {
 
           {/* RIGHT ACTIONS — desktop */}
           <div className="hidden md:flex gap-6 items-center">
-            <Link href="/carrito" className={`relative ${linkClass} ${!solid ? 'text-white/90 hover:text-white' : 'text-glow-navy hover:text-glow-navy/60'}`}>
+            <Link href="/carrito" className={`relative nav-link transition-colors duration-300 ${!scrolled ? 'text-white/90 hover:text-white' : ''}`}>
               Carrito
               {itemCount > 0 && (
                 <span className="absolute -top-2 -right-4 bg-glow-navy text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-montserrat">
@@ -66,13 +59,13 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
-            <Link href="/login" className={`${linkClass} ${!solid ? 'text-white/90 hover:text-white' : 'text-glow-navy hover:text-glow-navy/60'}`}>
+            <Link href="/mi-cuenta" className={`nav-link transition-colors duration-300 ${!scrolled ? 'text-white/90 hover:text-white' : ''}`}>
               Mi Cuenta
             </Link>
           </div>
 
-          {/* MOBILE: solo hamburger */}
-          <div className="flex md:hidden items-center ml-auto">
+          {/* MOBILE: hamburger */}
+          <div className="flex md:hidden items-center gap-4 ml-auto">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="text-glow-navy p-1"
@@ -108,8 +101,8 @@ export default function Navbar() {
               { href: '/', label: 'Inicio' },
               { href: '/productos', label: 'Market' },
               { href: '/cursos', label: 'Cursos Online' },
-              { href: '/carrito', label: `Carrito${itemCount > 0 ? ` (${itemCount})` : ''}` },
-              { href: '/login', label: 'Mi Cuenta' },
+              { href: '/carrito', label: 'Carrito' },
+              { href: '/mi-cuenta', label: 'Mi Cuenta' },
             ].map((link) => (
               <Link
                 key={link.href}
