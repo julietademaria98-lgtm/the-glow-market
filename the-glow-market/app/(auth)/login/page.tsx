@@ -22,6 +22,7 @@ function LoginForm() {
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') || '/mi-curso'
   const wasKicked = searchParams.get('kicked') === 'true'
+  const wasReset = searchParams.get('reset') === 'true'
 
   const [serverError, setServerError] = useState<string | null>(null)
 
@@ -45,7 +46,6 @@ function LoginForm() {
       return
     }
 
-    // Registrar sesión única — cierra cualquier otra sesión activa
     await fetch('/api/auth/set-session', { method: 'POST' })
 
     router.push(redirectTo)
@@ -80,10 +80,15 @@ function LoginForm() {
             Iniciar Sesión
           </h1>
 
-          {/* Mensaje si fue desconectada por otra sesión */}
           {wasKicked && (
             <p className="font-montserrat text-xs text-amber-700 bg-amber-50 border border-amber-200 px-4 py-3">
               Tu sesión fue cerrada porque ingresaste desde otro dispositivo.
+            </p>
+          )}
+
+          {wasReset && (
+            <p className="font-montserrat text-xs text-green-700 bg-green-50 border border-green-200 px-4 py-3">
+              Contraseña actualizada correctamente. Podés iniciar sesión.
             </p>
           )}
 
@@ -121,6 +126,15 @@ function LoginForm() {
             {errors.password && (
               <p className="font-montserrat text-[10px] text-red-400">{errors.password.message}</p>
             )}
+          </div>
+
+          <div className="text-right">
+            <Link
+              href="/recuperar-contrasena"
+              className="font-montserrat text-[10px] tracking-[0.1em] uppercase text-glow-navy/50 hover:text-glow-navy transition-colors"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
           </div>
 
           <Button
