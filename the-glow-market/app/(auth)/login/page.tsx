@@ -3,11 +3,11 @@
 import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createClient } from '@/lib/supabase/client'
+import StarIcon from '@/components/ui/StarIcon'
 import Button from '@/components/ui/Button'
 
 const loginSchema = z.object({
@@ -21,23 +21,33 @@ function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') || '/mi-curso'
+  const wasKicked = searchParams.get('kicked') === 'true'
+
   const [serverError, setServerError] = useState<string | null>(null)
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginForm>({
-    resolver: zodResolver(loginSchema)
-  })
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginForm>({ resolver: zodResolver(loginSchema) })
 
   const onSubmit = async (data: LoginForm) => {
     setServerError(null)
     const supabase = createClient()
+
     const { error } = await supabase.auth.signInWithPassword({
       email: data.email,
       password: data.password,
     })
+
     if (error) {
       setServerError('Email o contraseña incorrectos.')
       return
     }
+
+    // Registrar sesión única — cierra cualquier otra sesión activa
+    await fetch('/api/auth/set-session', { method: 'POST' })
+
     router.push(redirectTo)
     router.refresh()
   }
@@ -45,21 +55,37 @@ function LoginForm() {
   return (
     <main className="min-h-screen bg-glow-cream flex items-center justify-center px-6">
       <div className="w-full max-w-md">
-
-        {/* Acceso a Cursos — mismo tamaño que el logo */}
+        {/* Logo */}
         <div className="text-center mb-10">
           <Link href="/">
             <span className="font-cormorant text-2xl tracking-widest text-glow-navy font-light">
-              + ACCESO A CURSOS +
+              THE <span className="text-3xl font-normal">GLOW</span> MARKET
             </span>
           </Link>
+          <div className="flex items-center justify-center gap-2 mt-3">
+            <StarIcon size={8} className="text-glow-navy" />
+            <p className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
+              Acceso a Cursos
+            </p>
+            <StarIcon size={8} className="text-glow-navy" />
+          </div>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-8 md:p-10 flex flex-col gap-5">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="bg-white p-8 md:p-10 flex flex-col gap-5"
+        >
           <h1 className="font-cormorant text-3xl text-glow-navy font-light tracking-wide">
             Iniciar Sesión
           </h1>
+
+          {/* Mensaje si fue desconectada por otra sesión */}
+          {wasKicked && (
+            <p className="font-montserrat text-xs text-amber-700 bg-amber-50 border border-amber-200 px-4 py-3">
+              Tu sesión fue cerrada porque ingresaste desde otro dispositivo.
+            </p>
+          )}
 
           {serverError && (
             <p className="font-montserrat text-xs text-red-500 bg-red-50 px-4 py-3">
@@ -97,33 +123,25 @@ function LoginForm() {
             )}
           </div>
 
-          <Button type="submit" variant="primary" className="w-full mt-2" loading={isSubmitting}>
+          <Button
+            type="submit"
+            variant="primary"
+            className="w-full mt-2"
+            loading={isSubmitting}
+          >
             Ingresar
           </Button>
 
           <p className="font-montserrat text-xs text-center text-glow-navy/50">
             ¿No tenés cuenta?{' '}
-            <Link href="/registro" className="text-glow-navy border-b border-glow-navy/30 hover:border-glow-navy pb-0.5 transition-colors">
+            <Link
+              href="/registro"
+              className="text-glow-navy border-b border-glow-navy/30 hover:border-glow-navy pb-0.5 transition-colors"
+            >
               Registrate
             </Link>
           </p>
         </form>
-
-        {/* Sponsored by Clarins */}
-        <div className="flex items-center justify-center gap-3 mt-8">
-          <p className="font-cormorant italic text-glow-navy/40" style={{ fontSize: '18px' }}>
-            Sponsored by
-          </p>
-          <Image
-            src="/images/Clarins.svg.png"
-            alt="Clarins"
-            width={70}
-            height={20}
-            className="object-contain"
-            style={{ filter: 'brightness(0)', opacity: 0.25 }}
-          />
-        </div>
-
       </div>
     </main>
   )
