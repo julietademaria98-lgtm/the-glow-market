@@ -13,18 +13,16 @@ interface Props {
 async function getLessonData(lessonId: string, userId: string) {
   const supabase = await createClient()
 
-  // Obtener la lección y su curso
   const { data: leccion } = await supabase
     .from('lecciones')
     .select('*, cursos(*)')
-    .eq('id', lessonId)
+    .eq('id', leccion.id)
     .single()
 
   if (!leccion) return null
 
   const curso = leccion.cursos as Curso
 
-  // Si no es preview, verificar acceso
   if (!leccion.es_preview) {
     const { data: acceso } = await supabase
       .from('accesos_curso')
@@ -37,7 +35,6 @@ async function getLessonData(lessonId: string, userId: string) {
     if (!acceso) return { leccion, curso, hasAccess: false }
   }
 
-  // Todas las lecciones del curso
   const { data: lecciones } = await supabase
     .from('lecciones')
     .select('*')
@@ -71,16 +68,13 @@ export default async function LeccionPage({ params }: Props) {
 
   return (
     <main className="min-h-screen bg-glow-dark flex flex-col lg:flex-row pt-16">
-      {/* Sidebar */}
       <LessonSidebar
         curso={curso}
         lecciones={lecciones}
         activeLessonId={leccion.id}
       />
 
-      {/* Content */}
       <div className="flex-1 overflow-y-auto">
-        {/* Breadcrumb */}
         <div className="px-6 md:px-10 pt-6 pb-4">
           <nav className="font-montserrat text-[10px] tracking-[0.15em] uppercase text-white/30 flex gap-2">
             <Link href="/mi-curso" className="hover:text-white/60 transition-colors">
@@ -93,12 +87,10 @@ export default async function LeccionPage({ params }: Props) {
           </nav>
         </div>
 
-        {/* Video */}
         <div className="px-6 md:px-10">
-          <VideoPlayer lessonId={leccion.id} title={leccion.titulo} />
+          <VideoPlayer lessonId={leccion.id} title={leccion.titulo} userEmail={user.email} />
         </div>
 
-        {/* Lesson info */}
         <div className="px-6 md:px-10 py-8 max-w-3xl">
           <div className="flex items-center gap-2 mb-3">
             <StarIcon size={10} className="text-glow-blush" />
