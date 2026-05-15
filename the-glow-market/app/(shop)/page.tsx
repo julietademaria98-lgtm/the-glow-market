@@ -17,7 +17,7 @@ async function getHomeData() {
       .eq('activo', true)
       .eq('destacado', true)
       .order('created_at', { ascending: false })
-      .limit(6),
+      ..limit(4),
     supabase
       .from('cursos')
       .select('*, lecciones(*)')
