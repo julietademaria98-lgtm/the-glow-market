@@ -23,7 +23,7 @@ export default function ProductCard({ producto, index = 0 }: ProductCardProps) {
     '/placeholder-product.jpg'
 
   const hoverImage =
-    producto.imagenes?.find((img, i) => !img.es_principal && i > 0)?.url
+    producto.imagenes?.find((img) => !img.es_principal)?.url
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
