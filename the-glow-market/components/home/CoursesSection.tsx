@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -8,7 +7,6 @@ import type { Curso } from '@/types'
 import { formatPrice } from '@/lib/utils'
 import StarIcon from '@/components/ui/StarIcon'
 import Button from '@/components/ui/Button'
-import CourseInfoDrawer from '@/components/courses/CourseInfoDrawer'
 
 interface CoursesSectionProps {
   cursos: Curso[]
@@ -18,6 +16,7 @@ export default function CoursesSection({ cursos }: CoursesSectionProps) {
   return (
     <section className="bg-glow-navy py-24 px-6">
       <div className="max-w-[1400px] mx-auto">
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -40,12 +39,14 @@ export default function CoursesSection({ cursos }: CoursesSectionProps) {
           </p>
         </motion.div>
 
+        {/* Course cards grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {cursos.map((curso, i) => (
             <CourseCard key={curso.id} curso={curso} index={i} />
           ))}
         </div>
 
+        {/* CTA secundario */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -69,53 +70,60 @@ export default function CoursesSection({ cursos }: CoursesSectionProps) {
 }
 
 function CourseCard({ curso, index }: { curso: Curso; index: number }) {
-  const [drawerOpen, setDrawerOpen] = useState(false)
-
   return (
-    <>
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, delay: index * 0.15, ease: [0.22, 1, 0.36, 1] }}
-        className="group bg-glow-dark/60 border border-white/10 hover:border-white/20 transition-all duration-500"
-      >
-        <div className="relative aspect-video overflow-hidden">
-          <Image
-            src={curso.imagen_url || '/placeholder-course.jpg'}
-            alt={curso.titulo}
-            fill
-            className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-            sizes="(max-width: 768px) 100vw, 33vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-glow-dark/60 to-transparent" />
-        </div>
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8, delay: index * 0.15, ease: [0.22, 1, 0.36, 1] }}
+      className="group bg-glow-dark/60 border border-white/10 hover:border-white/20 transition-all duration-500"
+    >
+      {/* Imagen */}
+      <div className="relative aspect-video overflow-hidden">
+        <Image
+          src={curso.imagen_url || '/placeholder-course.jpg'}
+          alt={curso.titulo}
+          fill
+          className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+          sizes="(max-width: 768px) 100vw, 33vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-glow-dark/60 to-transparent" />
+      </div>
 
-        <div className="p-6 flex flex-col gap-4">
-          <h3 className="font-cormorant text-2xl text-white font-light tracking-wide leading-tight">
-            {curso.titulo}
-          </h3>
-          {curso.descripcion && (
-            <p className="font-montserrat text-xs text-white/60 leading-relaxed line-clamp-2">
-              {curso.descripcion}
-            </p>
-          )}
-          <div className="flex items-center justify-between mt-2">
-            <span className="font-montserrat text-sm font-medium text-glow-blush">
-              {formatPrice(curso.precio)}
-            </span>
-            <button onClick={() => setDrawerOpen(true)}>
-              <Button variant="outline-white" size="sm">
-                Más info
-              </Button>
-            </button>
+      {/* Info */}
+      <div className="p-6 flex flex-col gap-4">
+        <h3 className="font-cormorant text-2xl text-white font-light tracking-wide leading-tight">
+          {curso.titulo}
+        </h3>
+        {curso.descripcion && (
+          <p className="font-montserrat text-xs text-white/60 leading-relaxed line-clamp-2">
+            {curso.descripcion}
+          </p>
+        )}
+        <div className="flex items-center justify-between mt-2">
+          <div className="flex flex-col gap-0.5">
+            {curso.precio_oferta ? (
+              <>
+                <span className="font-montserrat text-sm font-medium text-glow-blush">
+                  {formatPrice(curso.precio_oferta)}
+                </span>
+                <span className="font-montserrat text-xs text-white/30 line-through">
+                  {formatPrice(curso.precio)}
+                </span>
+              </>
+            ) : (
+              <span className="font-montserrat text-sm font-medium text-glow-blush">
+                {formatPrice(curso.precio)}
+              </span>
+            )}
           </div>
+          <Link href={`/cursos`}>
+            <Button variant="outline-white" size="sm">
+              Ver Curso
+            </Button>
+          </Link>
         </div>
-      </motion.div>
-
-      {drawerOpen && (
-        <CourseInfoDrawer curso={curso} onClose={() => setDrawerOpen(false)} />
-      )}
-    </>
+      </div>
+    </motion.div>
   )
 }
