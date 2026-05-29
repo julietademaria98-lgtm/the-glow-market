@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect } from 'react'
-import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
 import type { Curso } from '@/types'
 import { formatPrice } from '@/lib/utils'
+import { useCartStore } from '@/store/cartStore'
 
 interface Props {
   curso: Curso
@@ -12,10 +12,25 @@ interface Props {
 }
 
 export default function CourseInfoDrawer({ curso, onClose }: Props) {
+  const [added, setAdded] = useState(false)
+  const addItem = useCartStore((state) => state.addItem)
+
   useEffect(() => {
     document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = '' }
   }, [])
+
+  const handleAddToCart = () => {
+    addItem({
+      id: curso.id,
+      slug: curso.slug,
+      nombre: curso.titulo,
+      precio: curso.precio,
+      imagen_url: curso.imagen_url || '',
+    })
+    setAdded(true)
+    setTimeout(() => setAdded(false), 2000)
+  }
 
   return (
     <>
@@ -92,30 +107,10 @@ export default function CourseInfoDrawer({ curso, onClose }: Props) {
             </p>
             <div className="flex flex-col gap-4">
               {[
-                {
-                  num: '01',
-                  titulo: 'Piel limpia e hidratada',
-                  duracion: '5-7 min',
-                  desc: 'La rutina de skincare que cambia el resultado del maquillaje en una sola sesión. Doble limpieza, tónico, sérum, hidratación y protección solar.',
-                },
-                {
-                  num: '02',
-                  titulo: 'Makeup básico de día',
-                  duracion: '7-9 min',
-                  desc: 'Tu look completo en pocos pasos. SOS Primer, Double Serum Foundation, corrector solo donde levanta, bronzer y un combo de labios que te llevás siempre.',
-                },
-                {
-                  num: '03',
-                  titulo: 'Retoque express',
-                  duracion: '3-4 min',
-                  desc: 'A las 4 de la tarde tu maquillaje no se va: solo necesita despertar. La mezcla mágica de aceite + base que te resucita la piel en menos de tres minutos.',
-                },
-                {
-                  num: '04',
-                  titulo: 'Transformación a noche',
-                  duracion: '6-8 min',
-                  desc: 'Mismo punto de partida que el de día, 5 pasos más y look completo de noche. Sombras, delineado, refuerzo de bronzer y labios potentes.',
-                },
+                { num: '01', titulo: 'Piel limpia e hidratada', duracion: '5-7 min', desc: 'La rutina de skincare que cambia el resultado del maquillaje en una sola sesión. Doble limpieza, tónico, sérum, hidratación y protección solar.' },
+                { num: '02', titulo: 'Makeup básico de día', duracion: '7-9 min', desc: 'Tu look completo en pocos pasos. SOS Primer, Double Serum Foundation, corrector solo donde levanta, bronzer y un combo de labios que te llevás siempre.' },
+                { num: '03', titulo: 'Retoque express', duracion: '3-4 min', desc: 'A las 4 de la tarde tu maquillaje no se va: solo necesita despertar. La mezcla mágica de aceite + base que te resucita la piel en menos de tres minutos.' },
+                { num: '04', titulo: 'Transformación a noche', duracion: '6-8 min', desc: 'Mismo punto de partida que el de día, 5 pasos más y look completo de noche. Sombras, delineado, refuerzo de bronzer y labios potentes.' },
               ].map((mod) => (
                 <div key={mod.num} className="border border-glow-navy/10 p-6 hover:border-glow-navy/20 transition-colors">
                   <div className="flex items-start justify-between gap-4 mb-2">
@@ -192,35 +187,18 @@ export default function CourseInfoDrawer({ curso, onClose }: Props) {
             </h2>
             <div className="flex flex-col gap-0 border-t border-glow-navy/10">
               {[
-                {
-                  q: '¿Cuánto dura el curso?',
-                  a: 'Los 4 módulos suman alrededor de 25 minutos de video. Está pensado para que lo puedas hacer en una mañana, o repartido en varios días.',
-                },
-                {
-                  q: '¿Cuándo lo puedo ver?',
-                  a: 'Apenas confirmás tu compra, te llega un mail con tu acceso. Podés empezar al minuto, desde la compu o el celular.',
-                },
-                {
-                  q: '¿Necesito comprar todos los productos?',
-                  a: 'No. El curso te sirve aunque uses productos que ya tenés. Te recomendamos Clarins porque son los que funcionan con este método, pero podés ir comprando de a uno.',
-                },
-                {
-                  q: '¿Tengo acceso para siempre?',
-                  a: 'Sí. Una vez que comprás el curso, lo tenés disponible para siempre, con todas las actualizaciones incluidas.',
-                },
-                {
-                  q: '¿Sirve si recién arranco con el maquillaje?',
-                  a: 'Sí. El curso está pensado para arrancar desde cero. El método es simple y progresivo.',
-                },
+                { q: '¿Cuánto dura el curso?', a: 'Los 4 módulos suman alrededor de 25 minutos de video. Está pensado para que lo puedas hacer en una mañana, o repartido en varios días.' },
+                { q: '¿Cuándo lo puedo ver?', a: 'Apenas confirmás tu compra, te llega un mail con tu acceso. Podés empezar al minuto, desde la compu o el celular.' },
+                { q: '¿Necesito comprar todos los productos?', a: 'No. El curso te sirve aunque uses productos que ya tenés. Te recomendamos Clarins porque son los que funcionan con este método, pero podés ir comprando de a uno.' },
+                { q: '¿Tengo acceso para siempre?', a: 'Sí. Una vez que comprás el curso, lo tenés disponible para siempre, con todas las actualizaciones incluidas.' },
+                { q: '¿Sirve si recién arranco con el maquillaje?', a: 'Sí. El curso está pensado para arrancar desde cero. El método es simple y progresivo.' },
               ].map((faq, i) => (
                 <details key={i} className="group border-b border-glow-navy/10 py-4">
                   <summary className="font-montserrat text-xs tracking-wide text-glow-navy cursor-pointer list-none flex items-center justify-between">
                     {faq.q}
                     <span className="text-glow-navy/30 group-open:rotate-45 transition-transform duration-200 text-lg leading-none">+</span>
                   </summary>
-                  <p className="font-montserrat text-xs text-glow-navy/55 leading-relaxed mt-3">
-                    {faq.a}
-                  </p>
+                  <p className="font-montserrat text-xs text-glow-navy/55 leading-relaxed mt-3">{faq.a}</p>
                 </details>
               ))}
             </div>
@@ -239,12 +217,16 @@ export default function CourseInfoDrawer({ curso, onClose }: Props) {
                 Acceso de por vida · 5 descargables
               </p>
             </div>
-            <Link
-              href={`/checkout?curso=${curso.id}`}
-              className="font-montserrat text-[10px] tracking-[0.25em] uppercase bg-glow-navy text-white px-8 py-3 hover:bg-glow-navy/80 transition-colors"
+            <button
+              onClick={handleAddToCart}
+              className={`font-montserrat text-[10px] tracking-[0.25em] uppercase px-8 py-3 transition-colors ${
+                added
+                  ? 'bg-green-700 text-white'
+                  : 'bg-glow-navy text-white hover:bg-glow-navy/80'
+              }`}
             >
-              Comprar curso
-            </Link>
+              {added ? '✓ Agregado al carrito' : 'Agregar al carrito'}
+            </button>
           </div>
         </div>
 
