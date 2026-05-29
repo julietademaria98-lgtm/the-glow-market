@@ -1,85 +1,96 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { X } from 'lucide-react'
-import type { Curso } from '@/types'
-import { formatPrice } from '@/lib/utils'
+import { X, Check } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
+import { formatPrice } from '@/lib/utils'
+import type { Curso } from '@/types'
 
-interface Props {
+interface CourseInfoDrawerProps {
   curso: Curso
+  isOpen: boolean
   onClose: () => void
 }
 
-export default function CourseInfoDrawer({ curso, onClose }: Props) {
-  const [added, setAdded] = useState(false)
+export default function CourseInfoDrawer({ curso, isOpen, onClose }: CourseInfoDrawerProps) {
   const addItem = useCartStore((state) => state.addItem)
+  const [added, setAdded] = useState(false)
 
   useEffect(() => {
-    document.body.style.overflow = 'hidden'
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
     return () => { document.body.style.overflow = '' }
-  }, [])
+  }, [isOpen])
 
   const handleAddToCart = () => {
     addItem({
       id: curso.id,
       slug: curso.slug,
       nombre: curso.titulo,
-      precio: curso.precio,
+      precio: Number(curso.precio_oferta ?? curso.precio),
       imagen_url: curso.imagen_url || '',
     })
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
   }
 
+  if (!isOpen) return null
+
   return (
     <>
-      {/* Overlay */}
       <div
-        className="fixed inset-0 bg-black/50 z-50 backdrop-blur-sm"
+        className="fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      {/* Drawer */}
-      <div className="fixed right-0 top-0 h-full w-full max-w-2xl bg-glow-cream z-50 overflow-y-auto shadow-2xl">
+      <div className="fixed right-0 top-0 h-full w-full max-w-xl bg-white z-50 flex flex-col shadow-2xl overflow-hidden">
 
-        {/* Header */}
-        <div className="sticky top-0 bg-glow-cream z-10 flex items-center justify-between px-8 py-5 border-b border-glow-navy/10">
-          <span className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-navy/50">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-glow-navy/10 flex-shrink-0">
+          <span className="font-montserrat text-[10px] tracking-[0.25em] uppercase text-glow-navy/40">
             Curso Online · En alianza con Clarins
           </span>
-          <button
-            onClick={onClose}
-            className="text-glow-navy/40 hover:text-glow-navy transition-colors"
-          >
+          <button onClick={onClose} className="text-glow-navy/40 hover:text-glow-navy transition-colors" aria-label="Cerrar">
             <X size={20} />
           </button>
         </div>
 
-        <div className="px-8 py-10 flex flex-col gap-14">
+        <div className="flex-1 overflow-y-auto pb-36">
 
-          {/* Hero */}
-          <div>
-            <h1 className="font-cormorant text-5xl md:text-6xl text-glow-navy font-light tracking-wide leading-none mb-4">
+          <div className="px-6 pt-8 pb-6 bg-glow-cream/40">
+            <h2 className="font-cormorant text-4xl text-glow-navy font-light tracking-wide leading-tight mb-2">
               {curso.titulo}
-            </h1>
-            <p className="font-cormorant text-xl text-glow-navy/70 italic mb-6">
+            </h2>
+            <p className="font-cormorant text-xl text-glow-navy/70 italic mb-4">
               Pocos productos. Piel divina. Maquillaje que dura todo el día.
             </p>
             <p className="font-montserrat text-sm text-glow-navy/60 leading-relaxed">
               De cara recién levantada a look de noche, en 4 módulos cortos. Te enseño el método que uso todos los días para tener piel divina y un maquillaje que no se va.
             </p>
+            <p className="font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/40 mt-4">
+              Acceso de por vida · 5 descargables · Links Clarins con regalos por compra
+            </p>
           </div>
 
-          {/* Para quién es */}
-          <div>
-            <span className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-navy/40 block mb-4">
-              ¿Para quién es?
-            </span>
-            <h2 className="font-cormorant text-2xl text-glow-navy font-light mb-6">
-              Si te sentís identificada con alguna de estas, este curso es para vos:
-            </h2>
-            <ul className="flex flex-col gap-3">
+          <div className="px-6 py-6 border-b border-glow-navy/10">
+            <h3 className="font-cormorant text-2xl text-glow-navy font-light mb-3">
+              Qué es Day to Night Glow
+            </h3>
+            <p className="font-montserrat text-sm text-glow-navy/60 leading-relaxed">
+              Un curso de automaquillaje en 4 módulos cortos, pensado para vos que querés salir prolija sin gastar 30 minutos cada mañana. Aprendés una rutina de piel que cambia todo, un maquillaje de día completo con pocos productos, un retoque express que te salva a las 4 de la tarde, y una transformación a noche que no te obliga a desarmar nada. Con productos buenos, buena técnica, y todo el respaldo de Clarins.
+            </p>
+          </div>
+
+          <div className="px-6 py-6 border-b border-glow-navy/10">
+            <h3 className="font-cormorant text-2xl text-glow-navy font-light mb-1">
+              ¿Este curso es para vos?
+            </h3>
+            <p className="font-montserrat text-xs text-glow-navy/50 mb-4">
+              Si te sentís identificada con alguna de estas, sí:
+            </p>
+            <ul className="space-y-3">
               {[
                 'Comprás productos de maquillaje y la mitad no los usás.',
                 'Te cuesta hacerte la cara en menos de 30 minutos a la mañana.',
@@ -87,118 +98,145 @@ export default function CourseInfoDrawer({ curso, onClose }: Props) {
                 'Tenés ganas de aprender un método simple que funcione siempre.',
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <span className="text-glow-navy/30 mt-1">—</span>
-                  <span className="font-montserrat text-sm text-glow-navy/70 leading-relaxed">{item}</span>
+                  <span className="mt-0.5 w-4 h-4 rounded-full bg-glow-blush/20 flex items-center justify-center flex-shrink-0">
+                    <Check size={10} className="text-glow-navy" />
+                  </span>
+                  <span className="font-montserrat text-sm text-glow-navy/70">{item}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Módulos */}
-          <div>
-            <span className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-navy/40 block mb-4">
-              Contenido
-            </span>
-            <h2 className="font-cormorant text-2xl text-glow-navy font-light mb-2">
+          <div className="px-6 py-6 border-b border-glow-navy/10">
+            <h3 className="font-cormorant text-2xl text-glow-navy font-light mb-1">
               Qué vas a aprender en cada módulo
-            </h2>
-            <p className="font-montserrat text-xs text-glow-navy/50 mb-8">
-              4 módulos cortos, pensados para que los puedas hacer en el orden que quieras y volver a verlos cuantas veces necesites.
+            </h3>
+            <p className="font-montserrat text-xs text-glow-navy/50 mb-5">
+              4 módulos cortos — volvé a verlos cuantas veces necesites.
             </p>
-            <div className="flex flex-col gap-4">
+            <div className="space-y-4">
               {[
-                { num: '01', titulo: 'Piel limpia e hidratada', duracion: '5-7 min', desc: 'La rutina de skincare que cambia el resultado del maquillaje en una sola sesión. Doble limpieza, tónico, sérum, hidratación y protección solar.' },
-                { num: '02', titulo: 'Makeup básico de día', duracion: '7-9 min', desc: 'Tu look completo en pocos pasos. SOS Primer, Double Serum Foundation, corrector solo donde levanta, bronzer y un combo de labios que te llevás siempre.' },
-                { num: '03', titulo: 'Retoque express', duracion: '3-4 min', desc: 'A las 4 de la tarde tu maquillaje no se va: solo necesita despertar. La mezcla mágica de aceite + base que te resucita la piel en menos de tres minutos.' },
-                { num: '04', titulo: 'Transformación a noche', duracion: '6-8 min', desc: 'Mismo punto de partida que el de día, 5 pasos más y look completo de noche. Sombras, delineado, refuerzo de bronzer y labios potentes.' },
+                {
+                  num: '01',
+                  titulo: 'Piel limpia e hidratada',
+                  duracion: '5–7 min',
+                  desc: 'La rutina de skincare que cambia el resultado del maquillaje en una sola sesión. Doble limpieza, tónico, sérum, hidratación y protección solar. El 50% del resultado pasa por acá.',
+                },
+                {
+                  num: '02',
+                  titulo: 'Makeup básico de día',
+                  duracion: '7–9 min',
+                  desc: 'Tu look completo en pocos pasos. SOS Primer, Double Serum Foundation, corrector solo donde levanta, bronzer según tu tipo de cara, y un combo de labios que te llevás siempre en la cartera.',
+                },
+                {
+                  num: '03',
+                  titulo: 'Retoque',
+                  duracion: '3–4 min',
+                  desc: 'A las 4 de la tarde tu maquillaje no se va: solo necesita despertar. La mezcla mágica de aceite + base y una tinta multiuso para pómulos, labios y ojos al mismo tiempo.',
+                },
+                {
+                  num: '04',
+                  titulo: 'Transformación a noche',
+                  duracion: '6–8 min',
+                  desc: 'Mismo punto de partida que el de día, 5 pasos más y look de noche. Sombras, delineado, bronzer reforzado y labios potentes. Sin desarmar nada de lo que ya tenés puesto.',
+                },
               ].map((mod) => (
-                <div key={mod.num} className="border border-glow-navy/10 p-6 hover:border-glow-navy/20 transition-colors">
-                  <div className="flex items-start justify-between gap-4 mb-2">
-                    <div className="flex items-center gap-3">
-                      <span className="font-montserrat text-[10px] tracking-[0.2em] text-glow-navy/30">{mod.num}</span>
-                      <h3 className="font-cormorant text-lg text-glow-navy font-light">{mod.titulo}</h3>
+                <div key={mod.num} className="flex gap-4">
+                  <span className="font-cormorant text-3xl text-glow-blush/50 font-light leading-none flex-shrink-0">
+                    {mod.num}
+                  </span>
+                  <div>
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <h4 className="font-montserrat text-xs font-medium tracking-wide text-glow-navy uppercase">
+                        {mod.titulo}
+                      </h4>
+                      <span className="font-montserrat text-[10px] text-glow-navy/40">· {mod.duracion}</span>
                     </div>
-                    <span className="font-montserrat text-[9px] tracking-[0.15em] uppercase text-glow-navy/30 whitespace-nowrap">{mod.duracion}</span>
+                    <p className="font-montserrat text-xs text-glow-navy/60 leading-relaxed">{mod.desc}</p>
                   </div>
-                  <p className="font-montserrat text-xs text-glow-navy/55 leading-relaxed pl-6">{mod.desc}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Descargables */}
-          <div>
-            <span className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-navy/40 block mb-4">
-              Material adicional
-            </span>
-            <h2 className="font-cormorant text-2xl text-glow-navy font-light mb-2">
+          <div className="px-6 py-6 border-b border-glow-navy/10">
+            <h3 className="font-cormorant text-2xl text-glow-navy font-light mb-1">
               5 descargables exclusivos
-            </h2>
-            <p className="font-montserrat text-xs text-glow-navy/50 mb-6">
-              Para que apliques sin volver al video. Son tuyos para siempre.
+            </h3>
+            <p className="font-montserrat text-xs text-glow-navy/50 mb-5">
+              Material adicional para que apliques sin volver al video — para siempre.
             </p>
-            <div className="flex flex-col gap-3">
+            <div className="space-y-3">
               {[
-                'Kit Esencial — lista completa de productos Clarins con qué hace cada uno.',
-                'Diagnóstico de Piel — test de 6 preguntas para identificar tu tipo de piel.',
-                'Guía de Subtono — 3 tests caseros para elegir la base correcta.',
-                'SOS Primer por Color — los 5 colores y para qué sirve cada uno.',
-                'Bronzer por Tipo de Cara — cómo aplicarlo según la forma de tu rostro.',
-              ].map((item, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <span className="font-montserrat text-[10px] text-glow-navy/30 mt-0.5">✓</span>
-                  <span className="font-montserrat text-xs text-glow-navy/65 leading-relaxed">{item}</span>
+                { titulo: 'Kit Esencial', desc: 'Lista completa de productos Clarins con qué hace cada uno y en qué módulos aparece.' },
+                { titulo: 'Diagnóstico de Piel', desc: 'Test de 6 preguntas para identificar tu tipo de piel y saber qué priorizar en cada módulo.' },
+                { titulo: 'Guía de Subtono', desc: '3 tests caseros para identificar tu subtono y elegir la base correcta sin perder plata.' },
+                { titulo: 'SOS Primer por Color', desc: 'Los 5 colores del SOS Primer Clarins y para qué sirve cada uno.' },
+                { titulo: 'Bronzer por Tipo de Cara', desc: 'Diagramas visuales del paso a paso según tu forma de rostro (6 tipos).' },
+              ].map((d, i) => (
+                <div key={i} className="flex gap-3 items-start">
+                  <span className="font-montserrat text-[10px] tracking-widest text-glow-blush flex-shrink-0 mt-0.5">PDF</span>
+                  <div>
+                    <p className="font-montserrat text-xs font-medium text-glow-navy">{d.titulo}</p>
+                    <p className="font-montserrat text-[11px] text-glow-navy/50 leading-relaxed">{d.desc}</p>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Qué incluye */}
-          <div>
-            <span className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-navy/40 block mb-4">
-              Incluye
-            </span>
-            <h2 className="font-cormorant text-2xl text-glow-navy font-light mb-6">
+          <div className="px-6 py-6 border-b border-glow-navy/10">
+            <h3 className="font-cormorant text-2xl text-glow-navy font-light mb-4">
               Lo que llevás al comprar el curso
-            </h2>
-            <div className="flex flex-col gap-3">
+            </h3>
+            <ul className="space-y-2">
               {[
                 '4 módulos en video, accesibles desde web y celular.',
                 '5 descargables exclusivos en PDF.',
                 'Acceso de por vida + todas las actualizaciones futuras.',
                 'Links directos a cada producto Clarins con regalos exclusivos por compra.',
-                'Acceso ilimitado para verlo cuantas veces necesités.',
+                'Acceso ilimitado para verlo cuantas veces necesites.',
+                'Soporte por mail para consultas durante los primeros 30 días.',
               ].map((item, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <span className="font-montserrat text-[10px] text-glow-navy/30 mt-0.5">✓</span>
-                  <span className="font-montserrat text-xs text-glow-navy/65 leading-relaxed">{item}</span>
-                </div>
+                <li key={i} className="flex items-start gap-3">
+                  <Check size={13} className="text-glow-navy mt-0.5 flex-shrink-0" />
+                  <span className="font-montserrat text-sm text-glow-navy/70">{item}</span>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
 
-          {/* FAQ */}
-          <div>
-            <span className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-navy/40 block mb-4">
-              Preguntas frecuentes
-            </span>
-            <h2 className="font-cormorant text-2xl text-glow-navy font-light mb-6">
+          <div className="px-6 py-6">
+            <h3 className="font-cormorant text-2xl text-glow-navy font-light mb-4">
               Lo que más nos preguntan
-            </h2>
-            <div className="flex flex-col gap-0 border-t border-glow-navy/10">
+            </h3>
+            <div className="space-y-2">
               {[
-                { q: '¿Cuánto dura el curso?', a: 'Los 4 módulos suman alrededor de 25 minutos de video. Está pensado para que lo puedas hacer en una mañana, o repartido en varios días.' },
-                { q: '¿Cuándo lo puedo ver?', a: 'Apenas confirmás tu compra, te llega un mail con tu acceso. Podés empezar al minuto, desde la compu o el celular.' },
-                { q: '¿Necesito comprar todos los productos?', a: 'No. El curso te sirve aunque uses productos que ya tenés. Te recomendamos Clarins porque son los que funcionan con este método, pero podés ir comprando de a uno.' },
-                { q: '¿Tengo acceso para siempre?', a: 'Sí. Una vez que comprás el curso, lo tenés disponible para siempre, con todas las actualizaciones incluidas.' },
-                { q: '¿Sirve si recién arranco con el maquillaje?', a: 'Sí. El curso está pensado para arrancar desde cero. El método es simple y progresivo.' },
-              ].map((faq, i) => (
-                <details key={i} className="group border-b border-glow-navy/10 py-4">
-                  <summary className="font-montserrat text-xs tracking-wide text-glow-navy cursor-pointer list-none flex items-center justify-between">
-                    {faq.q}
-                    <span className="text-glow-navy/30 group-open:rotate-45 transition-transform duration-200 text-lg leading-none">+</span>
+                {
+                  q: '¿Cuánto dura el curso?',
+                  a: 'Los 4 módulos suman alrededor de 25 minutos de video. Está pensado para que lo puedas hacer en una mañana o repartido en varios días. Lo importante no es la duración, es la cantidad de veces que vas a volver a verlo.',
+                },
+                {
+                  q: '¿Cuándo lo puedo ver?',
+                  a: 'Apenas confirmás tu compra, te llega un mail con tu acceso. Podés empezar al minuto, desde la compu o el celular.',
+                },
+                {
+                  q: '¿Necesito comprar todos los productos Clarins?',
+                  a: 'No. El curso te sirve aunque uses productos que ya tenés. Recomendamos Clarins porque son los que funcionan con este método, y las alumnas tienen un beneficio exclusivo. Podés ir comprando de a uno, según tu prioridad.',
+                },
+                {
+                  q: '¿Tengo acceso para siempre?',
+                  a: 'Sí. Una vez que comprás el curso, lo tenés disponible para siempre, con todas las actualizaciones que vayamos sumando.',
+                },
+              ].map((item, i) => (
+                <details key={i} className="group border-b border-glow-navy/10 last:border-0">
+                  <summary className="flex justify-between items-center py-3 cursor-pointer list-none">
+                    <span className="font-montserrat text-xs font-medium text-glow-navy pr-4">{item.q}</span>
+                    <span className="text-glow-navy/40 group-open:rotate-45 transition-transform duration-200 flex-shrink-0 text-lg leading-none">+</span>
                   </summary>
-                  <p className="font-montserrat text-xs text-glow-navy/55 leading-relaxed mt-3">{faq.a}</p>
+                  <p className="font-montserrat text-xs text-glow-navy/60 leading-relaxed pb-4">
+                    {item.a}
+                  </p>
                 </details>
               ))}
             </div>
@@ -206,28 +244,36 @@ export default function CourseInfoDrawer({ curso, onClose }: Props) {
 
         </div>
 
-        {/* Sticky CTA */}
-        <div className="sticky bottom-0 bg-glow-cream border-t border-glow-navy/10 px-8 py-5">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <span className="font-montserrat text-xl font-medium text-glow-navy">
+        <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-glow-navy/10 px-6 py-4 flex items-center justify-between gap-4">
+          <div className="flex flex-col gap-0.5">
+            {curso.precio_oferta ? (
+              <>
+                <span className="font-montserrat text-lg font-medium text-glow-navy">
+                  {formatPrice(curso.precio_oferta)}
+                </span>
+                <span className="font-montserrat text-xs text-glow-navy/40 line-through">
+                  {formatPrice(curso.precio)}
+                </span>
+              </>
+            ) : (
+              <span className="font-montserrat text-lg font-medium text-glow-navy">
                 {formatPrice(curso.precio)}
               </span>
-              <p className="font-montserrat text-[10px] text-glow-navy/40 mt-0.5">
-                Acceso de por vida · 5 descargables
-              </p>
-            </div>
-            <button
-              onClick={handleAddToCart}
-              className={`font-montserrat text-[10px] tracking-[0.25em] uppercase px-8 py-3 transition-colors ${
-                added
-                  ? 'bg-green-700 text-white'
-                  : 'bg-glow-navy text-white hover:bg-glow-navy/80'
-              }`}
-            >
-              {added ? '✓ Agregado al carrito' : 'Agregar al carrito'}
-            </button>
+            )}
+            <span className="font-montserrat text-[9px] tracking-[0.15em] uppercase text-glow-navy/40">
+              Precio de lanzamiento
+            </span>
           </div>
+          <button
+            onClick={handleAddToCart}
+            className={`flex-1 max-w-[220px] py-3.5 font-montserrat text-[10px] tracking-[0.2em] uppercase transition-colors duration-300 ${
+              added
+                ? 'bg-glow-royal text-white'
+                : 'bg-glow-navy text-white hover:bg-glow-blue'
+            }`}
+          >
+            {added ? '✓ Agregado al carrito' : 'Agregar al carrito'}
+          </button>
         </div>
 
       </div>
