@@ -38,6 +38,7 @@ export interface Curso {
   descripcion: string | null
   descripcion_larga: string | null
   precio: number
+  precio_oferta: number | null
   imagen_url: string | null
   activo: boolean
   created_at: string
