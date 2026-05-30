@@ -54,6 +54,8 @@ export interface Leccion {
   duracion: string | null
   orden: number
   es_preview: boolean
+  modulo: string | null
+  modulo_orden: number | null
   curso?: Curso
 }
 
