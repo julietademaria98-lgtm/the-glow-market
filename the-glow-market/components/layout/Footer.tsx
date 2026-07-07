@@ -28,7 +28,7 @@ export default function Footer() {
             { href: '/productos', label: 'Tienda' },
             { href: '/cursos', label: 'Cursos' },
             { href: '/mi-curso', label: 'Mi Cuenta' },
-            { href: 'mailto:admin@theglowmarket.com.ar', label: 'Contacto' },
+            { href: 'mailto:hola@theglowmarket.com', label: 'Contacto' },
           ].map((link) => (
             <Link
               key={link.href}
@@ -51,17 +51,6 @@ export default function Footer() {
           >
             <Instagram size={18} />
           </a>
-          <a
-            href="https://tiktok.com/@theglowmarket"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="TikTok"
-            className="text-white/60 hover:text-white transition-colors duration-300"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34l-.01-8.89a8.28 8.28 0 004.84 1.55V4.52a4.85 4.85 0 01-1.07-.18z" />
-            </svg>
-          </a>
         </div>
 
         {/* Divider + Copyright */}
@@ -69,23 +58,6 @@ export default function Footer() {
         <p className="font-montserrat text-[10px] tracking-widest text-white/40 uppercase">
           © {new Date().getFullYear()} The Glow Market. Todos los derechos reservados.
         </p>
-
-        {/* Links legales */}
-        <div className="flex flex-wrap justify-center gap-4 md:gap-8">
-          {[
-            { href: '/terminos-y-condiciones', label: 'Términos y Condiciones' },
-            { href: '/politica-privacidad', label: 'Política de Privacidad' },
-            { href: '/cambios-y-devoluciones', label: 'Cambios y Devoluciones' },
-          ].map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="font-montserrat text-[9px] tracking-[0.15em] uppercase text-white/30 hover:text-white/60 transition-colors duration-300"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
       </div>
     </footer>
   )
