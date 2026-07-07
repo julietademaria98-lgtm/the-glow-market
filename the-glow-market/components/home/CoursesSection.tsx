@@ -25,7 +25,7 @@ export default function CoursesSection({ cursos }: CoursesSectionProps) {
         >
           <h2
             className="font-cormorant text-white font-light tracking-[0.15em] uppercase"
-            style={{ fontSize: 'clamp(28px, 4vw, 52px)' }}
+            style={{ fontSize: 'clamp(44px, 7vw, 80px)' }}
           >
             Curso Online
           </h2>
@@ -74,26 +74,24 @@ function HomeCourseCard({ curso, index }: { curso: Curso; index: number }) {
         className="w-full bg-white"
       >
         {/* Imagen */}
-        <div className="relative w-full overflow-hidden" style={{ aspectRatio: '16/9' }}>
-          <Image
-            src={curso.imagen_url || '/placeholder-course.jpg'}
+        {curso.imagen_url && (
+          <img
+            src={curso.imagen_url}
             alt={curso.titulo}
-            fill
-            className="object-cover object-center"
-            sizes="(max-width: 768px) 100vw, 520px"
+            className="w-full h-auto block"
           />
-        </div>
+        )}
 
         {/* Info */}
-        <div className="bg-glow-cream px-6 pt-5 pb-6 flex flex-col gap-3">
+        <div className="bg-glow-navy px-6 pt-5 pb-6 flex flex-col gap-3">
           <h3
-            className="font-cormorant text-glow-navy font-light tracking-wide uppercase leading-tight"
+            className="font-cormorant text-white font-light tracking-wide uppercase leading-tight"
             style={{ fontSize: 'clamp(22px, 4vw, 30px)' }}
           >
             {curso.titulo}
           </h3>
           {curso.descripcion && (
-            <p className="font-montserrat text-[11px] text-glow-navy/60 leading-relaxed line-clamp-2">
+            <p className="font-montserrat text-[11px] text-white/60 leading-relaxed line-clamp-2">
               {curso.descripcion}
             </p>
           )}
@@ -101,22 +99,22 @@ function HomeCourseCard({ curso, index }: { curso: Curso; index: number }) {
             <div className="flex flex-col gap-0.5">
               {curso.precio_oferta ? (
                 <>
-                  <span className="font-montserrat text-sm font-medium text-glow-navy">
+                  <span className="font-montserrat text-sm font-medium text-white">
                     {formatPrice(curso.precio_oferta)}
                   </span>
-                  <span className="font-montserrat text-xs text-glow-navy/40 line-through">
+                  <span className="font-montserrat text-xs text-white/40 line-through">
                     {formatPrice(curso.precio)}
                   </span>
                 </>
               ) : (
-                <span className="font-montserrat text-sm font-medium text-glow-navy">
+                <span className="font-montserrat text-sm font-medium text-white">
                   {formatPrice(curso.precio)}
                 </span>
               )}
             </div>
             <button
               onClick={() => setDrawerOpen(true)}
-              className="font-montserrat text-[10px] tracking-[0.2em] uppercase border border-glow-navy text-glow-navy px-5 py-2 hover:bg-glow-navy hover:text-white transition-colors duration-300"
+              className="font-montserrat text-[10px] tracking-[0.2em] uppercase border border-white/60 text-white px-5 py-2 hover:bg-white hover:text-glow-navy transition-colors duration-300"
             >
               Más Info
             </button>
