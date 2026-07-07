@@ -9,7 +9,7 @@ export default function HeroSection() {
     <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden bg-glow-navy">
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url('/images/PORTADA1.png')` }}
+        style={{ backgroundImage: `url('/images/hero-01.jpg')` }}
       />
       <div className="absolute inset-0" style={{ backgroundColor: 'rgba(25, 33, 73, 0.35)' }} />
 
