@@ -46,12 +46,12 @@ export default function CoursesSection({ cursos }: CoursesSectionProps) {
 
         {/* Link alumnas */}
         <div className="text-center mt-12">
-          <p className="font-montserrat text-xs text-glow-navy/50 mb-2">
+          <p className="font-cormorant text-2xl md:text-3xl text-glow-navy tracking-[0.1em] uppercase mb-4">
             ¿Ya sos alumna?
           </p>
           <Link
             href="/login"
-            className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy border-b border-glow-navy/40 hover:border-glow-navy pb-0.5 transition-colors duration-300"
+            className="font-montserrat text-xs tracking-[0.25em] uppercase text-glow-navy border border-transparent px-6 py-3 inline-block hover:border-glow-navy transition-all duration-300"
           >
             Ingresar aquí →
           </Link>
