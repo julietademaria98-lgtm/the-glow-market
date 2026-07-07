@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import CourseCard from '@/components/courses/CourseCard'
+import StarIcon from '@/components/ui/StarIcon'
 import type { Curso } from '@/types'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -24,39 +25,49 @@ export default async function CursosPage() {
     <main className="min-h-screen bg-glow-navy pt-24">
       <div className="max-w-[1400px] mx-auto px-6 py-12">
 
-        {/* Header */}
-        <div className="flex flex-col md:flex-row items-center gap-8 md:gap-10 mb-20">
-
+        {/* Header — logo circular + título */}
+        <div className="flex flex-col md:flex-row items-center md:items-center gap-8 md:gap-12 mb-20">
           {/* Logo circular */}
           <div className="flex-shrink-0">
             <Image
               src="/images/Recurso 20Iso (1).png"
               alt="The Glow Market"
-              width={150}
-              height={150}
-              className="object-contain opacity-90"
+              width={220}
+              height={220}
+              className="object-contain"
             />
           </div>
 
-          {/* Texto */}
+          {/* Título + sponsored */}
           <div className="flex flex-col items-start">
-            <span className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-white/50 mb-2">
+            {/* Formación Exclusiva */}
+            <span className="font-montserrat text-[12px] tracking-[0.3em] uppercase text-white/50 mb-3">
               + Formación Exclusiva +
             </span>
-            <h1 className="font-cormorant text-white font-light leading-none uppercase text-5xl md:text-6xl lg:text-7xl" style={{ letterSpacing: '0.05em' }}>
+
+            {/* Título principal */}
+            <h1
+              className="font-cormorant text-white font-light leading-none uppercase"
+              style={{ fontSize: 'clamp(44px, 7vw, 96px)', letterSpacing: '0.05em' }}
+            >
               Cursos Online
             </h1>
-            <div className="flex items-center gap-3 mt-4">
-              <span className="font-cormorant text-white/60 italic text-lg">
+
+            {/* Sponsored by Clarins */}
+            <div className="flex items-center justify-between w-full mt-3">
+              <span
+                className="font-cormorant text-white/70 italic"
+                style={{ fontSize: 'clamp(16px, 2vw, 26px)' }}
+              >
                 Sponsored by
               </span>
               <Image
                 src="/images/Clarins.svg.png"
                 alt="Clarins"
-                width={72}
-                height={20}
+                width={90}
+                height={28}
                 className="object-contain"
-                style={{ filter: 'brightness(0) invert(1)', opacity: 0.6 }}
+                style={{ filter: 'brightness(0) invert(1)', opacity: 0.7 }}
               />
             </div>
           </div>
@@ -70,7 +81,7 @@ export default async function CursosPage() {
             </p>
           </div>
         ) : (
-          <div className={`grid gap-8 ${cursos.length === 1 ? 'grid-cols-1 max-w-lg mx-auto' : 'grid-cols-1 md:grid-cols-2'}`}>
+          <div className={`grid gap-8 ${cursos.length === 1 ? 'grid-cols-1 max-w-lg' : 'grid-cols-1 md:grid-cols-2'}`}>
             {cursos.map((curso, i) => (
               <CourseCard key={curso.id} curso={curso} index={i} />
             ))}
