@@ -5,20 +5,35 @@ import type { Producto } from '@/types'
 
 export const revalidate = 3600
 
-async function getProductos(): Promise<Producto[]> {
+interface SearchParams {
+  categoria?: string
+}
+
+async function getProductos(categoria?: string): Promise<Producto[]> {
   const supabase = await createClient()
 
-  const { data } = await supabase
+  let query = supabase
     .from('productos')
     .select('*, imagenes:producto_imagenes(*)')
     .eq('activo', true)
     .order('created_at', { ascending: false })
 
+  if (categoria && categoria !== 'todos') {
+    query = query.eq('categoria', categoria)
+  }
+
+  const { data } = await query
   return (data || []) as Producto[]
 }
 
-export default async function ProductosPage() {
-  const productos = await getProductos()
+
+export default async function ProductosPage({
+  searchParams,
+}: {
+  searchParams: SearchParams
+}) {
+  const categoria = searchParams.categoria
+  const productos = await getProductos(categoria)
 
   return (
     <main className="min-h-screen bg-glow-cream pt-24">
@@ -28,11 +43,11 @@ export default async function ProductosPage() {
           <div className="flex items-center justify-center gap-3 mb-4">
             <StarIcon size={10} className="text-glow-navy" />
             <span className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-navy/60">
-              Colección
+              The Flower Capsule
             </span>
             <StarIcon size={10} className="text-glow-navy" />
           </div>
-          <h1 className="font-cormorant text-5xl md:text-6xl text-glow-navy font-light tracking-wide">
+          <h1 className="font-cormorant text-5xl md:text-6xl text-glow-navy font-light tracking-wide uppercase">
             Nuestra Tienda
           </h1>
         </div>
