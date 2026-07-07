@@ -71,7 +71,7 @@ function HomeCourseCard({ curso, index }: { curso: Curso; index: number }) {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8, delay: index * 0.15, ease: [0.22, 1, 0.36, 1] }}
-        className="w-full bg-white"
+        className="w-full bg-white border border-glow-navy"
       >
         {/* Imagen */}
         {curso.imagen_url && (
