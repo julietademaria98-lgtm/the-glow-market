@@ -11,7 +11,7 @@ export default function HeroSection() {
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url('/images/hero-01.jpg')` }}
       />
-      <div className="absolute inset-0" style={{ backgroundColor: 'rgba(25, 33, 73, 0.35)' }} />
+      <div className="absolute inset-0" style={{ backgroundColor: 'rgba(25, 33, 73, 0.20)' }} />
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center text-center px-6 gap-6 md:gap-8">
