@@ -43,7 +43,7 @@ export default function Footer() {
         {/* RRSS */}
         <div className="flex gap-4">
           <a
-            href="https://instagram.com/theglowmarket"
+            href="https://www.instagram.com/theglowmarket_/"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram"
