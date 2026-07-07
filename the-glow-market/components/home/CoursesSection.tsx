@@ -25,11 +25,11 @@ export default function CoursesSection({ cursos }: CoursesSectionProps) {
         >
           <h2
             className="font-cormorant text-white font-light tracking-[0.15em] uppercase"
-            style={{ fontSize: 'clamp(48px, 8vw, 96px)' }}
+            style={{ fontSize: 'clamp(28px, 4vw, 52px)' }}
           >
             Curso Online
           </h2>
-          <p className="font-montserrat text-[11px] md:text-xs tracking-[0.3em] uppercase text-white/70 mt-4">
+          <p className="font-montserrat text-xs md:text-sm tracking-[0.3em] uppercase text-white/70 mt-4">
             Formación Exclusiva Sponsored By{' '}
             <span className="font-bold text-white">Clarins</span>
           </p>
@@ -74,12 +74,12 @@ function HomeCourseCard({ curso, index }: { curso: Curso; index: number }) {
         className="w-full bg-white"
       >
         {/* Imagen */}
-        <div className="relative w-full overflow-hidden" style={{ aspectRatio: '4/3' }}>
+        <div className="relative w-full overflow-hidden" style={{ aspectRatio: '16/9' }}>
           <Image
             src={curso.imagen_url || '/placeholder-course.jpg'}
             alt={curso.titulo}
             fill
-            className="object-cover"
+            className="object-cover object-center"
             sizes="(max-width: 768px) 100vw, 520px"
           />
         </div>
