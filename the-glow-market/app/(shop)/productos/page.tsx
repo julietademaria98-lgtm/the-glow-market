@@ -40,8 +40,8 @@ export default async function ProductosPage({
       <div className="max-w-[1400px] mx-auto px-6 py-12">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="font-cormorant text-5xl md:text-6xl text-glow-navy font-light tracking-wide uppercase">
-            Nuestra Tienda
+          <h1 className="font-cormorant text-3xl md:text-4xl text-glow-navy font-light tracking-wide uppercase">
+            The Market
           </h1>
           <div className="flex items-center justify-center gap-3 mt-4">
             <StarIcon size={10} className="text-glow-navy" />
