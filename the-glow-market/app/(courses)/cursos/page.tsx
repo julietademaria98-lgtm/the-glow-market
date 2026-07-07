@@ -41,20 +41,20 @@ export default async function CursosPage() {
           {/* Título + sponsored */}
           <div className="flex flex-col items-start">
             {/* Formación Exclusiva */}
-            <span className="font-montserrat text-[13px] tracking-[0.3em] uppercase text-white/50 mb-3">
+            <span className="font-montserrat text-[13px] tracking-[0.3em] uppercase text-white/50 mb-2">
               + Formación Exclusiva +
             </span>
 
             {/* Título principal */}
             <h1
               className="font-cormorant text-white font-light leading-none uppercase"
-              style={{ fontSize: 'clamp(40px, 6vw, 88px)', letterSpacing: '0.05em' }}
+              style={{ fontSize: 'clamp(38px, 5.5vw, 84px)', letterSpacing: '0.05em' }}
             >
               Cursos Online
             </h1>
 
             {/* Sponsored by Clarins — todo junto, misma distancia que arriba */}
-            <div className="flex items-center gap-3 mt-3">
+            <div className="flex items-center gap-3 mt-2">
               <span
                 className="font-cormorant text-white/70 italic"
                 style={{ fontSize: 'clamp(18px, 2vw, 28px)' }}
