@@ -29,7 +29,7 @@ export default function ProductsSlider({ productos }: ProductsSliderProps) {
             className="font-montserrat uppercase text-glow-navy tracking-[0.2em]"
             style={{ fontSize: 'clamp(18px, 2vw, 22px)' }}
           >
-            HIGHLIGHTS
+            THE FLOWER POUCH CAPSULE
           </span>
           <StarIcon size={12} className="text-glow-navy" />
         </motion.div>
