@@ -47,7 +47,7 @@ export default async function CursosPage() {
 
             {/* Título principal */}
             <h1
-              className="font-cormorant text-white font-light leading-none uppercase mt-4"
+              className="font-cormorant text-white font-light leading-none uppercase mt-6"
               style={{ fontSize: 'clamp(36px, 5vw, 72px)', letterSpacing: '0.05em' }}
             >
               Cursos Online
