@@ -41,7 +41,7 @@ export default async function CursosPage() {
           {/* Título + sponsored */}
           <div className="flex flex-col items-start">
             {/* Formación Exclusiva */}
-            <span className="font-montserrat text-[13px] tracking-[0.3em] uppercase text-white/50 mb-4">
+            <span className="font-montserrat text-[13px] tracking-[0.3em] uppercase text-white/50 mb-20">
               + Formación Exclusiva +
             </span>
 
