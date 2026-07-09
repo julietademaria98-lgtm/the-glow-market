@@ -54,7 +54,7 @@ export default async function CursosPage() {
             </h1>
 
             {/* Sponsored by Clarins — todo junto, misma distancia que arriba */}
-            <div className="flex items-center gap-3 mt-17">
+            <div className="flex items-center gap-3 mt-7">
               <span
                 className="font-cormorant text-white/70 italic"
                 style={{ fontSize: 'clamp(18px, 2vw, 28px)' }}
