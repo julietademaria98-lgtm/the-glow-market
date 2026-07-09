@@ -41,7 +41,7 @@ export default async function CursosPage() {
           {/* Título + sponsored */}
           <div className="flex flex-col items-start">
             {/* Formación Exclusiva */}
-            <span className="font-montserrat text-[13px] tracking-[0.3em] uppercase text-white/50 mb-20">
+            <span className="font-montserrat text-[13px] tracking-[0.3em] uppercase text-white/50 mb-7">
               + Formación Exclusiva +
             </span>
 
@@ -54,7 +54,7 @@ export default async function CursosPage() {
             </h1>
 
             {/* Sponsored by Clarins — todo junto, misma distancia que arriba */}
-            <div className="flex items-center gap-3 mt-4">
+            <div className="flex items-center gap-3 mt-10">
               <span
                 className="font-cormorant text-white/70 italic"
                 style={{ fontSize: 'clamp(18px, 2vw, 28px)' }}
