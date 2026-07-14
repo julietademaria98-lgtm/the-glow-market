@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { X, Check } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { formatPrice } from '@/lib/utils'
 import type { Curso } from '@/types'
+import { useState } from 'react'
 
 interface CourseInfoDrawerProps {
   curso: Curso
@@ -52,7 +53,11 @@ export default function CourseInfoDrawer({ curso, isOpen, onClose }: CourseInfoD
           <span className="font-montserrat text-[10px] tracking-[0.25em] uppercase text-glow-navy/40">
             Curso Online · En alianza con Clarins
           </span>
-          <button onClick={onClose} className="text-glow-navy/40 hover:text-glow-navy transition-colors" aria-label="Cerrar">
+          <button
+            onClick={onClose}
+            className="text-glow-navy/40 hover:text-glow-navy transition-colors"
+            aria-label="Cerrar"
+          >
             <X size={20} />
           </button>
         </div>
@@ -108,51 +113,28 @@ export default function CourseInfoDrawer({ curso, isOpen, onClose }: CourseInfoD
           </div>
 
           <div className="px-6 py-6 border-b border-glow-navy/10">
-            <h3 className="font-cormorant text-2xl text-glow-navy font-light mb-1">
+            <h3 className="font-cormorant text-2xl text-glow-navy font-light mb-1 uppercase">
               Qué vas a aprender en cada módulo
             </h3>
-            <p className="font-montserrat text-xs text-glow-navy/50 mb-5">
+            <p className="font-montserrat text-sm text-glow-navy/50 mb-5">
               4 módulos cortos — volvé a verlos cuantas veces necesites.
             </p>
             <div className="space-y-4">
               {[
-                {
-                  num: '01',
-                  titulo: 'Piel limpia e hidratada',
-                  duracion: '5–7 min',
-                  desc: 'La rutina de skincare que cambia el resultado del maquillaje en una sola sesión. Doble limpieza, tónico, sérum, hidratación y protección solar. El 50% del resultado pasa por acá.',
-                },
-                {
-                  num: '02',
-                  titulo: 'Makeup básico de día',
-                  duracion: '7–9 min',
-                  desc: 'Tu look completo en pocos pasos. SOS Primer, Double Serum Foundation, corrector solo donde levanta, bronzer según tu tipo de cara, y un combo de labios que te llevás siempre en la cartera.',
-                },
-                {
-                  num: '03',
-                  titulo: 'Retoque',
-                  duracion: '3–4 min',
-                  desc: 'A las 4 de la tarde tu maquillaje no se va: solo necesita despertar. La mezcla mágica de aceite + base y una tinta multiuso para pómulos, labios y ojos al mismo tiempo.',
-                },
-                {
-                  num: '04',
-                  titulo: 'Transformación a noche',
-                  duracion: '6–8 min',
-                  desc: 'Mismo punto de partida que el de día, 5 pasos más y look de noche. Sombras, delineado, bronzer reforzado y labios potentes. Sin desarmar nada de lo que ya tenés puesto.',
-                },
+                { num: '01', titulo: 'Piel limpia e hidratada', duracion: '5–7 min' },
+                { num: '02', titulo: 'Makeup básico de día', duracion: '7–9 min' },
+                { num: '03', titulo: 'Retoque', duracion: '3–4 min' },
+                { num: '04', titulo: 'Transformación a noche', duracion: '6–8 min' },
               ].map((mod) => (
                 <div key={mod.num} className="flex gap-4">
                   <span className="font-cormorant text-3xl text-glow-blush/50 font-light leading-none flex-shrink-0">
                     {mod.num}
                   </span>
-                  <div>
-                    <div className="flex items-baseline gap-2 mb-1">
-                      <h4 className="font-montserrat text-xs font-medium tracking-wide text-glow-navy uppercase">
-                        {mod.titulo}
-                      </h4>
-                      <span className="font-montserrat text-[10px] text-glow-navy/40">· {mod.duracion}</span>
-                    </div>
-                    <p className="font-montserrat text-xs text-glow-navy/60 leading-relaxed">{mod.desc}</p>
+                  <div className="flex items-baseline gap-2">
+                    <h4 className="font-montserrat text-xs font-medium tracking-wide text-glow-navy uppercase">
+                      {mod.titulo}
+                    </h4>
+                    <span className="font-montserrat text-[10px] text-glow-navy/40">· {mod.duracion}</span>
                   </div>
                 </div>
               ))}
@@ -196,7 +178,6 @@ export default function CourseInfoDrawer({ curso, isOpen, onClose }: CourseInfoD
                 'Acceso de por vida + todas las actualizaciones futuras.',
                 'Links directos a cada producto Clarins con regalos exclusivos por compra.',
                 'Acceso ilimitado para verlo cuantas veces necesites.',
-                'Soporte por mail para consultas durante los primeros 30 días.',
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <Check size={13} className="text-glow-navy mt-0.5 flex-shrink-0" />
