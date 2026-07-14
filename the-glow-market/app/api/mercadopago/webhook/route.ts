@@ -41,6 +41,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Error actualizando orden' }, { status: 500 })
     }
 
+    // Descontar stock de productos
+    if (orden.items) {
+      for (const item of orden.items) {
+        const { data: producto } = await adminClient
+          .from('productos')
+          .select('id, stock')
+          .eq('id', item.id)
+          .single()
+
+        if (producto && producto.stock > 0) {
+          const nuevoStock = Math.max(0, producto.stock - (item.cantidad || 1))
+          await adminClient
+            .from('productos')
+            .update({ stock: nuevoStock })
+            .eq('id', producto.id)
+        }
+      }
+    }
+
+    // Si hay user_id, verificar si compró algún curso
     if (orden.user_id && orden.items) {
       for (const item of orden.items) {
         const { data: curso } = await adminClient
