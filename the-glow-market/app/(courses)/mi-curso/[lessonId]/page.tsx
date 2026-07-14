@@ -5,6 +5,8 @@ import LessonSidebar from '@/components/courses/LessonSidebar'
 import StarIcon from '@/components/ui/StarIcon'
 import type { Leccion, Curso } from '@/types'
 import Link from 'next/link'
+import { Download } from 'lucide-react'
+import { getDescargablesByModulo } from '@/lib/descargables'
 
 interface Props {
   params: { lessonId: string }
@@ -16,7 +18,7 @@ async function getLessonData(lessonId: string, userId: string) {
   const { data: leccion } = await supabase
     .from('lecciones')
     .select('*, cursos(*)')
-.eq('id', lessonId)
+    .eq('id', lessonId)
     .single()
 
   if (!leccion) return null
@@ -65,6 +67,7 @@ export default async function LeccionPage({ params }: Props) {
   }
 
   const { leccion, curso, lecciones = [] } = data
+  const descargables = getDescargablesByModulo(leccion.modulo_orden, leccion.modulo)
 
   return (
     <main className="min-h-screen bg-glow-dark flex flex-col lg:flex-row pt-16">
@@ -88,7 +91,7 @@ export default async function LeccionPage({ params }: Props) {
         </div>
 
         <div className="px-6 md:px-10">
-          <VideoPlayer lessonId={leccion.id} title={leccion.titulo} userEmail={user.email} />
+          <VideoPlayer lessonId={leccion.id} title={leccion.titulo} />
         </div>
 
         <div className="px-6 md:px-10 py-8 max-w-3xl">
@@ -107,6 +110,59 @@ export default async function LeccionPage({ params }: Props) {
             </p>
           )}
         </div>
+
+        {descargables.length > 0 && (
+          <div className="px-6 md:px-10 pb-12 max-w-3xl">
+            <div className="border-t border-white/10 pt-8">
+              <div className="flex items-center gap-2 mb-5">
+                <StarIcon size={9} className="text-glow-blush" />
+                <span className="font-montserrat text-[10px] tracking-[0.25em] uppercase text-white/50">
+                  Descargables de este módulo
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {descargables.map((d) => (
+                  <a
+                    key={d.filename}
+                    href={`/${d.filename}`}
+                    download
+                    className="group flex items-start gap-4 p-4 border border-white/10 hover:border-glow-blush/40 hover:bg-white/5 transition-all duration-200"
+                  >
+                    <div className="flex-shrink-0 w-8 h-8 border border-white/20 group-hover:border-glow-blush/50 flex items-center justify-center transition-colors">
+                      <Download size={13} className="text-white/40 group-hover:text-glow-blush transition-colors" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-montserrat text-xs font-medium text-white group-hover:text-glow-blush transition-colors">
+                        {d.titulo}
+                      </p>
+                      <p className="font-montserrat text-[10px] text-white/40 mt-0.5 leading-relaxed">
+                        {d.subtitulo}
+                      </p>
+                      {d.notaExtra && (
+                        <p className="font-montserrat text-[9px] text-glow-blush/50 mt-1 italic">
+                          {d.notaExtra}
+                        </p>
+                      )}
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {leccion.modulo_orden !== 0 && descargables.every(d => d.filename !== 'kit-esencial.pdf') && (
+          <div className="px-6 md:px-10 pb-12 max-w-3xl">
+            <a
+              href="/kit-esencial.pdf"
+              download
+              className="group inline-flex items-center gap-2 font-montserrat text-[10px] tracking-[0.15em] uppercase text-white/30 hover:text-glow-blush transition-colors border-b border-white/10 hover:border-glow-blush/30 pb-0.5"
+            >
+              <Download size={10} />
+              Consultá el Kit Esencial completo
+            </a>
+          </div>
+        )}
       </div>
     </main>
   )
