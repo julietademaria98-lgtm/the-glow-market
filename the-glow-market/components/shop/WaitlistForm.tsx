@@ -27,7 +27,7 @@ export default function WaitlistForm() {
 
   return (
     <div className="text-center mt-6 mb-2">
-      <p className="font-montserrat text-[10px] tracking-[0.25em] uppercase text-glow-navy/40 mb-4">
+      <p className="font-montserrat text-[10px] tracking-[0.25em] uppercase text-glow-navy/70 mb-4">
         Coming Soon · Dejá tu mail para ser la primera en enterarte
       </p>
       {status === 'success' ? (
