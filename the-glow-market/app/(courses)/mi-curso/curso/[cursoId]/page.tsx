@@ -138,7 +138,7 @@ export default async function CourseOverviewPage({ params }: Props) {
               <div key={nombreModulo} className="border border-glow-navy/10">
                 <div className="px-6 py-4 bg-glow-navy/[0.03] flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <span className="font-cormorant text-2xl text-glow-blush font-light w-8">
+                    <span className="font-cormorant text-2xl font-light w-8" style={{ color: '#20699F' }}>
                       {String(mi + 1).padStart(2, '0')}
                     </span>
                     <h3 className="font-cormorant text-lg text-glow-navy font-light tracking-wide uppercase">
@@ -161,7 +161,7 @@ export default async function CourseOverviewPage({ params }: Props) {
                         <Play size={9} className="text-glow-navy/60 group-hover:text-glow-blush fill-current transition-colors" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-montserrat text-xs text-glow-navy group-hover:text-glow-navy transition-colors">
+                        <p className="font-montserrat text-xs text-glow-navy transition-colors">
                           {leccion.titulo}
                           {leccion.es_preview && (
                             <span className="ml-2 font-montserrat text-[9px] tracking-widest uppercase text-glow-blush/70">
@@ -205,10 +205,10 @@ export default async function CourseOverviewPage({ params }: Props) {
               { titulo: 'Bronzer por Tipo de Cara', desc: 'Paso a paso visual según tu forma de rostro' },
             ].map((d, i) => (
               <div key={i} className="flex items-start gap-4 p-4 border border-glow-navy/10">
-                <span className="font-montserrat text-[9px] tracking-widest text-glow-blush uppercase flex-shrink-0 mt-0.5">PDF</span>
+                <span className="font-montserrat text-[9px] tracking-widest text-glow-navy/50 uppercase flex-shrink-0 mt-0.5">PDF</span>
                 <div>
-                  <p className="font-montserrat text-xs font-medium text-glow-navy/80 mb-0.5">{d.titulo}</p>
-                  <p className="font-montserrat text-[10px] text-glow-navy/35 leading-relaxed">{d.desc}</p>
+                  <p className="font-montserrat text-xs font-medium text-glow-navy mb-0.5">{d.titulo}</p>
+                  <p className="font-montserrat text-[10px] text-glow-navy/60 leading-relaxed">{d.desc}</p>
                 </div>
               </div>
             ))}
@@ -232,8 +232,8 @@ export default async function CourseOverviewPage({ params }: Props) {
               'Acceso ilimitado, volvé a verlos cuando quieras',
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-3">
-                <Check size={13} className="text-glow-blush mt-0.5 flex-shrink-0" />
-                <span className="font-montserrat text-xs text-glow-navy/55">{item}</span>
+                <Check size={13} className="text-glow-navy mt-0.5 flex-shrink-0" />
+                <span className="font-montserrat text-xs text-glow-navy">{item}</span>
               </li>
             ))}
           </ul>
