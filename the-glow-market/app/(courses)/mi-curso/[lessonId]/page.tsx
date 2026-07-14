@@ -98,7 +98,7 @@ export default async function LeccionPage({ params }: Props) {
 
         <div className="px-6 md:px-10 py-8 max-w-3xl">
           <div className="flex items-center gap-2 mb-3">
-            <StarIcon size={10} className="text-glow-blush" />
+            <StarIcon size={10} className="text-glow-royal" />
             <span className="font-montserrat text-[9px] tracking-[0.2em] uppercase text-glow-navy/70">
               {leccion.duracion && `${leccion.duracion} ·`} Lección
             </span>
@@ -117,7 +117,7 @@ export default async function LeccionPage({ params }: Props) {
           <div className="px-6 md:px-10 pb-12 max-w-3xl">
             <div className="border-t border-glow-navy/10 pt-8">
               <div className="flex items-center gap-2 mb-5">
-                <StarIcon size={9} className="text-glow-blush" />
+                <StarIcon size={9} className="text-glow-royal" />
                 <span className="font-montserrat text-[10px] font-semibold tracking-[0.25em] uppercase text-glow-navy/80">
                   Descargables de este módulo
                 </span>
@@ -128,20 +128,20 @@ export default async function LeccionPage({ params }: Props) {
                     key={d.filename}
                     href={`/${d.filename}`}
                     download
-                    className="group flex items-start gap-4 p-4 border border-glow-navy/15 hover:border-glow-blush/50 hover:bg-glow-navy/5 transition-all duration-200"
+                    className="group flex items-start gap-4 p-4 border border-glow-navy/15 hover:border-glow-royal/50 hover:bg-glow-navy/5 transition-all duration-200"
                   >
-                    <div className="flex-shrink-0 w-8 h-8 border border-glow-navy/20 group-hover:border-glow-blush/50 flex items-center justify-center transition-colors">
-                      <Download size={13} className="text-glow-navy/40 group-hover:text-glow-blush transition-colors" />
+                    <div className="flex-shrink-0 w-8 h-8 border border-glow-navy/20 group-hover:border-glow-royal/50 flex items-center justify-center transition-colors">
+                      <Download size={13} className="text-glow-navy/40 group-hover:text-glow-royal transition-colors" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-montserrat text-xs font-medium text-glow-navy group-hover:text-glow-blush transition-colors">
+                      <p className="font-montserrat text-xs font-medium text-glow-navy group-hover:text-glow-royal transition-colors">
                         {d.titulo}
                       </p>
                       <p className="font-montserrat text-[10px] text-glow-navy/75 mt-0.5 leading-relaxed">
                         {d.subtitulo}
                       </p>
                       {d.notaExtra && (
-                        <p className="font-montserrat text-[9px] text-glow-blush/60 mt-1 italic">
+                        <p className="font-montserrat text-[9px] text-glow-royal/60 mt-1 italic">
                           {d.notaExtra}
                         </p>
                       )}
@@ -157,7 +157,7 @@ export default async function LeccionPage({ params }: Props) {
           <div className="px-6 md:px-10 pb-16 max-w-3xl">
             <div className="border-t border-glow-navy/10 pt-8">
               <div className="flex items-center gap-2 mb-5">
-                <StarIcon size={9} className="text-glow-blush" />
+                <StarIcon size={9} className="text-glow-royal" />
                 <span className="font-montserrat text-[10px] font-semibold tracking-[0.25em] uppercase text-glow-navy/80">
                   Productos de este módulo
                 </span>
@@ -169,12 +169,12 @@ export default async function LeccionPage({ params }: Props) {
                     href={p.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-center justify-between py-3 hover:text-glow-blush transition-colors"
+                    className="group flex items-center justify-between py-3 hover:text-glow-royal transition-colors"
                   >
-                    <span className="font-montserrat text-xs text-glow-navy/80 group-hover:text-glow-blush transition-colors">
+                    <span className="font-montserrat text-xs text-glow-navy/80 group-hover:text-glow-royal transition-colors">
                       {p.nombre}
                     </span>
-                    <ExternalLink size={11} className="text-glow-navy/30 group-hover:text-glow-blush transition-colors flex-shrink-0 ml-3" />
+                    <ExternalLink size={11} className="text-glow-navy/30 group-hover:text-glow-royal transition-colors flex-shrink-0 ml-3" />
                   </a>
                 ))}
               </div>
