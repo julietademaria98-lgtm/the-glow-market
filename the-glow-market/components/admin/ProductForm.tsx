@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import type { Producto } from '@/types'
 
-const CATEGORIAS = ['anillos', 'collares', 'aros', 'pulseras', 'tobilleras', 'accesorios', 'otros']
+const CATEGORIAS = ['pouches', 'otros']
 
 interface Props {
   producto?: Producto
