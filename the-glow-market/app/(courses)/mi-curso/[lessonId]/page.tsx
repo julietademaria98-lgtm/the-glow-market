@@ -79,14 +79,14 @@ export default async function LeccionPage({ params }: Props) {
 
       <div className="flex-1 overflow-y-auto">
         <div className="px-6 md:px-10 pt-6 pb-4">
-          <nav className="font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/40 flex gap-2">
+          <nav className="font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/60 flex gap-2">
             <Link href="/mi-curso" className="hover:text-glow-navy transition-colors">
               Mis Cursos
             </Link>
             <span>/</span>
-            <span className="text-glow-navy/60">{curso.titulo}</span>
+            <span className="text-glow-navy/80">{curso.titulo}</span>
             <span>/</span>
-            <span className="text-glow-navy/80">{leccion.titulo}</span>
+            <span className="text-glow-navy">{leccion.titulo}</span>
           </nav>
         </div>
 
@@ -97,7 +97,7 @@ export default async function LeccionPage({ params }: Props) {
         <div className="px-6 md:px-10 py-8 max-w-3xl">
           <div className="flex items-center gap-2 mb-3">
             <StarIcon size={10} className="text-glow-blush" />
-            <span className="font-montserrat text-[9px] tracking-[0.2em] uppercase text-glow-navy/40">
+            <span className="font-montserrat text-[9px] tracking-[0.2em] uppercase text-glow-navy/70">
               {leccion.duracion && `${leccion.duracion} ·`} Lección
             </span>
           </div>
@@ -105,7 +105,7 @@ export default async function LeccionPage({ params }: Props) {
             {leccion.titulo}
           </h1>
           {leccion.descripcion && (
-            <p className="font-montserrat text-sm text-glow-navy/70 leading-relaxed">
+            <p className="font-montserrat text-sm text-glow-navy/90 leading-relaxed">
               {leccion.descripcion}
             </p>
           )}
@@ -116,7 +116,7 @@ export default async function LeccionPage({ params }: Props) {
             <div className="border-t border-glow-navy/10 pt-8">
               <div className="flex items-center gap-2 mb-5">
                 <StarIcon size={9} className="text-glow-blush" />
-                <span className="font-montserrat text-[10px] tracking-[0.25em] uppercase text-glow-navy/50">
+                <span className="font-montserrat text-[10px] font-semibold tracking-[0.25em] uppercase text-glow-navy/80">
                   Descargables de este módulo
                 </span>
               </div>
@@ -135,7 +135,7 @@ export default async function LeccionPage({ params }: Props) {
                       <p className="font-montserrat text-xs font-medium text-glow-navy group-hover:text-glow-blush transition-colors">
                         {d.titulo}
                       </p>
-                      <p className="font-montserrat text-[10px] text-glow-navy/50 mt-0.5 leading-relaxed">
+                      <p className="font-montserrat text-[10px] text-glow-navy/75 mt-0.5 leading-relaxed">
                         {d.subtitulo}
                       </p>
                       {d.notaExtra && (
@@ -151,18 +151,6 @@ export default async function LeccionPage({ params }: Props) {
           </div>
         )}
 
-        {leccion.modulo_orden !== 0 && descargables.every(d => d.filename !== 'kit-esencial.pdf') && (
-          <div className="px-6 md:px-10 pb-12 max-w-3xl">
-            <a
-              href="/kit-esencial.pdf"
-              download
-              className="group inline-flex items-center gap-2 font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/40 hover:text-glow-blush transition-colors border-b border-glow-navy/15 hover:border-glow-blush/30 pb-0.5"
-            >
-              <Download size={10} />
-              Consultá el Kit Esencial completo
-            </a>
-          </div>
-        )}
       </div>
     </main>
   )
