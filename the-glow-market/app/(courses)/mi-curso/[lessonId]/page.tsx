@@ -5,8 +5,9 @@ import LessonSidebar from '@/components/courses/LessonSidebar'
 import StarIcon from '@/components/ui/StarIcon'
 import type { Leccion, Curso } from '@/types'
 import Link from 'next/link'
-import { Download } from 'lucide-react'
+import { Download, ExternalLink } from 'lucide-react'
 import { getDescargablesByModulo } from '@/lib/descargables'
+import { getProductosByModulo } from '@/lib/productos'
 
 interface Props {
   params: { lessonId: string }
@@ -68,6 +69,7 @@ export default async function LeccionPage({ params }: Props) {
 
   const { leccion, curso, lecciones = [] } = data
   const descargables = getDescargablesByModulo(leccion.modulo_orden, leccion.modulo)
+  const productos = getProductosByModulo(leccion.modulo_orden)
 
   return (
     <main className="min-h-screen bg-glow-navy/20 flex flex-col lg:flex-row pt-16">
@@ -144,6 +146,35 @@ export default async function LeccionPage({ params }: Props) {
                         </p>
                       )}
                     </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {productos.length > 0 && (
+          <div className="px-6 md:px-10 pb-16 max-w-3xl">
+            <div className="border-t border-glow-navy/10 pt-8">
+              <div className="flex items-center gap-2 mb-5">
+                <StarIcon size={9} className="text-glow-blush" />
+                <span className="font-montserrat text-[10px] font-semibold tracking-[0.25em] uppercase text-glow-navy/80">
+                  Productos de este módulo
+                </span>
+              </div>
+              <div className="flex flex-col divide-y divide-glow-navy/8">
+                {productos.map((p) => (
+                  <a
+                    key={p.nombre}
+                    href={p.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center justify-between py-3 hover:text-glow-blush transition-colors"
+                  >
+                    <span className="font-montserrat text-xs text-glow-navy/80 group-hover:text-glow-blush transition-colors">
+                      {p.nombre}
+                    </span>
+                    <ExternalLink size={11} className="text-glow-navy/30 group-hover:text-glow-blush transition-colors flex-shrink-0 ml-3" />
                   </a>
                 ))}
               </div>
