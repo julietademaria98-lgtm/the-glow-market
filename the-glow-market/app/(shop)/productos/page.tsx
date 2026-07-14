@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import ProductGrid from '@/components/shop/ProductGrid'
 import StarIcon from '@/components/ui/StarIcon'
+import WaitlistForm from '@/components/shop/WaitlistForm'
 import type { Producto } from '@/types'
 
 export const revalidate = 3600
@@ -26,7 +27,6 @@ async function getProductos(categoria?: string): Promise<Producto[]> {
   return (data || []) as Producto[]
 }
 
-
 export default async function ProductosPage({
   searchParams,
 }: {
@@ -50,6 +50,7 @@ export default async function ProductosPage({
             </span>
             <StarIcon size={10} className="text-glow-navy" />
           </div>
+          <WaitlistForm />
         </div>
 
         {/* Grid */}
