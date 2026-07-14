@@ -1,6 +1,6 @@
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import Link from 'next/link'
-import { deleteProducto, toggleActivo } from '@/lib/admin/actions'
+import { deleteProductoFromForm, toggleActivoFromForm } from '@/lib/admin/actions'
 import type { Producto } from '@/types'
 
 async function getProductos(): Promise<Producto[]> {
@@ -65,7 +65,9 @@ export default async function AdminProductosPage() {
                   </td>
                   <td className="px-4 py-3 font-montserrat text-xs text-gray-700">{p.stock}</td>
                   <td className="px-4 py-3">
-                    <form action={async () => { 'use server'; await toggleActivo(p.id, !p.activo) }}>
+                    <form action={toggleActivoFromForm}>
+                      <input type="hidden" name="id" value={p.id} />
+                      <input type="hidden" name="activo" value={String(!p.activo)} />
                       <button
                         type="submit"
                         className={`px-2 py-1 rounded font-montserrat text-[9px] tracking-wide uppercase ${
@@ -84,11 +86,11 @@ export default async function AdminProductosPage() {
                       >
                         Editar
                       </Link>
-                      <form action={async () => { 'use server'; await deleteProducto(p.id) }}>
+                      <form action={deleteProductoFromForm}>
+                        <input type="hidden" name="id" value={p.id} />
                         <button
                           type="submit"
                           className="font-montserrat text-[10px] text-red-400 hover:text-red-600"
-                          onClick={(e) => { if (!confirm('¿Eliminar producto?')) e.preventDefault() }}
                         >
                           Eliminar
                         </button>
