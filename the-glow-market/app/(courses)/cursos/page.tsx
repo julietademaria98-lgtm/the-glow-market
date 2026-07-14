@@ -5,29 +5,42 @@ import type { Curso } from '@/types'
 import Link from 'next/link'
 import Image from 'next/image'
 
-export const revalidate = 3600
+export const revalidate = 0
 
-async function getCursos(): Promise<Curso[]> {
+async function getCursosConAcceso() {
   const supabase = await createClient()
-  const { data } = await supabase
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const { data: cursos } = await supabase
     .from('cursos')
     .select('*, lecciones(*)')
     .eq('activo', true)
     .order('created_at', { ascending: false })
 
-  return (data || []) as Curso[]
+  if (!cursos) return []
+
+  if (!user) return cursos.map((c) => ({ ...c, hasAccess: false }))
+
+  const { data: accesos } = await supabase
+    .from('accesos_curso')
+    .select('curso_id')
+    .eq('user_id', user.id)
+    .eq('activo', true)
+
+  const accesoIds = new Set((accesos || []).map((a) => a.curso_id))
+
+  return cursos.map((c) => ({ ...c, hasAccess: accesoIds.has(c.id) }))
 }
 
 export default async function CursosPage() {
-  const cursos = await getCursos()
+  const cursos = await getCursosConAcceso()
 
   return (
     <main className="min-h-screen bg-glow-navy pt-24">
       <div className="max-w-[1400px] mx-auto px-6 py-12">
 
-        {/* Header — logo circular + título */}
         <div className="flex flex-col md:flex-row items-center md:items-center gap-8 md:gap-12 mb-20">
-          {/* Logo circular */}
           <div className="flex-shrink-0">
             <Image
               src="/images/Recurso 20Iso (1).png"
@@ -38,23 +51,17 @@ export default async function CursosPage() {
             />
           </div>
 
-          {/* Título + sponsored */}
           <div className="flex flex-col items-start">
-            {/* Formación Exclusiva */}
-            <span className="font-montserrat text-[13px] tracking-[0.3em] uppercase text-white/50 mb-7">
+            <span className="font-montserrat text-[13px] tracking-[0.3em] uppercase text-white/50 mb-8">
               + Formación Exclusiva +
             </span>
-
-            {/* Título principal */}
             <h1
-              className="font-cormorant text-white font-light leading-none uppercase mt-6"
+              className="font-cormorant text-white font-light leading-none uppercase"
               style={{ fontSize: 'clamp(36px, 5vw, 72px)', letterSpacing: '0.05em' }}
             >
               Cursos Online
             </h1>
-
-            {/* Sponsored by Clarins — todo junto, misma distancia que arriba */}
-            <div className="flex items-center gap-3 mt-7">
+            <div className="flex items-center gap-3 mt-4">
               <span
                 className="font-cormorant text-white/70 italic"
                 style={{ fontSize: 'clamp(18px, 2vw, 28px)' }}
@@ -73,7 +80,6 @@ export default async function CursosPage() {
           </div>
         </div>
 
-        {/* Courses grid */}
         {cursos.length === 0 ? (
           <div className="text-center py-20">
             <p className="font-cormorant text-2xl text-white/40">
@@ -83,12 +89,11 @@ export default async function CursosPage() {
         ) : (
           <div className={`grid gap-8 ${cursos.length === 1 ? 'grid-cols-1 max-w-lg' : 'grid-cols-1 md:grid-cols-2'}`}>
             {cursos.map((curso, i) => (
-              <CourseCard key={curso.id} curso={curso} index={i} />
+              <CourseCard key={curso.id} curso={curso} index={i} hasAccess={curso.hasAccess} />
             ))}
           </div>
         )}
 
-        {/* Already a student */}
         <div className="text-center mt-16 py-10 border-t border-white/10">
           <p className="font-montserrat text-sm text-white/40 mb-3">
             ¿Ya sos alumna?
