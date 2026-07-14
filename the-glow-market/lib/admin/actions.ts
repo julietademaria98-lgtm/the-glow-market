@@ -98,16 +98,19 @@ export async function updateProducto(id: string, formData: FormData) {
   redirect('/admin/productos')
 }
 
-export async function deleteProducto(id: string) {
+export async function deleteProductoFromForm(formData: FormData) {
   const db = await checkAdmin()
+  const id = formData.get('id') as string
   await db.from('producto_imagenes').delete().eq('producto_id', id)
   await db.from('productos').delete().eq('id', id)
   revalidatePath('/admin/productos')
   revalidatePath('/productos')
 }
 
-export async function toggleActivo(id: string, activo: boolean) {
+export async function toggleActivoFromForm(formData: FormData) {
   const db = await checkAdmin()
+  const id = formData.get('id') as string
+  const activo = formData.get('activo') === 'true'
   await db.from('productos').update({ activo }).eq('id', id)
   revalidatePath('/admin/productos')
   revalidatePath('/productos')
