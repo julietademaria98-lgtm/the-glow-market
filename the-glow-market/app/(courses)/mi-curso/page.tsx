@@ -39,7 +39,6 @@ export default async function MiCursoPage() {
   return (
     <main className="min-h-screen bg-glow-cream pt-24">
       <div className="max-w-[1200px] mx-auto px-6 py-12">
-        {/* Header */}
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-2">
             <StarIcon size={10} className="text-glow-navy" />
