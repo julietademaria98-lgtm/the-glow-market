@@ -29,7 +29,7 @@ export default async function AdminOrdenesPage() {
     .reduce((sum, o) => sum + o.total, 0)
 
   return (
-    <div className="p-8">
+    <div className="p-8 pt-12">
       <div className="flex items-center justify-between mb-8">
         <h1 className="font-cormorant text-3xl text-glow-navy font-light">Órdenes</h1>
         <div className="text-right">
