@@ -39,6 +39,7 @@ export default async function MiCursoPage() {
   return (
     <main className="min-h-screen bg-glow-cream pt-24">
       <div className="max-w-[1200px] mx-auto px-6 py-12">
+        {/* Header */}
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-2">
             <StarIcon size={10} className="text-glow-navy" />
@@ -66,40 +67,35 @@ export default async function MiCursoPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {cursos.map((curso) => {
-              const primeraLeccion = curso.lecciones
-                ?.sort((a, b) => a.orden - b.orden)?.[0]
-
-              return (
-                <Link
-                  key={curso.id}
-                  href={primeraLeccion ? `/mi-curso/${primeraLeccion.id}` : `/mi-curso/curso/${curso.id}`}
-                  className="group block bg-white hover:shadow-md transition-shadow duration-300"
-                >
-                  <div className="relative aspect-video overflow-hidden">
-                    <Image
-                      src={curso.imagen_url || '/placeholder-course.jpg'}
-                      alt={curso.titulo}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                    />
-                    <div className="absolute inset-0 bg-glow-navy/20" />
-                    <div className="absolute top-3 right-3 bg-glow-navy text-white font-montserrat text-[9px] tracking-widest uppercase px-3 py-1 flex items-center gap-1">
-                      <StarIcon size={7} /> Activo
-                    </div>
+            {cursos.map((curso) => (
+              <Link
+                key={curso.id}
+                href={`/mi-curso/curso/${curso.id}`}
+                className="group block bg-white hover:shadow-md transition-shadow duration-300"
+              >
+                <div className="relative aspect-video overflow-hidden">
+                  <Image
+                    src={curso.imagen_url || '/placeholder-course.jpg'}
+                    alt={curso.titulo}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                  <div className="absolute inset-0 bg-glow-navy/20" />
+                  <div className="absolute top-3 right-3 bg-glow-navy text-white font-montserrat text-[9px] tracking-widest uppercase px-3 py-1 flex items-center gap-1">
+                    <StarIcon size={7} /> Activo
                   </div>
-                  <div className="p-5">
-                    <h2 className="font-cormorant text-xl text-glow-navy font-light mb-1">
-                      {curso.titulo}
-                    </h2>
-                    <p className="font-montserrat text-[10px] text-glow-navy/40 uppercase tracking-widest">
-                      {curso.lecciones?.length || 0} lecciones
-                    </p>
-                  </div>
-                </Link>
-              )
-            })}
+                </div>
+                <div className="p-5">
+                  <h2 className="font-cormorant text-xl text-glow-navy font-light mb-1">
+                    {curso.titulo}
+                  </h2>
+                  <p className="font-montserrat text-[10px] text-glow-navy/40 uppercase tracking-widest">
+                    {curso.lecciones?.length || 0} lecciones
+                  </p>
+                </div>
+              </Link>
+            ))}
           </div>
         )}
       </div>
