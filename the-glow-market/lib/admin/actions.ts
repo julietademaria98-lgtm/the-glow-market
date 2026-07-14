@@ -29,8 +29,6 @@ function toSlug(nombre: string) {
     .replace(/[^a-z0-9-]/g, '')
 }
 
-// ============ PRODUCTOS ============
-
 export async function createProducto(formData: FormData) {
   const db = await checkAdmin()
   const nombre = formData.get('nombre') as string
@@ -115,8 +113,6 @@ export async function toggleActivo(id: string, activo: boolean) {
   revalidatePath('/productos')
 }
 
-// ============ CURSOS ============
-
 export async function updateCurso(id: string, formData: FormData) {
   const db = await checkAdmin()
 
@@ -153,8 +149,10 @@ export async function updateLeccion(id: string, formData: FormData) {
   revalidatePath('/admin/cursos')
 }
 
-export async function grantAcceso(userId: string, cursoId: string) {
+export async function grantAccesoFromForm(formData: FormData) {
   const db = await checkAdmin()
+  const userId = formData.get('user_id') as string
+  const cursoId = formData.get('curso_id') as string
   await db.from('accesos_curso').upsert({
     user_id: userId,
     curso_id: cursoId,
