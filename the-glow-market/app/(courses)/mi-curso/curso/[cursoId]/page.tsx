@@ -128,7 +128,7 @@ export default async function CourseOverviewPage({ params }: Props) {
         <div className="py-12 border-b border-glow-navy/10">
           <div className="flex items-center gap-3 mb-8">
             <StarIcon size={9} className="text-glow-blush" />
-            <span className="font-montserrat text-[13px] tracking-[0.25em] uppercase text-glow-navy/40">
+            <span className="font-montserrat text-[13px] tracking-[0.25em] uppercase text-glow-navy">
               Contenido del curso
             </span>
           </div>
@@ -192,7 +192,7 @@ export default async function CourseOverviewPage({ params }: Props) {
         <div className="py-12 border-b border-glow-navy/10">
           <div className="flex items-center gap-3 mb-8">
             <StarIcon size={9} className="text-glow-blush" />
-            <span className="font-montserrat text-[10px] tracking-[0.25em] uppercase text-glow-navy/40">
+            <span className="font-montserrat text-[13px] tracking-[0.25em] uppercase text-glow-navy">
               Material descargable
             </span>
           </div>
@@ -219,7 +219,7 @@ export default async function CourseOverviewPage({ params }: Props) {
         <div className="py-12 border-b border-glow-navy/10">
           <div className="flex items-center gap-3 mb-8">
             <StarIcon size={9} className="text-glow-blush" />
-            <span className="font-montserrat text-[10px] tracking-[0.25em] uppercase text-glow-navy/40">
+            <span className="font-montserrat text-[13px] tracking-[0.25em] uppercase text-glow-navy">
               Todo lo que llevás
             </span>
           </div>
@@ -233,7 +233,7 @@ export default async function CourseOverviewPage({ params }: Props) {
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-3">
                 <Check size={13} className="text-glow-navy mt-0.5 flex-shrink-0" />
-                <span className="font-montserrat text-xs text-glow-navy">{item}</span>
+                <span className="font-montserrat text-sm text-glow-navy">{item}</span>
               </li>
             ))}
           </ul>
@@ -250,7 +250,7 @@ export default async function CourseOverviewPage({ params }: Props) {
               Empezar ahora
             </Link>
           )}
-          <p className="font-montserrat text-[10px] text-glow-navy/25 tracking-wide mt-4">
+          <p className="font-montserrat text-[10px] text-glow-navy tracking-wide mt-4">
             Acceso de por vida · Sponsored by Clarins
           </p>
         </div>
