@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -12,11 +11,24 @@ import Link from 'next/link'
 import StarIcon from '@/components/ui/StarIcon'
 import Button from '@/components/ui/Button'
 
-const checkoutSchema = z.object({
+const baseSchema = {
   nombre: z.string().min(2, 'Requerido'),
   apellido: z.string().min(2, 'Requerido'),
   email: z.string().email('Email inválido'),
   telefono: z.string().min(8, 'Teléfono inválido'),
+}
+
+const checkoutSchema = z.object({
+  ...baseSchema,
+  provincia: z.string().optional(),
+  ciudad: z.string().optional(),
+  direccion: z.string().optional(),
+  codigo_postal: z.string().optional(),
+  notas: z.string().optional(),
+})
+
+const checkoutSchemaFisico = z.object({
+  ...baseSchema,
   provincia: z.string().min(2, 'Requerido'),
   ciudad: z.string().min(2, 'Requerido'),
   direccion: z.string().min(5, 'Dirección inválida'),
@@ -24,7 +36,7 @@ const checkoutSchema = z.object({
   notas: z.string().optional(),
 })
 
-type CheckoutForm = z.infer<typeof checkoutSchema>
+type CheckoutForm = z.infer<typeof checkoutSchemaFisico>
 
 const PROVINCIAS = [
   'Buenos Aires', 'CABA', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba',
@@ -38,16 +50,19 @@ const INPUT_CLASS =
   'border border-glow-navy/20 focus:border-glow-navy outline-none px-4 py-3 font-montserrat text-sm text-glow-navy bg-transparent transition-colors duration-300 placeholder:text-glow-navy/30 w-full'
 
 export default function CheckoutPage() {
-  const router = useRouter()
-  const { items, total, clearCart } = useCartStore()
+  const { items, total } = useCartStore()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const soloDigital = items.length > 0 && items.every((i) => i.tipo === 'curso')
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<CheckoutForm>({ resolver: zodResolver(checkoutSchema) })
+  } = useForm<CheckoutForm>({
+    resolver: zodResolver(soloDigital ? checkoutSchema : checkoutSchemaFisico),
+  })
 
   if (items.length === 0) {
     return (
@@ -79,7 +94,6 @@ export default function CheckoutPage() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Error al procesar el pago')
 
-      // Redirigir a MercadoPago
       window.location.href = data.init_point
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error inesperado')
@@ -102,7 +116,6 @@ export default function CheckoutPage() {
           onSubmit={handleSubmit(onSubmit)}
           className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-12"
         >
-          {/* Datos de envío */}
           <div className="flex flex-col gap-8">
             <div>
               <h2 className="font-cormorant text-2xl text-glow-navy font-light mb-5">
@@ -144,65 +157,67 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            <div>
-              <h2 className="font-cormorant text-2xl text-glow-navy font-light mb-5">
-                Dirección de Envío
-              </h2>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2 flex flex-col gap-1.5">
-                  <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
-                    Dirección
-                  </label>
-                  <input {...register('direccion')} placeholder="Av. Corrientes 1234" className={INPUT_CLASS} />
-                  {errors.direccion && (
-                    <p className="font-montserrat text-[10px] text-red-400">{errors.direccion.message}</p>
-                  )}
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
-                    Provincia
-                  </label>
-                  <select {...register('provincia')} className={INPUT_CLASS + ' cursor-pointer'}>
-                    <option value="">Seleccionar...</option>
-                    {PROVINCIAS.map((p) => (
-                      <option key={p} value={p}>{p}</option>
-                    ))}
-                  </select>
-                  {errors.provincia && (
-                    <p className="font-montserrat text-[10px] text-red-400">{errors.provincia.message}</p>
-                  )}
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
-                    Ciudad
-                  </label>
-                  <input {...register('ciudad')} placeholder="Buenos Aires" className={INPUT_CLASS} />
-                  {errors.ciudad && (
-                    <p className="font-montserrat text-[10px] text-red-400">{errors.ciudad.message}</p>
-                  )}
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
-                    Código Postal
-                  </label>
-                  <input {...register('codigo_postal')} placeholder="1000" className={INPUT_CLASS} />
-                  {errors.codigo_postal && (
-                    <p className="font-montserrat text-[10px] text-red-400">{errors.codigo_postal.message}</p>
-                  )}
-                </div>
-                <div className="col-span-2 flex flex-col gap-1.5">
-                  <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
-                    Notas (opcional)
-                  </label>
-                  <textarea
-                    {...register('notas')}
-                    rows={3}
-                    placeholder="Instrucciones especiales de entrega..."
-                    className={INPUT_CLASS + ' resize-none'}
-                  />
+            {!soloDigital && (
+              <div>
+                <h2 className="font-cormorant text-2xl text-glow-navy font-light mb-5">
+                  Dirección de Envío
+                </h2>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-2 flex flex-col gap-1.5">
+                    <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
+                      Dirección
+                    </label>
+                    <input {...register('direccion')} placeholder="Av. Corrientes 1234" className={INPUT_CLASS} />
+                    {errors.direccion && (
+                      <p className="font-montserrat text-[10px] text-red-400">{errors.direccion.message}</p>
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
+                      Provincia
+                    </label>
+                    <select {...register('provincia')} className={INPUT_CLASS + ' cursor-pointer'}>
+                      <option value="">Seleccionar...</option>
+                      {PROVINCIAS.map((p) => (
+                        <option key={p} value={p}>{p}</option>
+                      ))}
+                    </select>
+                    {errors.provincia && (
+                      <p className="font-montserrat text-[10px] text-red-400">{errors.provincia.message}</p>
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
+                      Ciudad
+                    </label>
+                    <input {...register('ciudad')} placeholder="Buenos Aires" className={INPUT_CLASS} />
+                    {errors.ciudad && (
+                      <p className="font-montserrat text-[10px] text-red-400">{errors.ciudad.message}</p>
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
+                      Código Postal
+                    </label>
+                    <input {...register('codigo_postal')} placeholder="1000" className={INPUT_CLASS} />
+                    {errors.codigo_postal && (
+                      <p className="font-montserrat text-[10px] text-red-400">{errors.codigo_postal.message}</p>
+                    )}
+                  </div>
+                  <div className="col-span-2 flex flex-col gap-1.5">
+                    <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
+                      Notas (opcional)
+                    </label>
+                    <textarea
+                      {...register('notas')}
+                      rows={3}
+                      placeholder="Instrucciones especiales de entrega..."
+                      className={INPUT_CLASS + ' resize-none'}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {error && (
               <p className="font-montserrat text-xs text-red-500 bg-red-50 px-4 py-3">
@@ -211,7 +226,6 @@ export default function CheckoutPage() {
             )}
           </div>
 
-          {/* Order Summary */}
           <div className="bg-white p-8 flex flex-col gap-6 h-fit sticky top-24">
             <h2 className="font-cormorant text-2xl text-glow-navy font-light">
               Tu Pedido
