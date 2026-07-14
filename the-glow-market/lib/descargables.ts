@@ -39,6 +39,14 @@ const DESCARGABLES_POR_ORDEN: Record<number, Descargable[]> = {
       filename: 'bronzer-tipo-cara.pdf',
     },
   ],
+  4: [
+    {
+      titulo: 'Bronzer por Tipo de Cara',
+      subtitulo: 'Aplicación personalizada según tu forma de rostro',
+      filename: 'bronzer-tipo-cara.pdf',
+      notaExtra: 'El mismo descargable del Módulo 2 — lo usás también acá',
+    },
+  ],
 }
 
 const MODULO_KEYWORDS: { keywords: string[]; orden: number }[] = [
