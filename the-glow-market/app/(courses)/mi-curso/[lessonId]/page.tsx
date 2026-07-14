@@ -70,7 +70,7 @@ export default async function LeccionPage({ params }: Props) {
   const descargables = getDescargablesByModulo(leccion.modulo_orden, leccion.modulo)
 
   return (
-    <main className="min-h-screen bg-glow-dark flex flex-col lg:flex-row pt-16">
+    <main className="min-h-screen bg-glow-navy/20 flex flex-col lg:flex-row pt-16">
       <LessonSidebar
         curso={curso}
         lecciones={lecciones}
@@ -79,14 +79,14 @@ export default async function LeccionPage({ params }: Props) {
 
       <div className="flex-1 overflow-y-auto">
         <div className="px-6 md:px-10 pt-6 pb-4">
-          <nav className="font-montserrat text-[10px] tracking-[0.15em] uppercase text-white/30 flex gap-2">
-            <Link href="/mi-curso" className="hover:text-white/60 transition-colors">
+          <nav className="font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/40 flex gap-2">
+            <Link href="/mi-curso" className="hover:text-glow-navy transition-colors">
               Mis Cursos
             </Link>
             <span>/</span>
-            <span className="text-white/50">{curso.titulo}</span>
+            <span className="text-glow-navy/60">{curso.titulo}</span>
             <span>/</span>
-            <span className="text-white/70">{leccion.titulo}</span>
+            <span className="text-glow-navy/80">{leccion.titulo}</span>
           </nav>
         </div>
 
@@ -97,15 +97,15 @@ export default async function LeccionPage({ params }: Props) {
         <div className="px-6 md:px-10 py-8 max-w-3xl">
           <div className="flex items-center gap-2 mb-3">
             <StarIcon size={10} className="text-glow-blush" />
-            <span className="font-montserrat text-[9px] tracking-[0.2em] uppercase text-white/30">
+            <span className="font-montserrat text-[9px] tracking-[0.2em] uppercase text-glow-navy/40">
               {leccion.duracion && `${leccion.duracion} ·`} Lección
             </span>
           </div>
-          <h1 className="font-cormorant text-3xl md:text-4xl text-white font-light tracking-wide mb-4">
+          <h1 className="font-cormorant text-3xl md:text-4xl text-glow-navy font-light tracking-wide mb-4">
             {leccion.titulo}
           </h1>
           {leccion.descripcion && (
-            <p className="font-montserrat text-sm text-white/60 leading-relaxed">
+            <p className="font-montserrat text-sm text-glow-navy/70 leading-relaxed">
               {leccion.descripcion}
             </p>
           )}
@@ -113,10 +113,10 @@ export default async function LeccionPage({ params }: Props) {
 
         {descargables.length > 0 && (
           <div className="px-6 md:px-10 pb-12 max-w-3xl">
-            <div className="border-t border-white/10 pt-8">
+            <div className="border-t border-glow-navy/10 pt-8">
               <div className="flex items-center gap-2 mb-5">
                 <StarIcon size={9} className="text-glow-blush" />
-                <span className="font-montserrat text-[10px] tracking-[0.25em] uppercase text-white/50">
+                <span className="font-montserrat text-[10px] tracking-[0.25em] uppercase text-glow-navy/50">
                   Descargables de este módulo
                 </span>
               </div>
@@ -126,20 +126,20 @@ export default async function LeccionPage({ params }: Props) {
                     key={d.filename}
                     href={`/${d.filename}`}
                     download
-                    className="group flex items-start gap-4 p-4 border border-white/10 hover:border-glow-blush/40 hover:bg-white/5 transition-all duration-200"
+                    className="group flex items-start gap-4 p-4 border border-glow-navy/15 hover:border-glow-blush/50 hover:bg-glow-navy/5 transition-all duration-200"
                   >
-                    <div className="flex-shrink-0 w-8 h-8 border border-white/20 group-hover:border-glow-blush/50 flex items-center justify-center transition-colors">
-                      <Download size={13} className="text-white/40 group-hover:text-glow-blush transition-colors" />
+                    <div className="flex-shrink-0 w-8 h-8 border border-glow-navy/20 group-hover:border-glow-blush/50 flex items-center justify-center transition-colors">
+                      <Download size={13} className="text-glow-navy/40 group-hover:text-glow-blush transition-colors" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-montserrat text-xs font-medium text-white group-hover:text-glow-blush transition-colors">
+                      <p className="font-montserrat text-xs font-medium text-glow-navy group-hover:text-glow-blush transition-colors">
                         {d.titulo}
                       </p>
-                      <p className="font-montserrat text-[10px] text-white/40 mt-0.5 leading-relaxed">
+                      <p className="font-montserrat text-[10px] text-glow-navy/50 mt-0.5 leading-relaxed">
                         {d.subtitulo}
                       </p>
                       {d.notaExtra && (
-                        <p className="font-montserrat text-[9px] text-glow-blush/50 mt-1 italic">
+                        <p className="font-montserrat text-[9px] text-glow-blush/60 mt-1 italic">
                           {d.notaExtra}
                         </p>
                       )}
@@ -156,7 +156,7 @@ export default async function LeccionPage({ params }: Props) {
             <a
               href="/kit-esencial.pdf"
               download
-              className="group inline-flex items-center gap-2 font-montserrat text-[10px] tracking-[0.15em] uppercase text-white/30 hover:text-glow-blush transition-colors border-b border-white/10 hover:border-glow-blush/30 pb-0.5"
+              className="group inline-flex items-center gap-2 font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/40 hover:text-glow-blush transition-colors border-b border-glow-navy/15 hover:border-glow-blush/30 pb-0.5"
             >
               <Download size={10} />
               Consultá el Kit Esencial completo
