@@ -91,7 +91,7 @@ export default async function AdminOrdenesPage() {
 
         {ordenes.length === 0 && (
           <div className="text-center py-16">
-            <p className="font-montserrat text-sm text-gray-400">No hay órdenes aún</p>
+            <p className="font-montserrat text-xs text-gray-400">No hay órdenes aún</p>
           </div>
         )}
       </div>
