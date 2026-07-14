@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Check, Play, ChevronLeft } from 'lucide-react'
+import { Check, Play, ChevronLeft, Download } from 'lucide-react'
 import type { Leccion, Curso } from '@/types'
 import StarIcon from '@/components/ui/StarIcon'
 
@@ -97,7 +97,11 @@ export default function LessonSidebar({
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className={`font-montserrat text-xs leading-relaxed ${isActive ? 'text-white font-medium' : 'text-white/55'}`}>
+                    <p
+                      className={`font-montserrat text-xs leading-relaxed ${
+                        isActive ? 'text-white font-medium' : 'text-white/55'
+                      }`}
+                    >
                       {leccion.titulo}
                     </p>
                     {leccion.duracion && (
@@ -112,6 +116,26 @@ export default function LessonSidebar({
           </div>
         ))}
       </nav>
+
+      <div className="border-t border-white/10 p-4">
+        <a
+          href="/kit-esencial.pdf"
+          download
+          className="group flex items-center gap-3 px-3 py-3 border border-white/10 hover:border-glow-blush/40 hover:bg-white/5 transition-all duration-200"
+        >
+          <div className="w-7 h-7 border border-white/20 group-hover:border-glow-blush/50 flex items-center justify-center flex-shrink-0 transition-colors">
+            <Download size={11} className="text-white/40 group-hover:text-glow-blush transition-colors" />
+          </div>
+          <div>
+            <p className="font-montserrat text-[10px] font-medium text-white/70 group-hover:text-white transition-colors">
+              Kit Esencial
+            </p>
+            <p className="font-montserrat text-[9px] text-white/30 mt-0.5">
+              Productos por módulo · PDF
+            </p>
+          </div>
+        </a>
+      </div>
     </aside>
   )
 }
