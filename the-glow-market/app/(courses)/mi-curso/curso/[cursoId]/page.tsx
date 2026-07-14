@@ -138,14 +138,14 @@ export default async function CourseOverviewPage({ params }: Props) {
               <div key={nombreModulo} className="border border-glow-navy/10">
                 <div className="px-6 py-4 bg-glow-navy/[0.03] flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <span className="font-cormorant text-2xl text-glow-blush/40 font-light w-8">
+                    <span className="font-cormorant text-2xl text-glow-blush font-light w-8">
                       {String(mi + 1).padStart(2, '0')}
                     </span>
                     <h3 className="font-cormorant text-lg text-glow-navy font-light tracking-wide uppercase">
                       {nombreModulo}
                     </h3>
                   </div>
-                  <span className="font-montserrat text-[9px] tracking-widest uppercase text-glow-navy/25">
+                  <span className="font-montserrat text-[9px] tracking-widest uppercase text-glow-navy/60">
                     {leccionesModulo.length} {leccionesModulo.length === 1 ? 'lección' : 'lecciones'}
                   </span>
                 </div>
@@ -157,11 +157,11 @@ export default async function CourseOverviewPage({ params }: Props) {
                       href={`/mi-curso/${leccion.id}`}
                       className="flex items-center gap-4 px-6 py-4 hover:bg-glow-navy/5 transition-colors duration-200 group"
                     >
-                      <div className="w-7 h-7 rounded-full border border-glow-navy/15 flex items-center justify-center flex-shrink-0 group-hover:border-glow-blush/60 group-hover:bg-glow-blush/10 transition-all duration-200">
-                        <Play size={9} className="text-glow-navy/30 group-hover:text-glow-blush fill-current transition-colors" />
+                      <div className="w-7 h-7 rounded-full border border-glow-navy/30 flex items-center justify-center flex-shrink-0 group-hover:border-glow-blush group-hover:bg-glow-blush/10 transition-all duration-200">
+                        <Play size={9} className="text-glow-navy/60 group-hover:text-glow-blush fill-current transition-colors" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-montserrat text-xs text-glow-navy/60 group-hover:text-glow-navy transition-colors">
+                        <p className="font-montserrat text-xs text-glow-navy group-hover:text-glow-navy transition-colors">
                           {leccion.titulo}
                           {leccion.es_preview && (
                             <span className="ml-2 font-montserrat text-[9px] tracking-widest uppercase text-glow-blush/70">
@@ -170,13 +170,13 @@ export default async function CourseOverviewPage({ params }: Props) {
                           )}
                         </p>
                         {leccion.descripcion && (
-                          <p className="font-montserrat text-[13px] text-glow-navy/40 mt-0.5 truncate pr-4">
+                          <p className="font-montserrat text-[13px] text-glow-navy/60 mt-0.5 truncate pr-4">
                             {leccion.descripcion}
                           </p>
                         )}
                       </div>
                       {leccion.duracion && (
-                        <span className="font-montserrat text-[10px] text-glow-navy/25 flex-shrink-0 tabular-nums">
+                        <span className="font-montserrat text-[10px] text-glow-navy/60 flex-shrink-0 tabular-nums">
                           {leccion.duracion}
                         </span>
                       )}
