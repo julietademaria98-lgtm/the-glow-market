@@ -1,4 +1,5 @@
 import { createClient as createServiceClient } from '@supabase/supabase-js'
+import Link from 'next/link'
 import { updateCurso, updateLeccion, grantAccesoFromForm, revokeAcceso } from '@/lib/admin/actions'
 import type { Curso, Leccion } from '@/types'
 
@@ -27,11 +28,12 @@ export default async function AdminCursosPage() {
       <h1 className="font-cormorant text-3xl text-glow-navy font-light">Cursos</h1>
 
       {cursos.map((curso) => {
-        const lecciones = (curso.lecciones || []).sort((a: Leccion, b: Leccion) => a.orden - b.orden)
+        const lecciones = (curso.lecciones || []).sort((a, b) => a.orden - b.orden)
         const cursosAccesos = accesos.filter((a: any) => a.curso_id === curso.id)
 
         return (
           <div key={curso.id} className="bg-white rounded shadow-sm overflow-hidden">
+            {/* Curso header */}
             <div className="border-b border-gray-100 p-6">
               <div className="flex items-start justify-between gap-4">
                 <div>
@@ -61,10 +63,11 @@ export default async function AdminCursosPage() {
               </div>
             </div>
 
+            {/* Lecciones */}
             <div className="p-6 border-b border-gray-100">
               <p className="font-montserrat text-[9px] tracking-[0.2em] uppercase text-gray-400 mb-4">Lecciones</p>
               <div className="space-y-3">
-                {lecciones.map((l: Leccion) => (
+                {lecciones.map((l) => (
                   <details key={l.id} className="border border-gray-100 rounded">
                     <summary className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50">
                       <span className="font-montserrat text-[10px] text-gray-400 w-5">{l.orden}</span>
@@ -93,14 +96,16 @@ export default async function AdminCursosPage() {
               </div>
             </div>
 
+            {/* Alumnas */}
             <div className="p-6">
               <p className="font-montserrat text-[9px] tracking-[0.2em] uppercase text-gray-400 mb-4">
                 Alumnas con acceso ({cursosAccesos.length})
               </p>
 
+              {/* Dar acceso */}
               <form action={grantAccesoFromForm} className="flex gap-2 mb-4">
-                <input name="user_id" className="admin-input flex-1" placeholder="User ID de Supabase" />
                 <input type="hidden" name="curso_id" value={curso.id} />
+                <input name="user_id" className="admin-input flex-1" placeholder="User ID de Supabase" />
                 <button type="submit" className="bg-glow-navy text-white font-montserrat text-[9px] tracking-wide uppercase px-4 py-2 whitespace-nowrap">
                   Dar acceso
                 </button>
