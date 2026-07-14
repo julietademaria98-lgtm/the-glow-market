@@ -13,7 +13,6 @@ export default function Navbar() {
   const itemCount = useCartStore((state) => state.itemCount())
   const pathname = usePathname()
 
-  // En homepage el navbar arranca transparente, en el resto siempre sólido
   const isHome = pathname === '/'
   const solid = scrolled || !isHome
 
@@ -65,7 +64,7 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
-            <Link href="/mi-cuenta" className={`nav-link transition-colors duration-300 ${!solid ? 'text-white/90 hover:text-white' : ''}`}>
+            <Link href="/mi-curso" className={`nav-link transition-colors duration-300 ${!solid ? 'text-white/90 hover:text-white' : ''}`}>
               Mi Cuenta
             </Link>
           </div>
@@ -108,7 +107,7 @@ export default function Navbar() {
               { href: '/productos', label: 'Market' },
               { href: '/cursos', label: 'Cursos Online' },
               { href: '/carrito', label: 'Carrito' },
-              { href: '/mi-cuenta', label: 'Mi Cuenta' },
+              { href: '/mi-curso', label: 'Mi Cuenta' },
             ].map((link) => (
               <Link
                 key={link.href}
