@@ -1,5 +1,5 @@
 import { createClient as createServiceClient } from '@supabase/supabase-js'
-import { updateCurso, updateLeccion, grantAcceso, revokeAcceso } from '@/lib/admin/actions'
+import { updateCurso, updateLeccion, grantAccesoFromForm, revokeAcceso } from '@/lib/admin/actions'
 import type { Curso, Leccion } from '@/types'
 
 async function getData() {
@@ -27,12 +27,11 @@ export default async function AdminCursosPage() {
       <h1 className="font-cormorant text-3xl text-glow-navy font-light">Cursos</h1>
 
       {cursos.map((curso) => {
-        const lecciones = (curso.lecciones || []).sort((a, b) => a.orden - b.orden)
+        const lecciones = (curso.lecciones || []).sort((a: Leccion, b: Leccion) => a.orden - b.orden)
         const cursosAccesos = accesos.filter((a: any) => a.curso_id === curso.id)
 
         return (
           <div key={curso.id} className="bg-white rounded shadow-sm overflow-hidden">
-            {/* Curso header */}
             <div className="border-b border-gray-100 p-6">
               <div className="flex items-start justify-between gap-4">
                 <div>
@@ -62,11 +61,10 @@ export default async function AdminCursosPage() {
               </div>
             </div>
 
-            {/* Lecciones */}
             <div className="p-6 border-b border-gray-100">
               <p className="font-montserrat text-[9px] tracking-[0.2em] uppercase text-gray-400 mb-4">Lecciones</p>
               <div className="space-y-3">
-                {lecciones.map((l) => (
+                {lecciones.map((l: Leccion) => (
                   <details key={l.id} className="border border-gray-100 rounded">
                     <summary className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50">
                       <span className="font-montserrat text-[10px] text-gray-400 w-5">{l.orden}</span>
@@ -76,4 +74,54 @@ export default async function AdminCursosPage() {
                     <form action={updateLeccion.bind(null, l.id)} className="p-4 pt-2 space-y-3 border-t border-gray-100">
                       <input name="titulo" defaultValue={l.titulo} className="admin-input" placeholder="Título" />
                       <input name="descripcion" defaultValue={l.descripcion || ''} className="admin-input" placeholder="Descripción" />
-                      <input name="video_path" defaultValue={l.vide
+                      <input name="video_path" defaultValue={l.video_path} className="admin-input" placeholder="video_path (ej: modulo 1 baja.mp4)" />
+                      <div className="flex gap-3">
+                        <input name="orden" type="number" defaultValue={l.orden} className="admin-input w-24" placeholder="Orden" />
+                        <input name="duracion" defaultValue={l.duracion || ''} className="admin-input w-24" placeholder="Duración" />
+                        <input name="modulo" defaultValue={l.modulo || ''} className="admin-input flex-1" placeholder="Nombre del módulo" />
+                      </div>
+                      <label className="flex items-center gap-2">
+                        <input name="es_preview" type="checkbox" defaultChecked={l.es_preview} />
+                        <span className="font-montserrat text-[10px] text-gray-600">Es preview</span>
+                      </label>
+                      <button type="submit" className="bg-glow-navy text-white font-montserrat text-[10px] tracking-wide uppercase px-4 py-2">
+                        Guardar lección
+                      </button>
+                    </form>
+                  </details>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-6">
+              <p className="font-montserrat text-[9px] tracking-[0.2em] uppercase text-gray-400 mb-4">
+                Alumnas con acceso ({cursosAccesos.length})
+              </p>
+
+              <form action={grantAccesoFromForm} className="flex gap-2 mb-4">
+                <input name="user_id" className="admin-input flex-1" placeholder="User ID de Supabase" />
+                <input type="hidden" name="curso_id" value={curso.id} />
+                <button type="submit" className="bg-glow-navy text-white font-montserrat text-[9px] tracking-wide uppercase px-4 py-2 whitespace-nowrap">
+                  Dar acceso
+                </button>
+              </form>
+
+              <div className="space-y-2">
+                {cursosAccesos.map((a: any) => (
+                  <div key={a.id} className="flex items-center justify-between py-2 border-b border-gray-50">
+                    <span className="font-montserrat text-[10px] text-gray-600">{a.user?.email || a.user_id}</span>
+                    <form action={revokeAcceso.bind(null, a.id)}>
+                      <button type="submit" className="font-montserrat text-[9px] text-red-400 hover:text-red-600">
+                        Revocar
+                      </button>
+                    </form>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
