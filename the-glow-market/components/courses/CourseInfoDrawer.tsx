@@ -33,6 +33,7 @@ export default function CourseInfoDrawer({ curso, isOpen, onClose }: CourseInfoD
       nombre: curso.titulo,
       precio: Number(curso.precio_oferta ?? curso.precio),
       imagen_url: curso.imagen_url || '',
+      tipo: 'curso',
     })
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
@@ -130,11 +131,13 @@ export default function CourseInfoDrawer({ curso, isOpen, onClose }: CourseInfoD
                   <span className="font-cormorant text-3xl text-glow-blush/50 font-light leading-none flex-shrink-0">
                     {mod.num}
                   </span>
-                  <div className="flex items-baseline gap-2">
-                    <h4 className="font-montserrat text-xs font-medium tracking-wide text-glow-navy uppercase">
-                      {mod.titulo}
-                    </h4>
-                    <span className="font-montserrat text-[10px] text-glow-navy/40">· {mod.duracion}</span>
+                  <div>
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <h4 className="font-montserrat text-xs font-medium tracking-wide text-glow-navy uppercase">
+                        {mod.titulo}
+                      </h4>
+                      <span className="font-montserrat text-[10px] text-glow-navy/40">· {mod.duracion}</span>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -195,7 +198,7 @@ export default function CourseInfoDrawer({ curso, isOpen, onClose }: CourseInfoD
               {[
                 {
                   q: '¿Cuánto dura el curso?',
-                  a: 'Los 4 módulos suman alrededor de 25 minutos de video. Está pensado para que lo puedas hacer en una mañana o repartido en varios días. Lo importante no es la duración, es la cantidad de veces que vas a volver a verlo.',
+                  a: 'Los 4 módulos suman alrededor de 25 minutos de video. Está pensado para que lo puedas hacer en una mañana o repartido en varios días.',
                 },
                 {
                   q: '¿Cuándo lo puedo ver?',
@@ -203,7 +206,7 @@ export default function CourseInfoDrawer({ curso, isOpen, onClose }: CourseInfoD
                 },
                 {
                   q: '¿Necesito comprar todos los productos Clarins?',
-                  a: 'No. El curso te sirve aunque uses productos que ya tenés. Recomendamos Clarins porque son los que funcionan con este método, y las alumnas tienen un beneficio exclusivo. Podés ir comprando de a uno, según tu prioridad.',
+                  a: 'No. El curso te sirve aunque uses productos que ya tenés. Recomendamos Clarins porque son los que funcionan con este método, y las alumnas tienen un beneficio exclusivo.',
                 },
                 {
                   q: '¿Tengo acceso para siempre?',
