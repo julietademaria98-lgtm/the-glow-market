@@ -23,7 +23,7 @@ export default function ProductCard({ producto, index = 0 }: ProductCardProps) {
     '/placeholder-product.jpg'
 
   const hoverImage =
-    producto.imagenes?.find((img) => !img.es_principal)?.url
+    producto.imagenes?.find((img, i) => !img.es_principal && i > 0)?.url
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -41,23 +41,20 @@ export default function ProductCard({ producto, index = 0 }: ProductCardProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.7, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
-      className="group"
+      className="group product-card-container"
     >
       <Link href={`/productos/${producto.slug}`} className="block">
         {/* Image container */}
-        <div
-          className="relative overflow-hidden"
-          style={{ aspectRatio: '3 / 4', backgroundColor: '#F2F0EC' }}
-        >
+        <div className="relative aspect-square overflow-hidden bg-white">
           <Image
             src={mainImage}
             alt={producto.nombre}
             fill
-            className="object-cover transition-opacity duration-500"
+            className="object-cover product-card-image transition-opacity duration-500"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
           {hoverImage && (
@@ -70,45 +67,51 @@ export default function ProductCard({ producto, index = 0 }: ProductCardProps) {
             />
           )}
 
-          {/* Oferta badge */}
-          {producto.precio_oferta && (
+          {/* Badges */}
+          {producto.stock === 0 ? (
+            <div className="absolute top-3 left-3 bg-glow-navy/50 text-white font-montserrat text-[9px] tracking-widest uppercase px-2 py-1">
+              Sin stock
+            </div>
+          ) : producto.precio_oferta ? (
             <div className="absolute top-3 left-3 bg-glow-navy text-white font-montserrat text-[9px] tracking-widest uppercase px-2 py-1">
               Oferta
             </div>
-          )}
+          ) : null}
 
-          {/* Add to cart — aparece en hover */}
-          <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]">
-            <button
-              onClick={handleAddToCart}
-              className={`w-full py-3 font-montserrat text-[10px] tracking-[0.2em] uppercase transition-colors duration-300 ${
-                added
-                  ? 'bg-glow-navy/80 text-white'
-                  : 'bg-white/90 text-glow-navy hover:bg-glow-navy hover:text-white'
-              }`}
-            >
-              {added ? '✓ Agregado' : 'Agregar al carrito'}
-            </button>
-          </div>
+          {/* Add to cart — slide from bottom */}
+          {producto.stock !== 0 && (
+            <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]">
+              <button
+                onClick={handleAddToCart}
+                className={`w-full py-3 font-montserrat text-[10px] tracking-[0.2em] uppercase transition-colors duration-300 ${
+                  added
+                    ? 'bg-glow-royal text-white'
+                    : 'bg-glow-navy text-white hover:bg-glow-blue'
+                }`}
+              >
+                {added ? '✓ Agregado' : 'Agregar al carrito'}
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* Product info — nombre izquierda, precio derecha */}
-        <div className="flex items-baseline justify-between mt-3 px-0.5">
-          <h3 className="font-montserrat text-[11px] tracking-[0.15em] uppercase text-glow-navy">
+        {/* Product info */}
+        <div className="mt-3 space-y-1">
+          <h3 className="font-cormorant text-base md:text-lg text-glow-navy tracking-wide leading-tight">
             {producto.nombre}
           </h3>
-          <div className="flex items-baseline gap-2 shrink-0 ml-2">
+          <div className="flex items-baseline gap-2">
             {producto.precio_oferta ? (
               <>
-                <span className="font-montserrat text-[11px] text-glow-navy">
+                <span className="font-montserrat text-sm font-medium text-glow-navy">
                   {formatPrice(Number(producto.precio_oferta))}
                 </span>
-                <span className="font-montserrat text-[10px] text-glow-navy/40 line-through">
+                <span className="font-montserrat text-xs text-glow-navy/40 line-through">
                   {formatPrice(Number(producto.precio))}
                 </span>
               </>
             ) : (
-              <span className="font-montserrat text-[11px] text-glow-navy">
+              <span className="font-montserrat text-sm font-medium text-glow-navy">
                 {formatPrice(Number(producto.precio))}
               </span>
             )}
