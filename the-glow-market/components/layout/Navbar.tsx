@@ -81,7 +81,10 @@ export default function Navbar() {
             </Link>
 
             <div className="relative group">
-              <Link href={user ? '/mi-curso' : '/login'} className={navLinkClass}>
+              <Link
+                href={user ? '/mi-curso' : '/login?redirect=%2Fmi-curso'}
+                className={navLinkClass}
+              >
                 {user ? 'Mi Curso' : 'Mi Cuenta'}
               </Link>
               <div className="absolute right-0 top-full pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
@@ -147,7 +150,6 @@ export default function Navbar() {
           }`}
           onClick={() => setMenuOpen(false)}
         />
-
         <div
           className={`absolute top-0 left-0 h-full w-72 bg-glow-cream flex flex-col pt-20 px-8 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
             menuOpen ? 'translate-x-0' : '-translate-x-full'
