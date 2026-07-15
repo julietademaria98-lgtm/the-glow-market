@@ -69,7 +69,7 @@ export default async function AdminOrdenesPage() {
                       <p className="font-montserrat text-[9px] text-gray-400">{o.datos_envio.email}</p>
                     </div>
                   ) : (
-                    <p className="font-montserrat text-[9px] text-gray-400">{o.userEmail || '—'}</p>
+                    <p className="font-montserrat text-[9px] text-gray-400">{(o as any).userEmail || '—'}</p>
                   )}
                 </td>
                 <td className="px-4 py-3">
@@ -85,18 +85,20 @@ export default async function AdminOrdenesPage() {
                   ${o.total.toLocaleString('es-AR')}
                 </td>
                 <td className="px-4 py-3">
-                  <form action={updateEstadoOrden.bind(null, o.id)}>
+                  <form action={updateEstadoOrden.bind(null, o.id)} className="flex items-center gap-2">
                     <select
                       name="estado"
                       defaultValue={o.estado}
-                      onChange="this.form.requestSubmit()"
-                      className={`text-[9px] font-montserrat tracking-wide uppercase rounded px-2 py-1 border-0 cursor-pointer ${ESTADO_COLORS[o.estado] || 'bg-gray-100 text-gray-400'}`}
+                      className="text-[9px] font-montserrat tracking-wide uppercase rounded px-2 py-1 border border-gray-200 cursor-pointer bg-white"
                     >
                       <option value="pendiente">Pendiente</option>
                       <option value="aprobado">Aprobado</option>
                       <option value="en_proceso">En proceso</option>
                       <option value="rechazado">Rechazado</option>
                     </select>
+                    <button type="submit" className="font-montserrat text-[9px] text-glow-navy hover:underline">
+                      ✓
+                    </button>
                   </form>
                 </td>
               </tr>
