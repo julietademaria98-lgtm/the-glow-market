@@ -3,15 +3,42 @@ import { createClient } from '@supabase/supabase-js'
 import { getPayment } from '@/lib/mercadopago'
 import { sendOrderConfirmation } from '@/lib/email'
 import type { MPWebhookData } from '@/types'
+import { createHmac } from 'crypto'
 
 const adminClient = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+function verifyWebhookSignature(request: Request, rawBody: string, dataId: string): boolean {
+  const secret = process.env.MP_WEBHOOK_SECRET
+  if (!secret) return true
+
+  const xSignature = request.headers.get('x-signature')
+  const xRequestId = request.headers.get('x-request-id')
+
+  if (!xSignature) return false
+
+  const parts = Object.fromEntries(xSignature.split(',').map(p => p.split('=')))
+  const ts = parts['ts']
+  const v1 = parts['v1']
+
+  if (!ts || !v1) return false
+
+  const signedTemplate = `id:${dataId};request-id:${xRequestId};ts:${ts};`
+  const expectedSignature = createHmac('sha256', secret).update(signedTemplate).digest('hex')
+
+  return expectedSignature === v1
+}
+
 export async function POST(request: Request) {
   try {
-    const body: MPWebhookData = await request.json()
+    const rawBody = await request.text()
+    const body: MPWebhookData = JSON.parse(rawBody)
+
+    if (!verifyWebhookSignature(request, rawBody, body.data?.id)) {
+      return NextResponse.json({ error: 'Firma inválida' }, { status: 401 })
+    }
 
     if (body.type !== 'payment') {
       return NextResponse.json({ ok: true })
@@ -41,7 +68,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Error actualizando orden' }, { status: 500 })
     }
 
-    // Descontar stock de productos
     if (orden.items) {
       for (const item of orden.items) {
         const { data: producto } = await adminClient
@@ -60,7 +86,6 @@ export async function POST(request: Request) {
       }
     }
 
-    // Si hay user_id, verificar si compró algún curso
     if (orden.user_id && orden.items) {
       for (const item of orden.items) {
         const { data: curso } = await adminClient
@@ -81,7 +106,6 @@ export async function POST(request: Request) {
       }
     }
 
-    // Enviar email de confirmación
     try {
       const { data: usuario } = await adminClient.auth.admin.getUserById(orden.user_id || '')
       const email = usuario?.user?.email || payment.payer?.email
