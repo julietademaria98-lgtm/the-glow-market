@@ -79,18 +79,27 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
+
             {user ? (
-              <>
-                <Link href="/mi-curso" className={navLinkClass}>
+              <div className="relative group">
+                <Link
+                  href="/mi-curso"
+                  className={navLinkClass}
+                >
                   Mi Curso
                 </Link>
-                <button
-                  onClick={handleLogout}
-                  className={`nav-link transition-colors duration-300 ${!scrolled ? 'text-white/70 hover:text-white' : 'opacity-60 hover:opacity-100'}`}
-                >
-                  Cerrar sesión
-                </button>
-              </>
+                {/* Dropdown */}
+                <div className="absolute right-0 top-full pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                  <div className="bg-white shadow-md min-w-[160px] py-2">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2.5 font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/60 hover:text-glow-navy hover:bg-glow-cream transition-colors"
+                    >
+                      Cerrar sesión
+                    </button>
+                  </div>
+                </div>
+              </div>
             ) : (
               <Link href="/login" className={navLinkClass}>
                 Iniciar sesión
@@ -158,7 +167,7 @@ export default function Navbar() {
             {user && (
               <button
                 onClick={handleLogout}
-                className="font-cormorant text-2xl text-glow-navy/50 tracking-wide hover:opacity-60 transition-opacity text-left"
+                className="font-cormorant text-2xl text-glow-navy/40 tracking-wide hover:opacity-60 transition-opacity text-left"
               >
                 Cerrar sesión
               </button>
