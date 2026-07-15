@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useCartStore } from '@/store/cartStore'
 import { formatPrice } from '@/lib/utils'
+import { createClient } from '@/lib/supabase/client'
+import type { User } from '@supabase/supabase-js'
 import Image from 'next/image'
 import Link from 'next/link'
 import StarIcon from '@/components/ui/StarIcon'
@@ -50,11 +52,22 @@ const INPUT_CLASS =
   'border border-glow-navy/20 focus:border-glow-navy outline-none px-4 py-3 font-montserrat text-sm text-glow-navy bg-transparent transition-colors duration-300 placeholder:text-glow-navy/30 w-full'
 
 export default function CheckoutPage() {
-  const { items, total } = useCartStore()
+  const { items, total, clearCart } = useCartStore()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [user, setUser] = useState<User | null>(null)
+  const [checkingAuth, setCheckingAuth] = useState(true)
 
   const soloDigital = items.length > 0 && items.every((i) => i.tipo === 'curso')
+  const hasCurso = items.some((i) => i.tipo === 'curso')
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user)
+      setCheckingAuth(false)
+    })
+  }, [])
 
   const {
     register,
@@ -75,6 +88,57 @@ export default function CheckoutPage() {
           <Link href="/productos">
             <Button variant="primary" size="md">Ver Tienda</Button>
           </Link>
+        </div>
+      </main>
+    )
+  }
+
+  if (checkingAuth) {
+    return (
+      <main className="min-h-screen bg-glow-cream flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-glow-navy border-t-transparent rounded-full animate-spin" />
+      </main>
+    )
+  }
+
+  // Gate: tiene curso y no está logueada
+  if (hasCurso && !user) {
+    return (
+      <main className="min-h-screen bg-glow-cream pt-24 flex items-center justify-center px-6">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-10">
+            <div className="flex items-center justify-center gap-2 mb-6">
+              <StarIcon size={10} className="text-glow-navy" />
+              <StarIcon size={16} className="text-glow-navy" />
+              <StarIcon size={10} className="text-glow-navy" />
+            </div>
+            <h1 className="font-cormorant text-4xl text-glow-navy font-light tracking-wide mb-4">
+              Antes de continuar
+            </h1>
+            <p className="font-montserrat text-sm text-glow-navy/60 leading-relaxed max-w-sm mx-auto">
+              Estás comprando un curso online. Para poder acceder a él una vez acreditado el pago, 
+              necesitás una cuenta en The Glow Market con el mismo email que uses para la compra.
+            </p>
+          </div>
+
+          <div className="bg-white p-8 flex flex-col gap-4">
+            <p className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/40 text-center">
+              ¿Cómo querés continuar?
+            </p>
+            <Link href="/registro?redirect=/checkout">
+              <Button variant="primary" className="w-full" size="md">
+                Crear cuenta nueva
+              </Button>
+            </Link>
+            <Link href="/login?redirect=/checkout">
+              <Button variant="outline" className="w-full" size="md">
+                Ya tengo cuenta — Iniciar sesión
+              </Button>
+            </Link>
+            <p className="font-montserrat text-[10px] text-glow-navy/40 text-center leading-relaxed pt-2">
+              Solo toma un minuto. Con ese usuario y contraseña vas a poder ver el curso desde cualquier dispositivo.
+            </p>
+          </div>
         </div>
       </main>
     )
@@ -226,6 +290,7 @@ export default function CheckoutPage() {
             )}
           </div>
 
+          {/* Order Summary */}
           <div className="bg-white p-8 flex flex-col gap-6 h-fit sticky top-24">
             <h2 className="font-cormorant text-2xl text-glow-navy font-light">
               Tu Pedido
