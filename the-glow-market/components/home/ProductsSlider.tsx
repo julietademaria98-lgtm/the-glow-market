@@ -29,7 +29,7 @@ export default function ProductsSlider({ productos }: ProductsSliderProps) {
             className="font-montserrat uppercase text-glow-navy tracking-[0.2em]"
             style={{ fontSize: 'clamp(18px, 2vw, 22px)' }}
           >
-            THE FLOWER POUCH CAPSULE
+            The Flower Pouch Capsule
           </span>
           <StarIcon size={12} className="text-glow-navy" />
         </motion.div>
@@ -42,6 +42,36 @@ export default function ProductsSlider({ productos }: ProductsSliderProps) {
         {productos.map((producto, i) => (
           <MejuriCard key={producto.id} producto={producto} index={i} />
         ))}
+      </div>
+
+      <div className="flex justify-center" style={{ marginTop: '48px', paddingBottom: '64px' }}>
+        <Link
+          href="/productos"
+          className="font-montserrat uppercase"
+          style={{
+            fontSize: '12px',
+            letterSpacing: '0.25em',
+            padding: '16px 48px',
+            border: '1.5px solid #192149',
+            borderRadius: '0',
+            backgroundColor: 'transparent',
+            color: '#192149',
+            display: 'inline-block',
+            transition: 'background-color 0.3s ease, color 0.3s ease',
+          }}
+          onMouseEnter={e => {
+            const el = e.currentTarget as HTMLAnchorElement
+            el.style.backgroundColor = '#192149'
+            el.style.color = '#ffffff'
+          }}
+          onMouseLeave={e => {
+            const el = e.currentTarget as HTMLAnchorElement
+            el.style.backgroundColor = 'transparent'
+            el.style.color = '#192149'
+          }}
+        >
+          VER TODA LA TIENDA
+        </Link>
       </div>
     </section>
   )
@@ -60,10 +90,12 @@ function MejuriCard({ producto, index }: { producto: Producto; index: number }) 
   const descuento = precioOferta
     ? Math.round((1 - precioOferta / precioOriginal) * 100)
     : null
+  const sinStock = producto.stock === 0
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    if (sinStock) return
     addItem({
       id: producto.id,
       slug: producto.slug,
@@ -96,27 +128,41 @@ function MejuriCard({ producto, index }: { producto: Producto; index: number }) 
               src={mainImage}
               alt={producto.nombre}
               fill
-              className="object-cover"
+              className="object-contain p-6"
               sizes="(max-width: 768px) 50vw, 25vw"
             />
           )}
 
-          <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-[350ms] ease-[cubic-bezier(0.22,1,0.36,1)]">
-            <button
-              onClick={handleAddToCart}
-              className="w-full font-montserrat uppercase text-center"
-              style={{
-                fontSize: '10px',
-                letterSpacing: '0.2em',
-                padding: '14px',
-                backgroundColor: added ? '#192149' : 'rgba(255,255,255,0.95)',
-                color: added ? '#ffffff' : '#192149',
-                transition: 'background-color 0.2s, color 0.2s',
-              }}
-            >
-              {added ? '✓ Agregado' : 'Agregar al carrito'}
-            </button>
-          </div>
+          {/* Badge sin stock / oferta */}
+          {sinStock ? (
+            <div className="absolute top-3 left-3 bg-glow-navy/50 text-white font-montserrat text-[9px] tracking-widest uppercase px-2 py-1">
+              Sin stock
+            </div>
+          ) : precioOferta ? (
+            <div className="absolute top-3 left-3 bg-glow-navy text-white font-montserrat text-[9px] tracking-widest uppercase px-2 py-1">
+              Oferta
+            </div>
+          ) : null}
+
+          {/* Botón agregar — solo si hay stock */}
+          {!sinStock && (
+            <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-[350ms] ease-[cubic-bezier(0.22,1,0.36,1)]">
+              <button
+                onClick={handleAddToCart}
+                className="w-full font-montserrat uppercase text-center"
+                style={{
+                  fontSize: '10px',
+                  letterSpacing: '0.2em',
+                  padding: '14px',
+                  backgroundColor: added ? '#192149' : 'rgba(255,255,255,0.95)',
+                  color: added ? '#ffffff' : '#192149',
+                  transition: 'background-color 0.2s, color 0.2s',
+                }}
+              >
+                {added ? '✓ Agregado' : 'Agregar al carrito'}
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="px-4 pt-4 pb-5">
