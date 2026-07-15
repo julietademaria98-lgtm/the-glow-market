@@ -100,16 +100,19 @@ export async function updateProducto(id: string, formData: FormData) {
   redirect('/admin/productos')
 }
 
-export async function deleteProducto(id: string) {
+export async function deleteProductoFromForm(formData: FormData) {
   const db = await checkAdmin()
+  const id = formData.get('id') as string
   await db.from('producto_imagenes').delete().eq('producto_id', id)
   await db.from('productos').delete().eq('id', id)
   revalidatePath('/admin/productos')
   revalidatePath('/productos')
 }
 
-export async function toggleActivo(id: string, activo: boolean) {
+export async function toggleActivoFromForm(formData: FormData) {
   const db = await checkAdmin()
+  const id = formData.get('id') as string
+  const activo = formData.get('activo') === 'true'
   await db.from('productos').update({ activo }).eq('id', id)
   revalidatePath('/admin/productos')
   revalidatePath('/productos')
@@ -153,17 +156,19 @@ export async function updateLeccion(id: string, formData: FormData) {
   revalidatePath('/admin/cursos')
 }
 
-export async function grantAcceso(userId: string, cursoId: string) {
+export async function grantAccesoFromForm(formData: FormData) {
   const db = await checkAdmin()
-  let finalUserId = userId
-  if (userId.includes('@')) {
+  const input = formData.get('user_id') as string
+  const cursoId = formData.get('curso_id') as string
+  let userId = input
+  if (input.includes('@')) {
     const { data: users } = await db.auth.admin.listUsers()
-    const user = users?.users?.find(u => u.email === userId)
-    if (!user) throw new Error(`No existe una cuenta con el email ${userId}`)
-    finalUserId = user.id
+    const user = users?.users?.find(u => u.email === input)
+    if (!user) throw new Error(`No existe una cuenta con el email ${input}`)
+    userId = user.id
   }
   await db.from('accesos_curso').upsert({
-    user_id: finalUserId,
+    user_id: userId,
     curso_id: cursoId,
     activo: true,
   }, { onConflict: 'user_id,curso_id' })
