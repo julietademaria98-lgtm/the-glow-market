@@ -1,6 +1,7 @@
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import Link from 'next/link'
-import { Package, BookOpen, ShoppingBag, Users } from 'lucide-react'
+import { Package, BookOpen, ShoppingBag, Users, DollarSign } from 'lucide-react'
+import { formatPrice } from '@/lib/utils'
 
 async function getStats() {
   const db = createServiceClient(
@@ -8,18 +9,22 @@ async function getStats() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  const [productos, cursos, ordenes, accesos] = await Promise.all([
+  const [productos, cursos, ordenes, accesos, ingresos] = await Promise.all([
     db.from('productos').select('id', { count: 'exact' }),
     db.from('cursos').select('id', { count: 'exact' }),
     db.from('ordenes').select('id', { count: 'exact' }),
     db.from('accesos_curso').select('id', { count: 'exact' }).eq('activo', true),
+    db.from('ordenes').select('total').eq('estado', 'aprobado'),
   ])
+
+  const totalIngresos = (ingresos.data || []).reduce((acc, o) => acc + (o.total || 0), 0)
 
   return {
     productos: productos.count || 0,
     cursos: cursos.count || 0,
     ordenes: ordenes.count || 0,
     alumnas: accesos.count || 0,
+    ingresos: totalIngresos,
   }
 }
 
@@ -30,7 +35,7 @@ export default async function AdminPage() {
     <div className="p-8">
       <h1 className="font-cormorant text-3xl text-glow-navy font-light mb-8">Dashboard</h1>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         {[
           { label: 'Productos', value: stats.productos, icon: Package, href: '/admin/productos' },
           { label: 'Cursos', value: stats.cursos, icon: BookOpen, href: '/admin/cursos' },
@@ -45,6 +50,15 @@ export default async function AdminPage() {
             <p className="font-cormorant text-4xl text-glow-navy font-light">{value}</p>
           </Link>
         ))}
+
+        {/* Ingresos — card destacada */}
+        <Link href="/admin/ordenes" className="bg-glow-navy p-6 rounded shadow-sm hover:shadow-md transition-shadow col-span-2 lg:col-span-1">
+          <div className="flex items-center justify-between mb-3">
+            <p className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-white/50">Ingresos aprobados</p>
+            <DollarSign size={16} className="text-white/40" />
+          </div>
+          <p className="font-cormorant text-4xl text-white font-light">{formatPrice(stats.ingresos)}</p>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
