@@ -118,22 +118,18 @@ function MejuriCard({ producto, index }: { producto: Producto; index: number }) 
       <Link href={`/productos/${producto.slug}`} className="block">
         <div
           className="relative overflow-hidden"
-          style={{
-            aspectRatio: '1/1',
-            backgroundColor: mainImage ? '#F5F5F3' : '#E9E2DA',
-          }}
+          style={{ aspectRatio: '1/1' }}
         >
           {mainImage && (
             <Image
               src={mainImage}
               alt={producto.nombre}
               fill
-              className="object-contain p-6"
+              className="object-cover"
               sizes="(max-width: 768px) 50vw, 25vw"
             />
           )}
 
-          {/* Badge sin stock / oferta */}
           {sinStock ? (
             <div className="absolute top-3 left-3 bg-glow-navy/50 text-white font-montserrat text-[9px] tracking-widest uppercase px-2 py-1">
               Sin stock
@@ -144,7 +140,6 @@ function MejuriCard({ producto, index }: { producto: Producto; index: number }) 
             </div>
           ) : null}
 
-          {/* Botón agregar — solo si hay stock */}
           {!sinStock && (
             <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-[350ms] ease-[cubic-bezier(0.22,1,0.36,1)]">
               <button
