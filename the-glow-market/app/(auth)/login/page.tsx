@@ -20,8 +20,8 @@ type LoginForm = z.infer<typeof loginSchema>
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const rawRedirect = searchParams.get('redirect') || '/mi-curso'
-  const redirectTo = rawRedirect.startsWith('/') ? rawRedirect : '/mi-curso'
+  const rawRedirect = searchParams.get('redirect') || '/'
+  const redirectTo = rawRedirect.startsWith('/') ? rawRedirect : '/'
 
   const [serverError, setServerError] = useState<string | null>(null)
 
@@ -52,7 +52,6 @@ function LoginForm() {
   return (
     <main className="min-h-screen bg-glow-cream flex items-center justify-center px-6">
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-10">
           <Link href="/">
             <span className="font-cormorant text-2xl tracking-widest text-glow-navy font-light">
@@ -68,7 +67,6 @@ function LoginForm() {
           </div>
         </div>
 
-        {/* Form */}
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="bg-white p-8 md:p-10 flex flex-col gap-5"
