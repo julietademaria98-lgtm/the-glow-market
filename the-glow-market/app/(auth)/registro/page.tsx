@@ -13,6 +13,7 @@ import { Suspense } from 'react'
 
 const registerSchema = z
   .object({
+    nombre: z.string().min(2, 'Requerido'),
     email: z.string().email('Email inválido'),
     password: z.string().min(6, 'Mínimo 6 caracteres'),
     confirmPassword: z.string(),
@@ -25,7 +26,6 @@ const registerSchema = z
 type RegisterForm = z.infer<typeof registerSchema>
 
 function RegistroForm() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') || '/checkout'
   const [serverError, setServerError] = useState<string | null>(null)
@@ -44,6 +44,9 @@ function RegistroForm() {
     const { error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
+      options: {
+        data: { nombre: data.nombre },
+      },
     })
 
     if (error) {
@@ -108,6 +111,7 @@ function RegistroForm() {
           )}
 
           {[
+            { name: 'nombre' as const, label: 'Nombre', type: 'text', placeholder: 'María' },
             { name: 'email' as const, label: 'Email', type: 'email', placeholder: 'tu@email.com' },
             { name: 'password' as const, label: 'Contraseña', type: 'password', placeholder: '••••••••' },
             { name: 'confirmPassword' as const, label: 'Confirmar Contraseña', type: 'password', placeholder: '••••••••' },
