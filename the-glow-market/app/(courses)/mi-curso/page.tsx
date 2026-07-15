@@ -35,19 +35,22 @@ export default async function MiCursoPage() {
   if (!user) redirect('/login?redirect=/mi-curso')
 
   const cursos = await getMisCursos(user.id)
+  const nombre = user.user_metadata?.nombre || user.email?.split('@')[0] || 'bienvenida'
+  const nombreCapitalizado = nombre.charAt(0).toUpperCase() + nombre.slice(1)
 
   return (
     <main className="min-h-screen bg-glow-cream pt-24">
       <div className="max-w-[1200px] mx-auto px-6 py-12">
+        {/* Header */}
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-2">
             <StarIcon size={10} className="text-glow-navy" />
             <span className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-navy/60">
-              Bienvenida
+              Mi espacio
             </span>
           </div>
           <h1 className="font-cormorant text-4xl md:text-5xl text-glow-navy font-light tracking-wide">
-            Mis Cursos
+            Hola, {nombreCapitalizado}
           </h1>
         </div>
 
