@@ -20,9 +20,8 @@ type LoginForm = z.infer<typeof loginSchema>
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirect') || '/mi-curso'
-  const wasKicked = searchParams.get('kicked') === 'true'
-  const wasReset = searchParams.get('reset') === 'true'
+  const rawRedirect = searchParams.get('redirect') || '/mi-curso'
+  const redirectTo = rawRedirect.startsWith('/') ? rawRedirect : '/mi-curso'
 
   const [serverError, setServerError] = useState<string | null>(null)
 
@@ -45,8 +44,6 @@ function LoginForm() {
       setServerError('Email o contraseña incorrectos.')
       return
     }
-
-    await fetch('/api/auth/set-session', { method: 'POST' })
 
     router.push(redirectTo)
     router.refresh()
@@ -79,18 +76,6 @@ function LoginForm() {
           <h1 className="font-cormorant text-3xl text-glow-navy font-light tracking-wide">
             Iniciar Sesión
           </h1>
-
-          {wasKicked && (
-            <p className="font-montserrat text-xs text-amber-700 bg-amber-50 border border-amber-200 px-4 py-3">
-              Tu sesión fue cerrada porque ingresaste desde otro dispositivo.
-            </p>
-          )}
-
-          {wasReset && (
-            <p className="font-montserrat text-xs text-green-700 bg-green-50 border border-green-200 px-4 py-3">
-              Contraseña actualizada correctamente. Podés iniciar sesión.
-            </p>
-          )}
 
           {serverError && (
             <p className="font-montserrat text-xs text-red-500 bg-red-50 px-4 py-3">
@@ -126,15 +111,6 @@ function LoginForm() {
             {errors.password && (
               <p className="font-montserrat text-[10px] text-red-400">{errors.password.message}</p>
             )}
-          </div>
-
-          <div className="text-right">
-            <Link
-              href="/recuperar-contrasena"
-              className="font-montserrat text-[10px] tracking-[0.1em] uppercase text-glow-navy/50 hover:text-glow-navy transition-colors"
-            >
-              ¿Olvidaste tu contraseña?
-            </Link>
           </div>
 
           <Button
