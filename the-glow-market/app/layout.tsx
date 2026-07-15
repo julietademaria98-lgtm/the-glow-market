@@ -3,13 +3,13 @@ import './globals.css'
 import NavbarWrapper, { FooterWrapper } from '@/components/layout/NavbarWrapper'
 
 export const metadata: Metadata = {
-  title: 'The Glow Market — Joyería & Accesorios de Alta Gama',
+  title: 'The Glow Market — Accesorios & Cursos Online',
   description:
-    'Accesorios y joyería de alta gama diseñados para la mujer que conoce su poder. Envíos a todo Argentina.',
-  keywords: ['joyería', 'accesorios', 'argentina', 'lujo', 'glow', 'cursos online'],
+    'Accesorios y cursos de automaquillaje. Envíos a todo Argentina.',
+  keywords: ['joyería', 'accesorios', 'argentina', 'cursos online', 'maquillaje', 'glow'],
   openGraph: {
     title: 'The Glow Market',
-    description: 'Own Your Glow — Joyería & Accesorios de Alta Gama',
+    description: 'Accesorios y cursos de automaquillaje.',
     siteName: 'The Glow Market',
     locale: 'es_AR',
     type: 'website',
