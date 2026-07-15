@@ -1,6 +1,5 @@
 import { createClient as createServiceClient } from '@supabase/supabase-js'
-import Link from 'next/link'
-import { updateCurso, updateLeccion, grantAcceso, revokeAcceso } from '@/lib/admin/actions'
+import { updateCurso, updateLeccion, grantAccesoFromForm, revokeAcceso } from '@/lib/admin/actions'
 import type { Curso, Leccion } from '@/types'
 
 async function getData() {
@@ -104,7 +103,8 @@ export default async function AdminCursosPage() {
                 Alumnas con acceso ({cursosAccesos.length})
               </p>
 
-              <form action={async (fd) => { 'use server'; await grantAcceso(fd.get('user_id') as string, curso.id) }} className="flex gap-2 mb-4">
+              <form action={grantAccesoFromForm} className="flex gap-2 mb-4">
+                <input type="hidden" name="curso_id" value={curso.id} />
                 <input name="user_id" className="admin-input flex-1" placeholder="User ID de Supabase" />
                 <button type="submit" className="bg-glow-navy text-white font-montserrat text-[9px] tracking-wide uppercase px-4 py-2 whitespace-nowrap">
                   Dar acceso
