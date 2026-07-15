@@ -80,31 +80,38 @@ export default function Navbar() {
               )}
             </Link>
 
-            {user ? (
-              <div className="relative group">
-                <Link
-                  href="/mi-curso"
-                  className={navLinkClass}
-                >
-                  Mi Curso
-                </Link>
-                {/* Dropdown */}
-                <div className="absolute right-0 top-full pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                  <div className="bg-white shadow-md min-w-[160px] py-2">
+            <div className="relative group">
+              <Link href={user ? '/mi-curso' : '/login'} className={navLinkClass}>
+                {user ? 'Mi Curso' : 'Mi Cuenta'}
+              </Link>
+              <div className="absolute right-0 top-full pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                <div className="bg-white shadow-md min-w-[160px] py-2">
+                  {user ? (
                     <button
                       onClick={handleLogout}
                       className="w-full text-left px-4 py-2.5 font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/60 hover:text-glow-navy hover:bg-glow-cream transition-colors"
                     >
                       Cerrar sesión
                     </button>
-                  </div>
+                  ) : (
+                    <>
+                      <Link
+                        href="/login"
+                        className="block px-4 py-2.5 font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/60 hover:text-glow-navy hover:bg-glow-cream transition-colors"
+                      >
+                        Iniciar sesión
+                      </Link>
+                      <Link
+                        href="/registro"
+                        className="block px-4 py-2.5 font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/60 hover:text-glow-navy hover:bg-glow-cream transition-colors"
+                      >
+                        Crear cuenta
+                      </Link>
+                    </>
+                  )}
                 </div>
               </div>
-            ) : (
-              <Link href="/login" className={navLinkClass}>
-                Iniciar sesión
-              </Link>
-            )}
+            </div>
           </div>
 
           {/* MOBILE: carrito + hamburger */}
@@ -164,13 +171,21 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
-            {user && (
+            {user ? (
               <button
                 onClick={handleLogout}
                 className="font-cormorant text-2xl text-glow-navy/40 tracking-wide hover:opacity-60 transition-opacity text-left"
               >
                 Cerrar sesión
               </button>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setMenuOpen(false)}
+                className="font-cormorant text-2xl text-glow-navy/40 tracking-wide hover:opacity-60 transition-opacity"
+              >
+                Iniciar sesión
+              </Link>
             )}
           </div>
         </div>
