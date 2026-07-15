@@ -154,13 +154,24 @@ export async function updateLeccion(id: string, formData: FormData) {
 
 export async function grantAccesoFromForm(formData: FormData) {
   const db = await checkAdmin()
-  const userId = formData.get('user_id') as string
+  const input = formData.get('user_id') as string
   const cursoId = formData.get('curso_id') as string
+
+  let userId = input
+
+  if (input.includes('@')) {
+    const { data: users } = await db.auth.admin.listUsers()
+    const user = users?.users?.find(u => u.email === input)
+    if (!user) throw new Error(`No existe una cuenta con el email ${input}`)
+    userId = user.id
+  }
+
   await db.from('accesos_curso').upsert({
     user_id: userId,
     curso_id: cursoId,
     activo: true,
   }, { onConflict: 'user_id,curso_id' })
+
   revalidatePath('/admin/cursos')
 }
 
