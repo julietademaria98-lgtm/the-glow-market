@@ -35,21 +35,23 @@ export default function CourseInfoDrawer({ curso, isOpen, onClose }: CourseInfoD
       imagen_url: curso.imagen_url || '',
       tipo: 'curso',
     })
-    setAdded(true)
-    setTimeout(() => setAdded(false), 2000)
+    setTimeout(() => onClose(), 300)
   }
 
   if (!isOpen) return null
 
   return (
     <>
+      {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
         onClick={onClose}
       />
 
+      {/* Drawer */}
       <div className="fixed right-0 top-0 h-full w-full max-w-xl bg-white z-50 flex flex-col shadow-2xl overflow-hidden">
 
+        {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-glow-navy/10 flex-shrink-0">
           <span className="font-montserrat text-[10px] tracking-[0.25em] uppercase text-glow-navy/40">
             Curso Online · En alianza con Clarins
@@ -63,8 +65,10 @@ export default function CourseInfoDrawer({ curso, isOpen, onClose }: CourseInfoD
           </button>
         </div>
 
+        {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto pb-36">
 
+          {/* Hero */}
           <div className="px-6 pt-8 pb-6 bg-glow-cream/40">
             <h2 className="font-cormorant text-4xl text-glow-navy font-light tracking-wide leading-tight mb-2">
               {curso.titulo}
@@ -80,6 +84,7 @@ export default function CourseInfoDrawer({ curso, isOpen, onClose }: CourseInfoD
             </p>
           </div>
 
+          {/* La promesa */}
           <div className="px-6 py-6 border-b border-glow-navy/10">
             <h3 className="font-cormorant text-2xl text-glow-navy font-light mb-3">
               Qué es Day to Night Glow
@@ -89,6 +94,7 @@ export default function CourseInfoDrawer({ curso, isOpen, onClose }: CourseInfoD
             </p>
           </div>
 
+          {/* Para quién es */}
           <div className="px-6 py-6 border-b border-glow-navy/10">
             <h3 className="font-cormorant text-2xl text-glow-navy font-light mb-1">
               ¿Este curso es para vos?
@@ -113,6 +119,7 @@ export default function CourseInfoDrawer({ curso, isOpen, onClose }: CourseInfoD
             </ul>
           </div>
 
+          {/* Los 4 módulos */}
           <div className="px-6 py-6 border-b border-glow-navy/10">
             <h3 className="font-cormorant text-2xl text-glow-navy font-light mb-1 uppercase">
               Qué vas a aprender en cada módulo
@@ -144,6 +151,7 @@ export default function CourseInfoDrawer({ curso, isOpen, onClose }: CourseInfoD
             </div>
           </div>
 
+          {/* 5 descargables */}
           <div className="px-6 py-6 border-b border-glow-navy/10">
             <h3 className="font-cormorant text-2xl text-glow-navy font-light mb-1">
               5 descargables exclusivos
@@ -170,6 +178,7 @@ export default function CourseInfoDrawer({ curso, isOpen, onClose }: CourseInfoD
             </div>
           </div>
 
+          {/* Qué incluye */}
           <div className="px-6 py-6 border-b border-glow-navy/10">
             <h3 className="font-cormorant text-2xl text-glow-navy font-light mb-4">
               Lo que llevás al comprar el curso
@@ -190,6 +199,7 @@ export default function CourseInfoDrawer({ curso, isOpen, onClose }: CourseInfoD
             </ul>
           </div>
 
+          {/* FAQ */}
           <div className="px-6 py-6">
             <h3 className="font-cormorant text-2xl text-glow-navy font-light mb-4">
               Lo que más nos preguntan
@@ -206,7 +216,7 @@ export default function CourseInfoDrawer({ curso, isOpen, onClose }: CourseInfoD
                 },
                 {
                   q: '¿Necesito comprar todos los productos Clarins?',
-                  a: 'No. El curso te sirve aunque uses productos que ya tenés. Recomendamos Clarins porque son los que funcionan con este método, y las alumnas tienen un beneficio exclusivo.',
+                  a: 'No. El curso te sirve aunque uses productos que ya tenés. Recomendamos Clarins porque son los que funcionan con este método.',
                 },
                 {
                   q: '¿Tengo acceso para siempre?',
@@ -228,6 +238,7 @@ export default function CourseInfoDrawer({ curso, isOpen, onClose }: CourseInfoD
 
         </div>
 
+        {/* Sticky CTA */}
         <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-glow-navy/10 px-6 py-4 flex items-center justify-between gap-4">
           <div className="flex flex-col gap-0.5">
             {curso.precio_oferta ? (
@@ -250,13 +261,9 @@ export default function CourseInfoDrawer({ curso, isOpen, onClose }: CourseInfoD
           </div>
           <button
             onClick={handleAddToCart}
-            className={`flex-1 max-w-[220px] py-3.5 font-montserrat text-[10px] tracking-[0.2em] uppercase transition-colors duration-300 ${
-              added
-                ? 'bg-glow-royal text-white'
-                : 'bg-glow-navy text-white hover:bg-glow-blue'
-            }`}
+            className="flex-1 max-w-[220px] py-3.5 font-montserrat text-[10px] tracking-[0.2em] uppercase transition-colors duration-300 bg-glow-navy text-white hover:bg-glow-blue"
           >
-            {added ? '✓ Agregado al carrito' : 'Agregar al carrito'}
+            Agregar al carrito
           </button>
         </div>
 
