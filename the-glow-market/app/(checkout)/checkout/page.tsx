@@ -101,7 +101,6 @@ export default function CheckoutPage() {
     )
   }
 
-  // Gate: tiene curso y no está logueada
   if (hasCurso && !user) {
     return (
       <main className="min-h-screen bg-glow-cream pt-24 flex items-center justify-center px-6">
@@ -116,7 +115,7 @@ export default function CheckoutPage() {
               Antes de continuar
             </h1>
             <p className="font-montserrat text-sm text-glow-navy/60 leading-relaxed max-w-sm mx-auto">
-              Estás comprando un curso online. Para poder acceder a él una vez acreditado el pago, 
+              Estás comprando un curso online. Para poder acceder a él una vez acreditado el pago,
               necesitás una cuenta en The Glow Market con el mismo email que uses para la compra.
             </p>
           </div>
@@ -135,7 +134,7 @@ export default function CheckoutPage() {
                 Ya tengo cuenta — Iniciar sesión
               </Button>
             </Link>
-            <p className="font-montserrat text-[10px] text-glow-navy/40 text-center leading-relaxed pt-2">
+            <p className="font-montserrat text-xs text-glow-navy/70 text-center leading-relaxed pt-2">
               Solo toma un minuto. Con ese usuario y contraseña vas a poder ver el curso desde cualquier dispositivo.
             </p>
           </div>
