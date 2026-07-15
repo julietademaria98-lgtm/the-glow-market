@@ -1,6 +1,6 @@
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import Link from 'next/link'
-import { updateCurso, updateLeccion, grantAccesoFromForm, revokeAcceso } from '@/lib/admin/actions'
+import { updateCurso, updateLeccion, grantAcceso, revokeAcceso } from '@/lib/admin/actions'
 import type { Curso, Leccion } from '@/types'
 
 async function getData() {
@@ -39,7 +39,8 @@ export default async function AdminCursosPage() {
                 <div>
                   <h2 className="font-cormorant text-xl text-glow-navy font-light">{curso.titulo}</h2>
                   <p className="font-montserrat text-[10px] text-gray-400 mt-1">
-                    ${curso.precio.toLocaleString('es-AR')} · {lecciones.length} lecciones · {cursosAccesos.length} alumnas
+                    ${curso.precio.toLocaleString('es-AR')}
+                    {curso.precio_oferta ? ` → $${curso.precio_oferta.toLocaleString('es-AR')}` : ''} · {lecciones.length} lecciones · {cursosAccesos.length} alumnas
                   </p>
                 </div>
                 <details className="text-right">
@@ -49,7 +50,8 @@ export default async function AdminCursosPage() {
                   <form action={updateCurso.bind(null, curso.id)} className="mt-4 text-left space-y-3 min-w-[300px]">
                     <input name="titulo" defaultValue={curso.titulo} className="admin-input" placeholder="Título" />
                     <textarea name="descripcion" defaultValue={curso.descripcion || ''} rows={2} className="admin-input" placeholder="Descripción corta" />
-                    <input name="precio" type="number" defaultValue={curso.precio} className="admin-input" placeholder="Precio" />
+                    <input name="precio" type="number" defaultValue={curso.precio} className="admin-input" placeholder="Precio original" />
+                    <input name="precio_oferta" type="number" defaultValue={curso.precio_oferta || ''} className="admin-input" placeholder="Precio con descuento (opcional)" />
                     <input name="imagen_url" defaultValue={curso.imagen_url || ''} className="admin-input" placeholder="URL imagen" />
                     <label className="flex items-center gap-2">
                       <input name="activo" type="checkbox" defaultChecked={curso.activo} />
@@ -102,9 +104,7 @@ export default async function AdminCursosPage() {
                 Alumnas con acceso ({cursosAccesos.length})
               </p>
 
-              {/* Dar acceso */}
-              <form action={grantAccesoFromForm} className="flex gap-2 mb-4">
-                <input type="hidden" name="curso_id" value={curso.id} />
+              <form action={async (fd) => { 'use server'; await grantAcceso(fd.get('user_id') as string, curso.id) }} className="flex gap-2 mb-4">
                 <input name="user_id" className="admin-input flex-1" placeholder="User ID de Supabase" />
                 <button type="submit" className="bg-glow-navy text-white font-montserrat text-[9px] tracking-wide uppercase px-4 py-2 whitespace-nowrap">
                   Dar acceso
