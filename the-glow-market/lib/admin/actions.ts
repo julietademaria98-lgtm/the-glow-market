@@ -24,10 +24,12 @@ async function checkAdmin() {
 function toSlug(nombre: string) {
   return nombre
     .toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
     .replace(/\s+/g, '-')
     .replace(/[^a-z0-9-]/g, '')
 }
+
+// ============ PRODUCTOS ============
 
 export async function createProducto(formData: FormData) {
   const db = await checkAdmin()
@@ -98,23 +100,22 @@ export async function updateProducto(id: string, formData: FormData) {
   redirect('/admin/productos')
 }
 
-export async function deleteProductoFromForm(formData: FormData) {
+export async function deleteProducto(id: string) {
   const db = await checkAdmin()
-  const id = formData.get('id') as string
   await db.from('producto_imagenes').delete().eq('producto_id', id)
   await db.from('productos').delete().eq('id', id)
   revalidatePath('/admin/productos')
   revalidatePath('/productos')
 }
 
-export async function toggleActivoFromForm(formData: FormData) {
+export async function toggleActivo(id: string, activo: boolean) {
   const db = await checkAdmin()
-  const id = formData.get('id') as string
-  const activo = formData.get('activo') === 'true'
   await db.from('productos').update({ activo }).eq('id', id)
   revalidatePath('/admin/productos')
   revalidatePath('/productos')
 }
+
+// ============ CURSOS ============
 
 export async function updateCurso(id: string, formData: FormData) {
   const db = await checkAdmin()
@@ -152,26 +153,20 @@ export async function updateLeccion(id: string, formData: FormData) {
   revalidatePath('/admin/cursos')
 }
 
-export async function grantAccesoFromForm(formData: FormData) {
+export async function grantAcceso(userId: string, cursoId: string) {
   const db = await checkAdmin()
-  const input = formData.get('user_id') as string
-  const cursoId = formData.get('curso_id') as string
-
-  let userId = input
-
-  if (input.includes('@')) {
+  let finalUserId = userId
+  if (userId.includes('@')) {
     const { data: users } = await db.auth.admin.listUsers()
-    const user = users?.users?.find(u => u.email === input)
-    if (!user) throw new Error(`No existe una cuenta con el email ${input}`)
-    userId = user.id
+    const user = users?.users?.find(u => u.email === userId)
+    if (!user) throw new Error(`No existe una cuenta con el email ${userId}`)
+    finalUserId = user.id
   }
-
   await db.from('accesos_curso').upsert({
-    user_id: userId,
+    user_id: finalUserId,
     curso_id: cursoId,
     activo: true,
   }, { onConflict: 'user_id,curso_id' })
-
   revalidatePath('/admin/cursos')
 }
 
