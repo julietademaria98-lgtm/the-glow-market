@@ -7,13 +7,22 @@ async function getData() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
-  const [cursosRes, accesosRes] = await Promise.all([
+
+  const [cursosRes, accesosRes, { data: authData }] = await Promise.all([
     db.from('cursos').select('*, lecciones(*)').order('created_at', { ascending: false }),
-    db.from('accesos_curso').select('*, user:auth.users(email)').eq('activo', true),
+    db.from('accesos_curso').select('*').eq('activo', true),
+    db.auth.admin.listUsers(),
   ])
+
+  const users = authData?.users || []
+  const accesos = (accesosRes.data || []).map((a) => ({
+    ...a,
+    user: { email: users.find((u) => u.id === a.user_id)?.email || a.user_id },
+  }))
+
   return {
     cursos: (cursosRes.data || []) as (Curso & { lecciones: Leccion[] })[],
-    accesos: accesosRes.data || [],
+    accesos,
   }
 }
 
