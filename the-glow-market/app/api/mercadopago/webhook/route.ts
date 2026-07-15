@@ -68,7 +68,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Error actualizando orden' }, { status: 500 })
     }
 
-    // Descontar stock de productos físicos
+    // Descontar stock de productos
     if (orden.items) {
       for (const item of orden.items) {
         const { data: producto } = await adminClient
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // Crear accesos a cursos
+    // Si hay user_id, verificar si compró algún curso y dar acceso
     if (orden.user_id && orden.items) {
       for (const item of orden.items) {
         const { data: curso } = await adminClient
@@ -116,23 +116,11 @@ export async function POST(request: Request) {
       if (email) {
         const nombreCliente = usuario?.user?.user_metadata?.nombre || email.split('@')[0]
 
-        let hasCurso = false
-        let hasProductoFisico = false
-
-        if (orden.items) {
-          for (const item of orden.items) {
-            const { data: curso } = await adminClient
-              .from('cursos')
-              .select('id')
-              .eq('id', item.id)
-              .single()
-            if (curso) {
-              hasCurso = true
-            } else {
-              hasProductoFisico = true
-            }
-          }
-        }
+        const cursosIds = new Set(
+          (await adminClient.from('cursos').select('id')).data?.map((c: any) => c.id) || []
+        )
+        const hasCurso = (orden.items || []).some((item: any) => cursosIds.has(item.id))
+        const hasProductoFisico = (orden.items || []).some((item: any) => !cursosIds.has(item.id))
 
         await sendOrderConfirmation({
           to: email,
