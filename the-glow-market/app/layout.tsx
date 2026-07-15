@@ -1,8 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import Navbar from '@/components/layout/Navbar'
-import Footer from '@/components/layout/Footer'
-import CartDrawer from '@/components/layout/CartDrawer'
+import NavbarWrapper, { FooterWrapper } from '@/components/layout/NavbarWrapper'
 
 export const metadata: Metadata = {
   title: 'The Glow Market — Joyería & Accesorios de Alta Gama',
@@ -26,10 +24,9 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className="bg-glow-cream antialiased">
-        <Navbar />
-        <CartDrawer />
+        <NavbarWrapper />
         {children}
-        <Footer />
+        <FooterWrapper />
       </body>
     </html>
   )
