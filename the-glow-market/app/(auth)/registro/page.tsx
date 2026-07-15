@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -9,6 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { createClient } from '@/lib/supabase/client'
 import StarIcon from '@/components/ui/StarIcon'
 import Button from '@/components/ui/Button'
+import { Suspense } from 'react'
 
 const registerSchema = z
   .object({
@@ -23,8 +24,10 @@ const registerSchema = z
 
 type RegisterForm = z.infer<typeof registerSchema>
 
-export default function RegistroPage() {
+function RegistroForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect') || '/checkout'
   const [serverError, setServerError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
 
@@ -60,9 +63,9 @@ export default function RegistroPage() {
             ¡Cuenta creada!
           </h1>
           <p className="font-montserrat text-sm text-glow-navy/60 max-w-xs leading-relaxed">
-            Revisá tu email para confirmar tu cuenta y luego podés iniciar sesión.
+            Revisá tu email para confirmar tu cuenta y luego iniciá sesión para continuar con tu compra.
           </p>
-          <Link href="/login">
+          <Link href={`/login?redirect=${encodeURIComponent(redirectTo)}`}>
             <Button variant="primary" size="md">
               Ir al Login
             </Button>
@@ -75,7 +78,6 @@ export default function RegistroPage() {
   return (
     <main className="min-h-screen bg-glow-cream flex items-center justify-center px-6">
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-10">
           <Link href="/">
             <span className="font-cormorant text-2xl tracking-widest text-glow-navy font-light">
@@ -140,7 +142,7 @@ export default function RegistroPage() {
           <p className="font-montserrat text-xs text-center text-glow-navy/50">
             ¿Ya tenés cuenta?{' '}
             <Link
-              href="/login"
+              href={`/login?redirect=${encodeURIComponent(redirectTo)}`}
               className="text-glow-navy border-b border-glow-navy/30 hover:border-glow-navy pb-0.5 transition-colors"
             >
               Iniciá sesión
@@ -149,5 +151,17 @@ export default function RegistroPage() {
         </form>
       </div>
     </main>
+  )
+}
+
+export default function RegistroPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-glow-cream flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-glow-navy border-t-transparent rounded-full animate-spin" />
+      </main>
+    }>
+      <RegistroForm />
+    </Suspense>
   )
 }
