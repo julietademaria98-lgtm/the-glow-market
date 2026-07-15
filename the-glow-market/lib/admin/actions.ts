@@ -180,3 +180,12 @@ export async function revokeAcceso(id: string) {
   await db.from('accesos_curso').update({ activo: false }).eq('id', id)
   revalidatePath('/admin/cursos')
 }
+
+// ============ ORDENES ============
+
+export async function updateEstadoOrden(id: string, formData: FormData) {
+  const db = await checkAdmin()
+  const estado = formData.get('estado') as string
+  await db.from('ordenes').update({ estado }).eq('id', id)
+  revalidatePath('/admin/ordenes')
+}
