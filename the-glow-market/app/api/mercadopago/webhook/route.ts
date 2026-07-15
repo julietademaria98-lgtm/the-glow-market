@@ -68,25 +68,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Error actualizando orden' }, { status: 500 })
     }
 
+    let hasCurso = false
+    let hasProductoFisico = false
+
     if (orden.items) {
-      for (const item of orden.items) {
-        const { data: producto } = await adminClient
-          .from('productos')
-          .select('id, stock')
-          .eq('id', item.id)
-          .single()
-
-        if (producto && producto.stock > 0) {
-          const nuevoStock = Math.max(0, producto.stock - (item.cantidad || 1))
-          await adminClient
-            .from('productos')
-            .update({ stock: nuevoStock })
-            .eq('id', producto.id)
-        }
-      }
-    }
-
-    if (orden.user_id && orden.items) {
       for (const item of orden.items) {
         const { data: curso } = await adminClient
           .from('cursos')
@@ -95,13 +80,31 @@ export async function POST(request: Request) {
           .single()
 
         if (curso) {
-          await adminClient
-            .from('accesos_curso')
-            .upsert({
-              user_id: orden.user_id,
-              curso_id: curso.id,
-              activo: true,
-            })
+          hasCurso = true
+          if (orden.user_id) {
+            await adminClient
+              .from('accesos_curso')
+              .upsert({
+                user_id: orden.user_id,
+                curso_id: curso.id,
+                activo: true,
+              })
+          }
+        } else {
+          hasProductoFisico = true
+          const { data: producto } = await adminClient
+            .from('productos')
+            .select('id, stock')
+            .eq('id', item.id)
+            .single()
+
+          if (producto && producto.stock > 0) {
+            const nuevoStock = Math.max(0, producto.stock - (item.cantidad || 1))
+            await adminClient
+              .from('productos')
+              .update({ stock: nuevoStock })
+              .eq('id', producto.id)
+          }
         }
       }
     }
@@ -118,6 +121,8 @@ export async function POST(request: Request) {
           ordenId: orden.id,
           items: orden.items || [],
           total: orden.total || 0,
+          hasCurso,
+          hasProductoFisico,
         })
       }
     } catch (emailError) {
