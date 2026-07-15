@@ -68,10 +68,27 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Error actualizando orden' }, { status: 500 })
     }
 
-    let hasCurso = false
-    let hasProductoFisico = false
-
+    // Descontar stock de productos físicos
     if (orden.items) {
+      for (const item of orden.items) {
+        const { data: producto } = await adminClient
+          .from('productos')
+          .select('id, stock')
+          .eq('id', item.id)
+          .single()
+
+        if (producto && producto.stock > 0) {
+          const nuevoStock = Math.max(0, producto.stock - (item.cantidad || 1))
+          await adminClient
+            .from('productos')
+            .update({ stock: nuevoStock })
+            .eq('id', producto.id)
+        }
+      }
+    }
+
+    // Crear accesos a cursos
+    if (orden.user_id && orden.items) {
       for (const item of orden.items) {
         const { data: curso } = await adminClient
           .from('cursos')
@@ -80,41 +97,43 @@ export async function POST(request: Request) {
           .single()
 
         if (curso) {
-          hasCurso = true
-          if (orden.user_id) {
-            await adminClient
-              .from('accesos_curso')
-              .upsert({
-                user_id: orden.user_id,
-                curso_id: curso.id,
-                activo: true,
-              })
-          }
-        } else {
-          hasProductoFisico = true
-          const { data: producto } = await adminClient
-            .from('productos')
-            .select('id, stock')
-            .eq('id', item.id)
-            .single()
-
-          if (producto && producto.stock > 0) {
-            const nuevoStock = Math.max(0, producto.stock - (item.cantidad || 1))
-            await adminClient
-              .from('productos')
-              .update({ stock: nuevoStock })
-              .eq('id', producto.id)
-          }
+          await adminClient
+            .from('accesos_curso')
+            .upsert({
+              user_id: orden.user_id,
+              curso_id: curso.id,
+              activo: true,
+            })
         }
       }
     }
 
+    // Enviar email de confirmación
     try {
       const { data: usuario } = await adminClient.auth.admin.getUserById(orden.user_id || '')
       const email = usuario?.user?.email || payment.payer?.email
 
       if (email) {
         const nombreCliente = usuario?.user?.user_metadata?.nombre || email.split('@')[0]
+
+        let hasCurso = false
+        let hasProductoFisico = false
+
+        if (orden.items) {
+          for (const item of orden.items) {
+            const { data: curso } = await adminClient
+              .from('cursos')
+              .select('id')
+              .eq('id', item.id)
+              .single()
+            if (curso) {
+              hasCurso = true
+            } else {
+              hasProductoFisico = true
+            }
+          }
+        }
+
         await sendOrderConfirmation({
           to: email,
           nombreCliente,
