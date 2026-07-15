@@ -1,4 +1,5 @@
 import { createClient as createServiceClient } from '@supabase/supabase-js'
+import Link from 'next/link'
 import { updateCurso, updateLeccion, grantAccesoFromForm, revokeAcceso } from '@/lib/admin/actions'
 import type { Curso, Leccion } from '@/types'
 
@@ -32,14 +33,15 @@ export default async function AdminCursosPage() {
 
         return (
           <div key={curso.id} className="bg-white rounded shadow-sm overflow-hidden">
-            {/* Curso header */}
             <div className="border-b border-gray-100 p-6">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h2 className="font-cormorant text-xl text-glow-navy font-light">{curso.titulo}</h2>
                   <p className="font-montserrat text-[10px] text-gray-400 mt-1">
-                    ${curso.precio.toLocaleString('es-AR')}
-                    {curso.precio_oferta ? ` → $${curso.precio_oferta.toLocaleString('es-AR')}` : ''} · {lecciones.length} lecciones · {cursosAccesos.length} alumnas
+                    {curso.precio_oferta
+                      ? `$${curso.precio.toLocaleString('es-AR')} → $${curso.precio_oferta.toLocaleString('es-AR')}`
+                      : `$${curso.precio.toLocaleString('es-AR')}`
+                    } · {lecciones.length} lecciones · {cursosAccesos.length} alumnas
                   </p>
                 </div>
                 <details className="text-right">
@@ -64,7 +66,6 @@ export default async function AdminCursosPage() {
               </div>
             </div>
 
-            {/* Lecciones */}
             <div className="p-6 border-b border-gray-100">
               <p className="font-montserrat text-[9px] tracking-[0.2em] uppercase text-gray-400 mb-4">Lecciones</p>
               <div className="space-y-3">
@@ -78,7 +79,7 @@ export default async function AdminCursosPage() {
                     <form action={updateLeccion.bind(null, l.id)} className="p-4 pt-2 space-y-3 border-t border-gray-100">
                       <input name="titulo" defaultValue={l.titulo} className="admin-input" placeholder="Título" />
                       <input name="descripcion" defaultValue={l.descripcion || ''} className="admin-input" placeholder="Descripción" />
-                      <input name="video_path" defaultValue={l.video_path} className="admin-input" placeholder="video_path (ej: modulo 1 baja.mp4)" />
+                      <input name="video_path" defaultValue={l.video_path} className="admin-input" placeholder="video_path" />
                       <div className="flex gap-3">
                         <input name="orden" type="number" defaultValue={l.orden} className="admin-input w-24" placeholder="Orden" />
                         <input name="duracion" defaultValue={l.duracion || ''} className="admin-input w-24" placeholder="Duración" />
@@ -97,7 +98,6 @@ export default async function AdminCursosPage() {
               </div>
             </div>
 
-            {/* Alumnas */}
             <div className="p-6">
               <p className="font-montserrat text-[9px] tracking-[0.2em] uppercase text-gray-400 mb-4">
                 Alumnas con acceso ({cursosAccesos.length})
@@ -105,7 +105,7 @@ export default async function AdminCursosPage() {
 
               <form action={grantAccesoFromForm} className="flex gap-2 mb-4">
                 <input type="hidden" name="curso_id" value={curso.id} />
-                <input name="user_id" className="admin-input flex-1" placeholder="User ID de Supabase" />
+                <input name="user_id" className="admin-input flex-1" placeholder="Email o User ID" />
                 <button type="submit" className="bg-glow-navy text-white font-montserrat text-[9px] tracking-wide uppercase px-4 py-2 whitespace-nowrap">
                   Dar acceso
                 </button>
