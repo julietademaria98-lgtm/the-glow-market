@@ -72,7 +72,7 @@ export default async function CursoLandingPage({ params }: { params: { slug: str
               'Tenés ganas de aprender un método simple que funcione siempre.',
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-3">
-                <span className="mt-0.5 w-5 h-5 rounded-full bg-glow-blush/20 flex items-center justify-center flex-shrink-0">
+                <span className="mt-0.5 w-5 h-5 rounded-full bg-glow-blush flex items-center justify-center flex-shrink-0">
                   <Check size={11} className="text-glow-navy" />
                 </span>
                 <span className="font-montserrat text-sm text-glow-navy/70">{item}</span>
@@ -97,7 +97,7 @@ export default async function CursoLandingPage({ params }: { params: { slug: str
               { num: '04', titulo: 'Transformación a noche', duracion: '6–8 min' },
             ].map((mod) => (
               <div key={mod.num} className="flex gap-6 items-start border-b border-glow-navy/10 pb-6 last:border-0">
-                <span className="font-cormorant text-5xl text-glow-blush/40 font-light leading-none flex-shrink-0 w-12">
+                <span className="font-cormorant text-5xl text-glow-blush font-light leading-none flex-shrink-0 w-12">
                   {mod.num}
                 </span>
                 <div className="pt-2">
