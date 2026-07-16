@@ -56,9 +56,9 @@ export default function Navbar() {
           </div>
 
           {/* CENTER LOGO */}
-          <Link
+                    <Link
             href="/"
-            className={`absolute left-1/2 -translate-x-1/2 whitespace-nowrap transition-all duration-500 ${
+            className={`hidden md:block absolute left-1/2 -translate-x-1/2 whitespace-nowrap transition-all duration-500 ${
               scrolled ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
             }`}
           >
