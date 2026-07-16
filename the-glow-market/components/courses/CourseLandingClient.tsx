@@ -5,6 +5,7 @@ import { useRef, useEffect, useState } from 'react'
 import { Check } from 'lucide-react'
 import Link from 'next/link'
 import AddToCartCurso from '@/components/courses/AddToCartCurso'
+import PreviewVideo from '@/components/courses/PreviewVideo'
 import type { Curso } from '@/types'
 
 const fadeUp = {
@@ -28,12 +29,8 @@ function Counter({ target, suffix = '' }: { target: number; suffix?: string }) {
     const step = target / (1200 / 16)
     const timer = setInterval(() => {
       current += step
-      if (current >= target) {
-        setCount(target)
-        clearInterval(timer)
-      } else {
-        setCount(Math.floor(current))
-      }
+      if (current >= target) { setCount(target); clearInterval(timer) }
+      else setCount(Math.floor(current))
     }, 16)
     return () => clearInterval(timer)
   }, [inView, target])
@@ -98,12 +95,11 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="max-w-3xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
+          className="max-w-3xl mx-auto grid grid-cols-3 gap-8 text-center"
         >
           {[
             { value: 4, suffix: '', label: 'Módulos' },
             { value: 5, suffix: '', label: 'Descargables PDF' },
-            { value: 25, suffix: ' min', label: 'De video total' },
             { value: 100, suffix: '%', label: 'Online y a tu ritmo' },
           ].map((stat) => (
             <motion.div key={stat.label} variants={fadeUp}>
@@ -130,19 +126,18 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           <h2 className="font-cormorant text-3xl text-glow-navy font-light mb-4">
             Qué es Day to Night Glow
           </h2>
-          <p className="font-montserrat text-sm text-glow-navy/60 leading-relaxed">
+          <p className="font-montserrat text-sm text-glow-navy/60 leading-relaxed mb-8">
             Un curso de automaquillaje en 4 módulos cortos, pensado para vos que querés salir prolija sin gastar 30 minutos cada mañana. Aprendés una rutina de piel que cambia todo, un maquillaje de día completo con pocos productos, un retoque express que te salva a las 4 de la tarde, y una transformación a noche que no te obliga a desarmar nada. Con productos buenos, buena técnica, y todo el respaldo de Clarins.
           </p>
+          <p className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/40 mb-4">
+            Video de bienvenida
+          </p>
+          <PreviewVideo cursoId={curso.id} />
         </motion.section>
 
         {/* Para quién */}
         <section className="border-t border-glow-navy/10 pt-16">
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <h2 className="font-cormorant text-3xl text-glow-navy font-light mb-2">
               ¿Este curso es para vos?
             </h2>
@@ -150,13 +145,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
               Si te sentís identificada con alguna de estas, sí:
             </p>
           </motion.div>
-          <motion.ul
-            variants={stagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="space-y-4"
-          >
+          <motion.ul variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }} className="space-y-4">
             {[
               'Comprás productos de maquillaje y la mitad no los usás.',
               'Te cuesta hacerte la cara en menos de 30 minutos a la mañana.',
@@ -175,12 +164,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
 
         {/* Módulos */}
         <section className="border-t border-glow-navy/10 pt-16">
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <h2 className="font-cormorant text-3xl text-glow-navy font-light mb-2 uppercase">
               Qué vas a aprender en cada módulo
             </h2>
@@ -219,12 +203,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
 
         {/* Descargables */}
         <section className="border-t border-glow-navy/10 pt-16">
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <h2 className="font-cormorant text-3xl text-glow-navy font-light mb-2">
               5 descargables exclusivos
             </h2>
@@ -232,13 +211,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
               Material adicional para que apliques sin volver al video — para siempre.
             </p>
           </motion.div>
-          <motion.div
-            variants={stagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="space-y-4"
-          >
+          <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }} className="space-y-4">
             {[
               { titulo: 'Kit Esencial', desc: 'Lista completa de productos Clarins con qué hace cada uno y en qué módulos aparece.' },
               { titulo: 'Diagnóstico de Piel', desc: 'Test de 6 preguntas para identificar tu tipo de piel y saber qué priorizar en cada módulo.' },
@@ -264,22 +237,10 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
 
         {/* Lo que incluye */}
         <section className="border-t border-glow-navy/10 pt-16">
-          <motion.h2
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="font-cormorant text-3xl text-glow-navy font-light mb-6"
-          >
+          <motion.h2 variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="font-cormorant text-3xl text-glow-navy font-light mb-6">
             Lo que llevás al comprar el curso
           </motion.h2>
-          <motion.ul
-            variants={stagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="space-y-3"
-          >
+          <motion.ul variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }} className="space-y-3">
             {[
               '4 módulos en video, accesibles desde web y celular.',
               '5 descargables exclusivos en PDF.',
@@ -297,33 +258,17 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
 
         {/* FAQ */}
         <section className="border-t border-glow-navy/10 pt-16">
-          <motion.h2
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="font-cormorant text-3xl text-glow-navy font-light mb-6"
-          >
+          <motion.h2 variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="font-cormorant text-3xl text-glow-navy font-light mb-6">
             Lo que más nos preguntan
           </motion.h2>
-          <motion.div
-            variants={stagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="space-y-1"
-          >
+          <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }} className="space-y-1">
             {[
               { q: '¿Cuánto dura el curso?', a: 'Los 4 módulos suman alrededor de 25 minutos de video. Está pensado para que lo puedas hacer en una mañana o repartido en varios días.' },
               { q: '¿Cuándo lo puedo ver?', a: 'Apenas confirmás tu compra, te llega un mail con tu acceso. Podés empezar al minuto, desde la compu o el celular.' },
               { q: '¿Necesito comprar todos los productos Clarins?', a: 'No. El curso te sirve aunque uses productos que ya tenés. Recomendamos Clarins porque son los que funcionan con este método, y las alumnas tienen un beneficio exclusivo.' },
               { q: '¿Tengo acceso para siempre?', a: 'Sí. Una vez que comprás el curso, lo tenés disponible para siempre, con todas las actualizaciones que vayamos sumando.' },
             ].map((item, i) => (
-              <motion.details
-                key={i}
-                variants={fadeUp}
-                className="group border-b border-glow-navy/10 last:border-0"
-              >
+              <motion.details key={i} variants={fadeUp} className="group border-b border-glow-navy/10 last:border-0">
                 <summary className="flex justify-between items-center py-4 cursor-pointer list-none">
                   <span className="font-montserrat text-sm font-medium text-glow-navy pr-4">{item.q}</span>
                   <span className="text-glow-navy/40 group-open:rotate-45 transition-transform duration-200 flex-shrink-0 text-xl leading-none">+</span>
