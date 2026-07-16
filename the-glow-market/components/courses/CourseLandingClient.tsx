@@ -114,7 +114,23 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
         </motion.div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-6 py-16 space-y-16">
+            <div className="max-w-3xl mx-auto px-6 py-16 space-y-16">
+
+        {/* Cita creadora */}
+        <motion.section
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="text-center py-8"
+        >
+          <p className="font-cormorant text-2xl md:text-3xl text-glow-navy/80 italic leading-relaxed mb-4">
+            "Este curso lo armé para vos, mujeres reales que quieren salir prolijas y se cansaron de probar productos que no usan."
+          </p>
+          <span className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-navy/40">
+            — Nina Amateis
+          </span>
+        </motion.section>
 
         {/* Qué es */}
         <motion.section
