@@ -37,7 +37,7 @@ export default async function CursosPage() {
   const cursos = await getCursosConAcceso()
 
   return (
-    <main className="min-h-screen bg-glow-navy/40 pt-24">
+    <main className="min-h-screen bg-glow-navy/70 pt-24">
       <div className="max-w-[1400px] mx-auto px-6 py-12">
 
         <div className="flex flex-col md:flex-row items-center md:items-center gap-8 md:gap-12 mb-20">
