@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import Image from 'next/image'
 import Link from 'next/link'
 import { Check } from 'lucide-react'
 import AddToCartCurso from '@/components/courses/AddToCartCurso'
@@ -28,10 +27,10 @@ export default async function CursoLandingPage({ params }: { params: { slug: str
       <div className="bg-glow-cream pt-24 pb-16 px-6">
         <div className="max-w-3xl mx-auto">
           <p className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-navy/40 mb-4">
-            Curso Online · En alianza con Clarins
+            Curso Online · Sponsored by Clarins
           </p>
           <h1 className="font-cormorant text-5xl md:text-7xl text-glow-navy font-light tracking-wide leading-none mb-4">
-            {curso.titulo}
+            Curso de Maquillaje: {curso.titulo}
           </h1>
           <p className="font-cormorant text-2xl text-glow-navy/60 italic mb-6">
             Pocos productos. Piel divina. Maquillaje que dura todo el día.
@@ -44,19 +43,6 @@ export default async function CursoLandingPage({ params }: { params: { slug: str
           </p>
         </div>
       </div>
-
-      {/* Imagen */}
-      {curso.imagen_url && (
-        <div className="relative h-[400px] md:h-[560px] w-full">
-          <Image
-            src={curso.imagen_url}
-            alt={curso.titulo}
-            fill
-            className="object-cover"
-            priority
-          />
-        </div>
-      )}
 
       <div className="max-w-3xl mx-auto px-6 py-16 space-y-16">
 
