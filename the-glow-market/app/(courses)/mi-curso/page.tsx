@@ -54,6 +54,18 @@ export default async function MiCursoPage() {
           </h1>
         </div>
 
+                {/* Comunidad */}
+        {cursos.length > 0 && (
+          <div className="mb-10 flex gap-4">
+            <Link
+              href="/comunidad"
+              className="font-montserrat text-[10px] tracking-[0.2em] uppercase bg-glow-navy text-white px-6 py-3 hover:bg-glow-navy/80 transition-colors"
+            >
+              + Comunidad
+            </Link>
+          </div>
+        )}
+
         {cursos.length === 0 ? (
           <div className="text-center py-20 flex flex-col items-center gap-6">
             <StarIcon size={48} className="text-glow-navy/20" />
