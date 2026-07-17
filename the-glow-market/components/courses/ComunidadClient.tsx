@@ -42,7 +42,6 @@ export default function ComunidadClient({ posts: initialPosts, currentUserId, cu
 
   function formatName(email?: string) {
     if (!email) return 'Alumna'
-    if (email === NINA_EMAIL) return 'Nina Amateis'
     return email.split('@')[0]
   }
 
@@ -163,14 +162,15 @@ export default function ComunidadClient({ posts: initialPosts, currentUserId, cu
                 transition={{ duration: 0.5, delay: i * 0.08 }}
                 className="bg-white p-6"
               >
-                {/* Autor y fecha */}
+                {/* Autor y fecha del post */}
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="font-montserrat text-[11px] font-medium text-glow-navy">
-                    {formatName(post.email)}
-                  </span>
-                  {post.email === NINA_EMAIL && (
-                    <span className="font-montserrat text-[9px] tracking-[0.15em] uppercase bg-glow-blush text-white px-2 py-0.5">
-                      Profesora
+                  {post.email === NINA_EMAIL ? (
+                    <span className="font-montserrat text-[12px] font-bold text-glow-navy">
+                      Nina Amateis — Creadora
+                    </span>
+                  ) : (
+                    <span className="font-montserrat text-[11px] font-medium text-glow-navy">
+                      {formatName(post.email)}
                     </span>
                   )}
                   <span className="font-montserrat text-[10px] text-glow-navy/30 ml-auto">
@@ -210,12 +210,13 @@ export default function ComunidadClient({ posts: initialPosts, currentUserId, cu
                     {post.respuestas.map((r) => (
                       <div key={r.id}>
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-montserrat text-[11px] font-medium text-glow-navy">
-                            {formatName(r.email)}
-                          </span>
-                          {r.email === NINA_EMAIL && (
-                            <span className="font-montserrat text-[9px] tracking-[0.15em] uppercase bg-glow-blush text-white px-2 py-0.5">
-                              Profesora
+                          {r.email === NINA_EMAIL ? (
+                            <span className="font-montserrat text-[12px] font-bold text-glow-navy">
+                              Nina Amateis — Creadora
+                            </span>
+                          ) : (
+                            <span className="font-montserrat text-[11px] font-medium text-glow-navy">
+                              {formatName(r.email)}
                             </span>
                           )}
                           <span className="font-montserrat text-[10px] text-glow-navy/30 ml-auto">
