@@ -106,9 +106,17 @@ function LoginForm() {
               className="border border-glow-navy/20 focus:border-glow-navy outline-none px-4 py-3 font-montserrat text-sm text-glow-navy bg-transparent transition-colors duration-300 placeholder:text-glow-navy/30"
               placeholder="••••••••"
             />
-            {errors.password && (
+                        {errors.password && (
               <p className="font-montserrat text-[10px] text-red-400">{errors.password.message}</p>
             )}
+            <div className="flex justify-end">
+              <Link
+                href="/forgot-password"
+                className="font-montserrat text-[10px] text-glow-navy/40 hover:text-glow-navy transition-colors"
+              >
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
           </div>
 
           <Button
