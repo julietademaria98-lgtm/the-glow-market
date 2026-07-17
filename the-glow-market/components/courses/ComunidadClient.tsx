@@ -1,144 +1,181 @@
 'use client'
 
 import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Heart, MessageCircle, Send } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
+import { Heart, Send, MessageCircle } from 'lucide-react'
 
 const NINA_EMAIL = 'ninaamateis@gmail.com'
 
-function getDisplayName(user: any, email: string) {
-  if (email === NINA_EMAIL) return 'Nina Amateis'
-  return user?.user_metadata?.nombre || email?.split('@')[0] || 'Alumna'
+interface Reply {
+  id: string
+  contenido: string
+  created_at: string
+  user_id: string
+  email?: string
 }
 
-function getInitials(name: string) {
-  return name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
+interface Post {
+  id: string
+  contenido: string
+  created_at: string
+  user_id: string
+  email?: string
+  likes: number
+  liked_by_user: boolean
+  respuestas: Reply[]
 }
 
-export default function ComunidadClient({ posts: initialPosts, currentUserId, currentUserEmail }: {
-  posts: any[]
+interface Props {
+  posts: Post[]
   currentUserId: string
   currentUserEmail: string
-}) {
-  const [posts, setPosts] = useState(initialPosts)
-  const [newPost, setNewPost] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const [replyingTo, setReplyingTo] = useState<string | null>(null)
-  const [replyContent, setReplyContent] = useState('')
-  const router = useRouter()
+}
 
-  const handlePost = async () => {
-    if (!newPost.trim() || submitting) return
-    setSubmitting(true)
-    const res = await fetch('/api/comunidad/post', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contenido: newPost }),
-    })
-    if (res.ok) {
-      setNewPost('')
-      router.refresh()
-    }
-    setSubmitting(false)
+export default function ComunidadClient({ posts: initialPosts, currentUserId, currentUserEmail }: Props) {
+  const router = useRouter()
+  const [posts, setPosts] = useState(initialPosts)
+  const [nuevoPost, setNuevoPost] = useState('')
+  const [loadingPost, setLoadingPost] = useState(false)
+  const [replyTexts, setReplyTexts] = useState<Record<string, string>>({})
+  const [replyOpen, setReplyOpen] = useState<Record<string, boolean>>({})
+
+  function formatName(email?: string) {
+    if (!email) return 'Alumna'
+    if (email === NINA_EMAIL) return 'Nina Amateis'
+    return email.split('@')[0]
   }
 
-  const handleReply = async (postId: string) => {
-    if (!replyContent.trim()) return
+  function formatDate(dateStr: string) {
+    const d = new Date(dateStr)
+    return d.toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' })
+  }
+
+  async function handlePost() {
+    if (!nuevoPost.trim() || loadingPost) return
+    setLoadingPost(true)
+    try {
+      const res = await fetch('/api/comunidad/post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contenido: nuevoPost.trim() }),
+      })
+      if (res.ok) {
+        setNuevoPost('')
+        router.refresh()
+      }
+    } finally {
+      setLoadingPost(false)
+    }
+  }
+
+  async function handleLike(postId: string) {
+    const res = await fetch('/api/comunidad/like', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ postId }),
+    })
+    if (res.ok) {
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === postId
+            ? { ...p, liked_by_user: !p.liked_by_user, likes: p.liked_by_user ? p.likes - 1 : p.likes + 1 }
+            : p
+        )
+      )
+    }
+  }
+
+  async function handleReply(postId: string) {
+    const texto = replyTexts[postId]?.trim()
+    if (!texto) return
     const res = await fetch('/api/comunidad/reply', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ post_id: postId, contenido: replyContent }),
+      body: JSON.stringify({ postId, contenido: texto }),
     })
     if (res.ok) {
-      setReplyContent('')
-      setReplyingTo(null)
+      setReplyTexts((prev) => ({ ...prev, [postId]: '' }))
+      setReplyOpen((prev) => ({ ...prev, [postId]: false }))
       router.refresh()
     }
-  }
-
-  const handleLike = async (postId: string) => {
-    await fetch('/api/comunidad/like', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ post_id: postId }),
-    })
-    router.refresh()
   }
 
   return (
     <main className="min-h-screen bg-glow-cream pt-24 pb-16">
       <div className="max-w-2xl mx-auto px-6">
-
         {/* Header */}
-        <div className="mb-10">
-          <p className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-navy/40 mb-2">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mb-10"
+        >
+          <p className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-navy/50 mb-2">
             Espacio exclusivo para alumnas
           </p>
           <h1 className="font-cormorant text-5xl text-glow-navy font-light">
             Comunidad
           </h1>
-        </div>
+        </motion.div>
 
-        {/* Nueva pregunta */}
-        <div className="bg-white border border-glow-navy/10 p-6 mb-8">
-          <p className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/40 mb-3">
+        {/* Nuevo post */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="bg-white p-6 mb-8"
+        >
+          <p className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/50 mb-3">
             Hacé una pregunta
           </p>
           <textarea
-            value={newPost}
-            onChange={(e) => setNewPost(e.target.value)}
+            value={nuevoPost}
+            onChange={(e) => setNuevoPost(e.target.value)}
             placeholder="¿Qué querés preguntar?"
             rows={3}
-            className="w-full font-montserrat text-sm text-glow-navy placeholder:text-glow-navy/30 border-b border-glow-navy/20 focus:outline-none focus:border-glow-navy resize-none pb-2 bg-transparent"
+            className="w-full font-montserrat text-sm text-glow-navy placeholder:text-glow-navy/30 resize-none outline-none border-b border-glow-navy/10 pb-3"
           />
           <div className="flex justify-end mt-3">
             <button
               onClick={handlePost}
-              disabled={submitting || !newPost.trim()}
-              className="flex items-center gap-2 font-montserrat text-[10px] tracking-[0.2em] uppercase bg-glow-navy text-white px-5 py-2.5 hover:bg-glow-navy/80 disabled:opacity-40 transition-colors"
+              disabled={loadingPost || !nuevoPost.trim()}
+              className="font-montserrat text-[10px] tracking-[0.2em] uppercase bg-glow-navy text-white px-6 py-2.5 hover:bg-glow-navy/80 transition-colors disabled:opacity-40 flex items-center gap-2"
             >
-              <Send size={11} />
-              {submitting ? 'Publicando...' : 'Publicar'}
+              <Send size={12} />
+              Publicar
             </button>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Posts */}
-        <div className="space-y-6">
-          {posts.length === 0 && (
-            <p className="font-montserrat text-sm text-glow-navy/40 text-center py-12">
-              Sé la primera en preguntar algo.
-            </p>
-          )}
-          {posts.map((post, i) => {
-            const isNina = post.user?.email === NINA_EMAIL
-            const displayName = getDisplayName(post.user, post.user?.email)
-            const userLiked = (post.likes || []).some((l: any) => l.user_id === currentUserId)
-            const likeCount = (post.likes || []).length
-
-            return (
+        {/* Lista de posts */}
+        {posts.length === 0 ? (
+          <p className="font-cormorant text-xl text-glow-navy/40 text-center py-12">
+            Sé la primera en preguntar algo.
+          </p>
+        ) : (
+          <div className="flex flex-col gap-6">
+            {posts.map((post, i) => (
               <motion.div
                 key={post.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-                className="bg-white border border-glow-navy/10 p-6"
+                transition={{ duration: 0.5, delay: i * 0.08 }}
+                className="bg-white p-6"
               >
-                {/* Autor */}
-                <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-montserrat text-[10px] font-medium ${isNina ? 'bg-glow-blush text-white' : 'bg-glow-navy/10 text-glow-navy'}`}>
-                    {getInitials(displayName)}
-                  </div>
-                  <div>
-                    <p className={`font-montserrat text-xs font-medium ${isNina ? 'text-glow-blush' : 'text-glow-navy'}`}>
-                      {displayName}
-                      {isNina && <span className="ml-2 text-[9px] tracking-widest uppercase bg-glow-blush/10 px-2 py-0.5 rounded-full">Profesora</span>}
-                    </p>
-                    <p className="font-montserrat text-[9px] text-glow-navy/30">
-                      {new Date(post.created_at).toLocaleDateString('es-AR', { day: 'numeric', month: 'long' })}
-                    </p>
-                  </div>
+                {/* Autor y fecha */}
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="font-montserrat text-[11px] font-medium text-glow-navy">
+                    {formatName(post.email)}
+                  </span>
+                  {post.email === NINA_EMAIL && (
+                    <span className="font-montserrat text-[9px] tracking-[0.15em] uppercase bg-glow-blush text-white px-2 py-0.5">
+                      Profesora
+                    </span>
+                  )}
+                  <span className="font-montserrat text-[10px] text-glow-navy/30 ml-auto">
+                    {formatDate(post.created_at)}
+                  </span>
                 </div>
 
                 {/* Contenido */}
@@ -147,71 +184,75 @@ export default function ComunidadClient({ posts: initialPosts, currentUserId, cu
                 </p>
 
                 {/* Acciones */}
-                <div className="flex items-center gap-4 border-t border-glow-navy/10 pt-3">
+                <div className="flex items-center gap-4 pt-3 border-t border-glow-navy/5">
                   <button
                     onClick={() => handleLike(post.id)}
-                    className={`flex items-center gap-1.5 font-montserrat text-[10px] transition-colors ${userLiked ? 'text-glow-blush' : 'text-glow-navy/40 hover:text-glow-blush'}`}
+                    className={`flex items-center gap-1.5 font-montserrat text-[10px] tracking-[0.1em] uppercase transition-colors ${
+                      post.liked_by_user ? 'text-rose-400' : 'text-glow-navy/30 hover:text-rose-400'
+                    }`}
                   >
-                    <Heart size={13} fill={userLiked ? 'currentColor' : 'none'} />
-                    {likeCount > 0 && likeCount}
+                    <Heart size={13} fill={post.liked_by_user ? 'currentColor' : 'none'} />
+                    {post.likes > 0 && post.likes}
                   </button>
+
                   <button
-                    onClick={() => setReplyingTo(replyingTo === post.id ? null : post.id)}
-                    className="flex items-center gap-1.5 font-montserrat text-[10px] text-glow-navy/40 hover:text-glow-navy transition-colors"
+                    onClick={() => setReplyOpen((prev) => ({ ...prev, [post.id]: !prev[post.id] }))}
+                    className="flex items-center gap-1.5 font-montserrat text-[10px] tracking-[0.1em] uppercase text-glow-navy/30 hover:text-glow-navy transition-colors"
                   >
                     <MessageCircle size={13} />
-                    {post.replies?.length > 0 ? `${post.replies.length} respuestas` : 'Responder'}
+                    Responder
                   </button>
                 </div>
 
-                {/* Replies */}
-                {post.replies?.length > 0 && (
-                  <div className="mt-4 space-y-3 pl-4 border-l-2 border-glow-blush/20">
-                    {post.replies.map((reply: any) => {
-                      const replyIsNina = reply.user?.email === NINA_EMAIL
-                      const replyName = getDisplayName(reply.user, reply.user?.email)
-                      return (
-                        <div key={reply.id}>
-                          <div className="flex items-center gap-2 mb-1">
-                            <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 font-montserrat text-[9px] font-medium ${replyIsNina ? 'bg-glow-blush text-white' : 'bg-glow-navy/10 text-glow-navy'}`}>
-                              {getInitials(replyName)}
-                            </div>
-                            <p className={`font-montserrat text-[10px] font-medium ${replyIsNina ? 'text-glow-blush' : 'text-glow-navy'}`}>
-                              {replyName}
-                              {replyIsNina && <span className="ml-2 text-[9px] tracking-widest uppercase bg-glow-blush/10 px-1.5 py-0.5 rounded-full">Profesora</span>}
-                            </p>
-                          </div>
-                          <p className="font-montserrat text-xs text-glow-navy/70 leading-relaxed pl-8">
-                            {reply.contenido}
-                          </p>
+                {/* Respuestas */}
+                {post.respuestas?.length > 0 && (
+                  <div className="mt-4 pl-4 border-l-2 border-glow-blush/40 flex flex-col gap-3">
+                    {post.respuestas.map((r) => (
+                      <div key={r.id}>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-montserrat text-[11px] font-medium text-glow-navy">
+                            {formatName(r.email)}
+                          </span>
+                          {r.email === NINA_EMAIL && (
+                            <span className="font-montserrat text-[9px] tracking-[0.15em] uppercase bg-glow-blush text-white px-2 py-0.5">
+                              Profesora
+                            </span>
+                          )}
+                          <span className="font-montserrat text-[10px] text-glow-navy/30 ml-auto">
+                            {formatDate(r.created_at)}
+                          </span>
                         </div>
-                      )
-                    })}
+                        <p className="font-montserrat text-sm text-glow-navy/70 leading-relaxed">
+                          {r.contenido}
+                        </p>
+                      </div>
+                    ))}
                   </div>
                 )}
 
-                {/* Reply input */}
-                {replyingTo === post.id && (
+                {/* Input respuesta */}
+                {replyOpen[post.id] && (
                   <div className="mt-4 flex gap-2">
                     <input
-                      value={replyContent}
-                      onChange={(e) => setReplyContent(e.target.value)}
-                      placeholder="Tu respuesta..."
-                      className="flex-1 font-montserrat text-xs text-glow-navy placeholder:text-glow-navy/30 border-b border-glow-navy/20 focus:outline-none focus:border-glow-navy bg-transparent pb-1"
+                      type="text"
+                      value={replyTexts[post.id] || ''}
+                      onChange={(e) => setReplyTexts((prev) => ({ ...prev, [post.id]: e.target.value }))}
                       onKeyDown={(e) => e.key === 'Enter' && handleReply(post.id)}
+                      placeholder="Tu respuesta..."
+                      className="flex-1 font-montserrat text-sm text-glow-navy placeholder:text-glow-navy/30 border-b border-glow-navy/20 outline-none pb-1 bg-transparent"
                     />
                     <button
                       onClick={() => handleReply(post.id)}
-                      className="font-montserrat text-[9px] tracking-widest uppercase text-glow-navy hover:text-glow-blush transition-colors"
+                      className="text-glow-navy/40 hover:text-glow-navy transition-colors"
                     >
-                      Enviar
+                      <Send size={14} />
                     </button>
                   </div>
                 )}
               </motion.div>
-            )
-          })}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </main>
   )
