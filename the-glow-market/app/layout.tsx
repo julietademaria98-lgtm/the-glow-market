@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import NavbarWrapper, { FooterWrapper } from '@/components/layout/NavbarWrapper'
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 export const metadata: Metadata = {
   title: 'The Glow Market — Accesorios & Cursos Online',
@@ -28,6 +29,9 @@ export default function RootLayout({
         {children}
         <FooterWrapper />
       </body>
+      {process.env.NEXT_PUBLIC_GA_ID && (
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+      )}
     </html>
   )
 }
