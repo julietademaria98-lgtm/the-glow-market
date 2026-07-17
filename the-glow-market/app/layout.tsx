@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import NavbarWrapper, { FooterWrapper } from '@/components/layout/NavbarWrapper'
-import { GoogleAnalytics } from '@next/third-parties/google'
+import Script from 'next/script'
 
 export const metadata: Metadata = {
   title: 'The Glow Market — Accesorios & Cursos Online',
@@ -22,6 +22,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const gaId = process.env.NEXT_PUBLIC_GA_ID
+
   return (
     <html lang="es">
       <body className="bg-glow-cream antialiased">
@@ -29,8 +31,21 @@ export default function RootLayout({
         {children}
         <FooterWrapper />
       </body>
-      {process.env.NEXT_PUBLIC_GA_ID && (
-        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+      {gaId && (
+        <>
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+            strategy="afterInteractive"
+          />
+          <Script id="ga-init" strategy="afterInteractive">
+            {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${gaId}');
+            `}
+          </Script>
+        </>
       )}
     </html>
   )
