@@ -32,12 +32,14 @@ async function getPosts() {
   const { data: authData } = await db.auth.admin.listUsers()
   const users = authData?.users || []
 
-  return (posts || []).map((post) => ({
+    return (posts || []).map((post) => ({
     ...post,
-    user: users.find((u) => u.id === post.user_id),
+    email: users.find((u) => u.id === post.user_id)?.email,
+    likes: (post.likes || []).length,
+    liked_by_user: false,
     replies: (post.replies || []).map((r: any) => ({
       ...r,
-      user: users.find((u) => u.id === r.user_id),
+      email: users.find((u) => u.id === r.user_id)?.email,
     })),
   }))
 }
