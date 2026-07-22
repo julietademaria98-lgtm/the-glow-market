@@ -8,9 +8,47 @@ import { formatPrice } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 import StarIcon from '@/components/ui/StarIcon'
 import Button from '@/components/ui/Button'
+import { useState } from 'react'
 
 export default function CarritoPage() {
   const { items, removeItem, updateQuantity, total } = useCartStore()
+  const [codigoCupon, setCodigoCupon] = useState('')
+  const [cuponAplicado, setCuponAplicado] = useState<{ codigo: string; descuento: number } | null>(null)
+  const [cuponError, setCuponError] = useState<string | null>(null)
+  const [loadingCupon, setLoadingCupon] = useState(false)
+
+  const subtotal = total()
+  const descuento = cuponAplicado ? Math.round(subtotal * cuponAplicado.descuento / 100) : 0
+  const totalFinal = subtotal - descuento
+
+  async function aplicarCupon() {
+    if (!codigoCupon.trim()) return
+    setLoadingCupon(true)
+    setCuponError(null)
+    try {
+      const res = await fetch('/api/cupones/validar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ codigo: codigoCupon }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setCuponError(data.error)
+        setCuponAplicado(null)
+      } else {
+        setCuponAplicado({ codigo: data.codigo, descuento: data.descuento })
+        setCuponError(null)
+      }
+    } finally {
+      setLoadingCupon(false)
+    }
+  }
+
+  function quitarCupon() {
+    setCuponAplicado(null)
+    setCodigoCupon('')
+    setCuponError(null)
+  }
 
   if (items.length === 0) {
     return (
@@ -24,9 +62,7 @@ export default function CarritoPage() {
             Explorá nuestra colección y encontrá piezas que te hagan brillar.
           </p>
           <Link href="/productos">
-            <Button variant="primary" size="md">
-              Explorar Tienda
-            </Button>
+            <Button variant="primary" size="md">Explorar Tienda</Button>
           </Link>
         </div>
       </main>
@@ -36,7 +72,6 @@ export default function CarritoPage() {
   return (
     <main className="min-h-screen bg-glow-cream pt-24">
       <div className="max-w-[1200px] mx-auto px-6 py-12">
-        {/* Header */}
         <div className="flex items-center gap-3 mb-10">
           <StarIcon size={12} className="text-glow-navy" />
           <h1 className="font-cormorant text-4xl md:text-5xl text-glow-navy font-light tracking-wide">
@@ -49,10 +84,7 @@ export default function CarritoPage() {
           <div>
             <div className="hidden md:grid grid-cols-[1fr_auto_auto_auto] gap-4 pb-3 mb-3 border-b border-glow-navy/10">
               {['Producto', 'Precio', 'Cantidad', 'Total'].map((h) => (
-                <span
-                  key={h}
-                  className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/40"
-                >
+                <span key={h} className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/40">
                   {h}
                 </span>
               ))}
@@ -69,7 +101,6 @@ export default function CarritoPage() {
                   transition={{ duration: 0.3 }}
                   className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto_auto] gap-4 items-center py-6 border-b border-glow-navy/10"
                 >
-                  {/* Product */}
                   <div className="flex gap-4 items-start">
                     <div className="relative w-20 h-24 flex-shrink-0 overflow-hidden bg-white">
                       <Image
@@ -81,12 +112,8 @@ export default function CarritoPage() {
                       />
                     </div>
                     <div className="flex flex-col gap-1">
-                      <p className="font-cormorant text-lg text-glow-navy leading-tight">
-                        {item.nombre}
-                      </p>
-                      <p className="font-montserrat text-xs text-glow-navy/50 md:hidden">
-                        {formatPrice(item.precio)}
-                      </p>
+                      <p className="font-cormorant text-lg text-glow-navy leading-tight">{item.nombre}</p>
+                      <p className="font-montserrat text-xs text-glow-navy/50 md:hidden">{formatPrice(item.precio)}</p>
                       <button
                         onClick={() => removeItem(item.id)}
                         className="flex items-center gap-1 font-montserrat text-[10px] tracking-wide uppercase text-glow-navy/30 hover:text-glow-navy transition-colors w-fit mt-2"
@@ -96,69 +123,102 @@ export default function CarritoPage() {
                       </button>
                     </div>
                   </div>
-
-                  {/* Price */}
-                  <span className="hidden md:block font-montserrat text-sm text-glow-navy">
-                    {formatPrice(item.precio)}
-                  </span>
-
-                  {/* Qty */}
+                  <span className="hidden md:block font-montserrat text-sm text-glow-navy">{formatPrice(item.precio)}</span>
                   <div className="flex items-center gap-2 border border-glow-navy/20 w-fit px-2 py-1">
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="text-glow-navy hover:opacity-60 transition-opacity p-1"
-                    >
+                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="text-glow-navy hover:opacity-60 transition-opacity p-1">
                       <Minus size={10} />
                     </button>
-                    <span className="font-montserrat text-xs w-6 text-center text-glow-navy">
-                      {item.quantity}
-                    </span>
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="text-glow-navy hover:opacity-60 transition-opacity p-1"
-                    >
+                    <span className="font-montserrat text-xs w-6 text-center text-glow-navy">{item.quantity}</span>
+                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="text-glow-navy hover:opacity-60 transition-opacity p-1">
                       <Plus size={10} />
                     </button>
                   </div>
-
-                  {/* Subtotal */}
-                  <span className="font-montserrat text-sm font-medium text-glow-navy">
-                    {formatPrice(item.precio * item.quantity)}
-                  </span>
+                  <span className="font-montserrat text-sm font-medium text-glow-navy">{formatPrice(item.precio * item.quantity)}</span>
                 </motion.div>
               ))}
             </AnimatePresence>
           </div>
 
-          {/* Order summary */}
+          {/* Resumen */}
           <div className="bg-white p-8 flex flex-col gap-6 h-fit sticky top-24">
             <h2 className="font-cormorant text-2xl text-glow-navy font-light">Resumen</h2>
 
             <div className="flex flex-col gap-3">
               {items.map((item) => (
                 <div key={item.id} className="flex justify-between">
-                  <span className="font-montserrat text-xs text-glow-navy/60">
-                    {item.nombre} × {item.quantity}
-                  </span>
-                  <span className="font-montserrat text-xs text-glow-navy">
-                    {formatPrice(item.precio * item.quantity)}
-                  </span>
+                  <span className="font-montserrat text-xs text-glow-navy/60">{item.nombre} × {item.quantity}</span>
+                  <span className="font-montserrat text-xs text-glow-navy">{formatPrice(item.precio * item.quantity)}</span>
                 </div>
               ))}
             </div>
 
             <div className="h-px bg-glow-navy/10" />
 
-            <div className="flex justify-between items-baseline">
-              <span className="font-montserrat text-xs tracking-[0.15em] uppercase text-glow-navy/60">
-                Total
-              </span>
-              <span className="font-cormorant text-3xl text-glow-navy">
-                {formatPrice(total())}
-              </span>
+            {/* Cupón */}
+            {cuponAplicado ? (
+              <div className="flex items-center justify-between bg-glow-blush/10 border border-glow-blush/40 px-4 py-3">
+                <div>
+                  <p className="font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/60">
+                    Cupón aplicado
+                  </p>
+                  <p className="font-montserrat text-xs font-medium text-glow-navy">
+                    {cuponAplicado.codigo} — {cuponAplicado.descuento}% off
+                  </p>
+                </div>
+                <button onClick={quitarCupon} className="font-montserrat text-[10px] text-glow-navy/40 hover:text-glow-navy transition-colors underline">
+                  Quitar
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                <p className="font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/40">
+                  Código de descuento
+                </p>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={codigoCupon}
+                    onChange={(e) => setCodigoCupon(e.target.value.toUpperCase())}
+                    onKeyDown={(e) => e.key === 'Enter' && aplicarCupon()}
+                    placeholder="GLOW10"
+                    className="flex-1 border border-glow-navy/20 px-3 py-2 font-montserrat text-xs text-glow-navy placeholder:text-glow-navy/20 outline-none focus:border-glow-navy transition-colors bg-transparent"
+                  />
+                  <button
+                    onClick={aplicarCupon}
+                    disabled={loadingCupon || !codigoCupon.trim()}
+                    className="font-montserrat text-[10px] tracking-[0.15em] uppercase bg-glow-navy text-white px-4 py-2 hover:bg-glow-navy/80 transition-colors disabled:opacity-40"
+                  >
+                    {loadingCupon ? '...' : 'Aplicar'}
+                  </button>
+                </div>
+                {cuponError && (
+                  <p className="font-montserrat text-[10px] text-red-400">{cuponError}</p>
+                )}
+              </div>
+            )}
+
+            <div className="h-px bg-glow-navy/10" />
+
+            {/* Totales */}
+            <div className="flex flex-col gap-2">
+              <div className="flex justify-between">
+                <span className="font-montserrat text-xs text-glow-navy/50">Subtotal</span>
+                <span className="font-montserrat text-xs text-glow-navy">{formatPrice(subtotal)}</span>
+              </div>
+              {cuponAplicado && (
+                <div className="flex justify-between">
+                  <span className="font-montserrat text-xs text-glow-blush">Descuento ({cuponAplicado.descuento}%)</span>
+                  <span className="font-montserrat text-xs text-glow-blush">− {formatPrice(descuento)}</span>
+                </div>
+              )}
             </div>
 
-            <Link href="/checkout">
+            <div className="flex justify-between items-baseline">
+              <span className="font-montserrat text-xs tracking-[0.15em] uppercase text-glow-navy/60">Total</span>
+              <span className="font-cormorant text-3xl text-glow-navy">{formatPrice(totalFinal)}</span>
+            </div>
+
+            <Link href={`/checkout${cuponAplicado ? `?cupon=${cuponAplicado.codigo}&descuento=${cuponAplicado.descuento}` : ''}`}>
               <Button variant="primary" className="w-full" size="md">
                 Proceder al Checkout
               </Button>
