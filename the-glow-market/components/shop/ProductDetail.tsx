@@ -35,10 +35,9 @@ const ACCORDIONS = [
     label: '✨ Cuidados',
     render: () => (
       <ul className="space-y-2 font-montserrat text-xs text-glow-navy/70 leading-relaxed">
-        <li>Guardar en estuche cuando no se use para evitar oxidación.</li>
-        <li>Evitar contacto con agua, perfumes y cremas.</li>
-        <li>Limpiar con paño suave y seco.</li>
-        <li>No usar durante actividades físicas intensas.</li>
+        <li>Guardar lejos del sol directo para evitar oxidación.</li>
+        <li>Evitar contacto en el exterior con perfumes y cremas.</li>
+        <li>Limpiar con paño suave y húmedo por dentro.</li>
       </ul>
     ),
   },
@@ -47,10 +46,9 @@ const ACCORDIONS = [
     label: '📦 Envío',
     render: () => (
       <ul className="space-y-2 font-montserrat text-xs text-glow-navy/70 leading-relaxed">
-        <li>Envíos a todo el país por correo argentino o Andreani.</li>
+        <li>Envíos a todo el país por Andreani.</li>
         <li>Tiempo estimado: 3 a 7 días hábiles.</li>
-        <li>Envío gratis en compras mayores a $30.000.</li>
-        <li>Retiro en CABA disponible previa coordinación.</li>
+        <li>Retiro en CABA (Núñez) o Tigre con coordinación previa.</li>
       </ul>
     ),
   },
@@ -77,7 +75,6 @@ export default function ProductDetail({ producto }: ProductDetailProps) {
       <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-12 md:gap-16">
         {/* LEFT: Images */}
         <div className="flex flex-col gap-4">
-          {/* Main image */}
           <div className="relative aspect-[4/5] overflow-hidden bg-white">
             <AnimatePresence mode="wait">
               <motion.div
@@ -100,7 +97,6 @@ export default function ProductDetail({ producto }: ProductDetailProps) {
             </AnimatePresence>
           </div>
 
-          {/* Thumbnails */}
           {imagenes.length > 1 && (
             <div className="flex gap-3 overflow-x-auto pb-1">
               {imagenes.map((img) => (
@@ -128,7 +124,6 @@ export default function ProductDetail({ producto }: ProductDetailProps) {
 
         {/* RIGHT: Info */}
         <div className="flex flex-col gap-6">
-          {/* Star + nombre */}
           <div className="flex flex-col gap-3">
             <StarIcon size={14} className="text-glow-navy" />
             <h1 className="font-cormorant text-3xl md:text-4xl text-glow-navy font-light tracking-wide leading-tight">
@@ -136,7 +131,6 @@ export default function ProductDetail({ producto }: ProductDetailProps) {
             </h1>
           </div>
 
-          {/* Precio */}
           <div className="flex items-baseline gap-3">
             {producto.precio_oferta ? (
               <>
@@ -154,17 +148,14 @@ export default function ProductDetail({ producto }: ProductDetailProps) {
             )}
           </div>
 
-          {/* Separador */}
           <div className="h-px bg-glow-navy/10" />
 
-          {/* Descripción */}
           {producto.descripcion && (
             <p className="font-montserrat text-sm text-glow-navy/70 leading-relaxed">
               {producto.descripcion}
             </p>
           )}
 
-          {/* Acordeones */}
           <div className="flex flex-col divide-y divide-glow-navy/10">
             {ACCORDIONS.map(({ id, label, render }) => (
               <div key={id}>
@@ -199,7 +190,6 @@ export default function ProductDetail({ producto }: ProductDetailProps) {
             ))}
           </div>
 
-          {/* CTA Buttons */}
           <div className="flex flex-col gap-3 mt-2">
             <AddToCartButton
               producto={producto}
@@ -212,7 +202,6 @@ export default function ProductDetail({ producto }: ProductDetailProps) {
             </Link>
           </div>
 
-          {/* Stock info */}
           {producto.stock <= 5 && producto.stock > 0 && (
             <p className="font-montserrat text-xs text-glow-royal tracking-wide">
               ¡Solo quedan {producto.stock} unidades!
