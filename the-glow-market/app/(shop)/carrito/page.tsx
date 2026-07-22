@@ -180,7 +180,7 @@ export default function CarritoPage() {
                     value={codigoCupon}
                     onChange={(e) => setCodigoCupon(e.target.value.toUpperCase())}
                     onKeyDown={(e) => e.key === 'Enter' && aplicarCupon()}
-                    placeholder="GLOW10"
+                    placeholder=""
                     className="flex-1 border border-glow-navy/20 px-3 py-2 font-montserrat text-xs text-glow-navy placeholder:text-glow-navy/20 outline-none focus:border-glow-navy transition-colors bg-transparent"
                   />
                   <button
