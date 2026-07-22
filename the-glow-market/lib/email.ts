@@ -48,12 +48,15 @@ export async function sendOrderConfirmation({
       <p style="font-family: 'Georgia', serif; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #e8b4b8; margin: 0 0 8px 0;">
         Tu curso está disponible ahora
       </p>
-      <p style="font-family: 'Georgia', serif; font-size: 22px; font-weight: 300; color: #ffffff; margin: 0 0 20px 0;">
+      <p style="font-family: 'Georgia', serif; font-size: 22px; font-weight: 300; color: #ffffff; margin: 0 0 12px 0;">
         Accedé cuando quieras, de por vida.
       </p>
-      <a href="https://theglowmarket.com.ar/mi-curso"
+      <p style="font-family: 'Georgia', serif; font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.7; margin: 0 0 24px 0;">
+        Para ingresar al curso, entrá a la web con el <strong style="color: #e8b4b8;">usuario y contraseña</strong> que creaste al momento de la compra. Tu contenido ya está listo para disfrutar.
+      </p>
+      <a href="https://theglowmarket.com.ar/login"
         style="display: inline-block; background: #e8b4b8; color: #1a2340; font-family: 'Georgia', serif; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; padding: 14px 32px; text-decoration: none;">
-        Ir a mi curso →
+        Ingresar al curso →
       </a>
     </div>
   ` : ''
