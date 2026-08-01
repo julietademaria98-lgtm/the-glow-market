@@ -50,6 +50,12 @@ export interface Zona {
    * comprador es siempre el `nombre` que se carga en la base.
    */
   etiqueta: string
+  /**
+   * Los CP que componen la zona, para mostrarlos en el panel: sin esto el admin no puede
+   * saber qué está cubriendo cuando le pone precio a "GBA". Solo las zonas que matchean por
+   * lista; "Resto de Buenos Aires" es el complemento y no tiene una lista propia.
+   */
+  codigosPostales?: string[]
 }
 
 /** Provincias que matchean por nombre (todas menos Buenos Aires, que va por CP). */
@@ -84,8 +90,8 @@ export const ZONA_BUENOS_AIRES = 'buenos-aires'
 
 /** Las 26 zonas: 3 de Buenos Aires + 23 provincias. */
 export const ZONAS: Zona[] = [
-  { id: 'gba', grupo: 'buenos-aires', etiqueta: 'GBA' },
-  { id: 'gba2', grupo: 'buenos-aires', etiqueta: 'GBA2' },
+  { id: 'gba', grupo: 'buenos-aires', etiqueta: 'GBA', codigosPostales: Array.from(CP_GBA) },
+  { id: 'gba2', grupo: 'buenos-aires', etiqueta: 'GBA2', codigosPostales: Array.from(CP_GBA2) },
   { id: 'bsas-resto', grupo: 'buenos-aires', etiqueta: 'Resto de Buenos Aires' },
   ...PROVINCIAS_POR_NOMBRE.map((p): Zona => ({
     id: slugProvincia(p),

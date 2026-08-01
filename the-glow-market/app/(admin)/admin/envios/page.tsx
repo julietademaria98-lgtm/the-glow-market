@@ -7,6 +7,8 @@ interface ZonaForm {
   id: string
   grupo: 'buenos-aires' | 'provincia'
   etiqueta: string
+  /** CP que cubre la zona. null en las que matchean por provincia o por descarte. */
+  codigosPostales: string[] | null
   nombre: string
   descripcion: string
   precio: string
@@ -146,9 +148,16 @@ function Seccion({
             }`}
           >
             <div className="flex items-center justify-between mb-4">
-              <p className="font-montserrat text-[11px] tracking-widest uppercase text-glow-navy">
-                {z.etiqueta}
-              </p>
+              <div className="flex items-baseline gap-3">
+                <p className="font-montserrat text-[11px] tracking-widest uppercase text-glow-navy">
+                  {z.etiqueta}
+                </p>
+                {z.codigosPostales && (
+                  <span className="font-montserrat text-[10px] text-gray-400">
+                    {z.codigosPostales.length} códigos postales
+                  </span>
+                )}
+              </div>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -203,6 +212,24 @@ function Seccion({
                 className={INPUT + ' resize-y'}
               />
             </div>
+
+            {z.codigosPostales && (
+              <details className="mt-4">
+                <summary className="cursor-pointer font-montserrat text-[10px] tracking-widest uppercase text-glow-navy/50 hover:text-glow-navy transition-colors">
+                  Ver los {z.codigosPostales.length} códigos postales
+                </summary>
+                <p className="mt-2 bg-gray-50 p-3 max-h-36 overflow-y-auto font-montserrat text-[10px] text-gray-500 leading-relaxed break-words">
+                  {z.codigosPostales.join(' · ')}
+                </p>
+              </details>
+            )}
+
+            {z.id === 'bsas-resto' && (
+              <p className="mt-4 font-montserrat text-[10px] text-gray-400 leading-relaxed">
+                Cubre todo código postal bonaerense que no esté en GBA ni en GBA2, así que no
+                tiene una lista propia.
+              </p>
+            )}
           </div>
         ))}
       </div>

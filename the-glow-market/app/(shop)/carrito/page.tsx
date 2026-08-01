@@ -9,15 +9,19 @@ import { motion, AnimatePresence } from 'framer-motion'
 import StarIcon from '@/components/ui/StarIcon'
 import Button from '@/components/ui/Button'
 import { useState } from 'react'
+import { useHasMounted } from '@/hooks/useHasMounted'
 
 export default function CarritoPage() {
   const { items, removeItem, updateQuantity, total } = useCartStore()
+  const hasMounted = useHasMounted()
   const [codigoCupon, setCodigoCupon] = useState('')
   const [cuponAplicado, setCuponAplicado] = useState<{ codigo: string; descuento: number } | null>(null)
   const [cuponError, setCuponError] = useState<string | null>(null)
   const [loadingCupon, setLoadingCupon] = useState(false)
 
   const subtotal = total()
+  // Los cursos no se envían: un carrito solo digital no habla de envío en ningún lado.
+  const soloDigital = items.length > 0 && items.every((i) => i.tipo === 'curso')
   const descuento = cuponAplicado ? Math.round(subtotal * cuponAplicado.descuento / 100) : 0
   const totalFinal = subtotal - descuento
 
@@ -48,6 +52,12 @@ export default function CarritoPage() {
     setCuponAplicado(null)
     setCodigoCupon('')
     setCuponError(null)
+  }
+
+  // El carrito vive en localStorage, así que hasta montar en el cliente no sabemos qué tiene.
+  // Sin esto, el server y el primer render dirían "vacío" aunque haya productos.
+  if (!hasMounted) {
+    return <main className="min-h-screen bg-glow-cream pt-24" />
   }
 
   if (items.length === 0) {
@@ -211,12 +221,28 @@ export default function CarritoPage() {
                   <span className="font-montserrat text-xs text-glow-blush">− {formatPrice(descuento)}</span>
                 </div>
               )}
+              {/* El envío depende de la dirección, que recién se pide en el checkout. Se
+                  muestra igual para que el total de acá no se lea como el precio final. */}
+              {!soloDigital && (
+                <div className="flex justify-between">
+                  <span className="font-montserrat text-xs text-glow-navy/50">Envío</span>
+                  <span className="font-montserrat text-xs text-glow-navy/40">
+                    Se calcula en el checkout
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="flex justify-between items-baseline">
               <span className="font-montserrat text-xs tracking-[0.15em] uppercase text-glow-navy/60">Total</span>
               <span className="font-cormorant text-3xl text-glow-navy">{formatPrice(totalFinal)}</span>
             </div>
+
+            {!soloDigital && (
+              <p className="font-montserrat text-[10px] text-glow-navy/40 -mt-3">
+                Sin el envío, que se suma al poner tu dirección.
+              </p>
+            )}
 
             <Link href={`/checkout${cuponAplicado ? `?cupon=${cuponAplicado.codigo}&descuento=${cuponAplicado.descuento}` : ''}`}>
               <Button variant="primary" className="w-full" size="md">

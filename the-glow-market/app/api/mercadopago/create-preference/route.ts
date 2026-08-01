@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { createPreference } from '@/lib/mercadopago'
 import { cotizarEnvio } from '@/lib/envios/server'
 import { createClient } from '@/lib/supabase/server'
@@ -13,11 +14,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'El carrito está vacío' }, { status: 400 })
     }
 
-    // Crear orden en Supabase
+    // El cliente con cookies solo se usa para saber quién compra (puede ser nadie).
     const supabase = await createClient()
     const {
       data: { user },
     } = await supabase.auth.getUser()
+
+    // La orden se escribe con service-role, como ya hace el webhook. RLS en `ordenes` solo
+    // deja leer las propias (`user_id = auth.uid()`), así que un comprador sin cuenta no
+    // podía hacer insert().select() y la compra fallaba con "violates row-level security".
+    const db = createServiceClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    )
 
     const subtotal = items.reduce(
       (acc: number, item: CartItem) => acc + item.precio * item.quantity,
@@ -47,7 +56,7 @@ export async function POST(request: Request) {
 
     const total = subtotal + costoEnvio
 
-    const { data: orden, error: ordenError } = await supabase
+    const { data: orden, error: ordenError } = await db
       .from('ordenes')
       .insert({
         user_id: user?.id || null,
@@ -77,7 +86,7 @@ export async function POST(request: Request) {
     const preference = await createPreference(items, orden.id, costoEnvio)
 
     // Actualizar orden con ID de preferencia
-    await supabase
+    await db
       .from('ordenes')
       .update({ mp_preference_id: preference.id })
       .eq('id', orden.id)

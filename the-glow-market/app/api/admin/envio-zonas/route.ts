@@ -28,6 +28,7 @@ export async function GET() {
       id: z.id,
       grupo: z.grupo,
       etiqueta: z.etiqueta,
+      codigosPostales: z.codigosPostales ?? null,
       nombre: fila?.nombre ?? '',
       descripcion: fila?.descripcion ?? '',
       precio: fila?.precio != null ? String(fila.precio) : '0',

@@ -12,6 +12,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import StarIcon from '@/components/ui/StarIcon'
 import Button from '@/components/ui/Button'
+import { useHasMounted } from '@/hooks/useHasMounted'
 
 const baseSchema = {
   nombre: z.string().min(2, 'Requerido'),
@@ -61,6 +62,7 @@ const INPUT_CLASS =
 
 export default function CheckoutPage() {
   const { items, total, clearCart } = useCartStore()
+  const hasMounted = useHasMounted()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [user, setUser] = useState<User | null>(null)
@@ -133,6 +135,12 @@ export default function CheckoutPage() {
       clearTimeout(t)
     }
   }, [provincia, codigoPostal, soloDigital])
+
+  // El carrito vive en localStorage: hasta montar en el cliente no sabemos qué tiene, y sin
+  // este guard el checkout diría "carrito vacío" aunque haya productos.
+  if (!hasMounted) {
+    return <main className="min-h-screen bg-glow-cream pt-24" />
+  }
 
   if (items.length === 0) {
     return (
