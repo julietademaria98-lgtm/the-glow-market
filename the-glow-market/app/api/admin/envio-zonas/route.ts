@@ -9,9 +9,10 @@ export async function GET() {
   const auth = await getAdminOr401()
   if (!auth.ok) return auth.response
 
+  // leerZonas ya devuelve el orden de evaluación, que es el que se muestra en el panel.
   const zonas = await leerZonas()
   return NextResponse.json({
-    zonas: ordenarParaPanel(zonas).map((z) => ({
+    zonas: zonas.map((z) => ({
       ...z,
       codigosPostales: z.codigosPostales.join(', '),
       cobertura: describirCobertura(z),
@@ -41,20 +42,37 @@ export async function POST(request: Request) {
 }
 
 /**
- * Ordena como se evalúan: primero las de códigos postales, después las de provincia, y los
- * dos descartes al final. Así la lista del panel se lee de lo más chico a lo más grande.
+ * Guarda el orden en que quedaron las zonas después de arrastrarlas. Recibe los ids en el
+ * orden nuevo y escribe la posición de cada una, que es la que usa el matcheo.
  */
-function ordenarParaPanel<T extends { tipo: string; codigosPostales: string[]; provincias: string[] }>(
-  zonas: T[],
-): T[] {
-  const nivel = (z: T) => {
-    if (z.tipo === 'resto-pais') return 3
-    if (z.tipo === 'resto-bsas') return 2
-    return z.codigosPostales.length > 0 ? 0 : 1
-  }
-  // Dentro del mismo nivel, primero la que abarca menos: es el orden real de evaluación.
-  const amplitud = (z: T) =>
-    z.codigosPostales.length > 0 ? z.codigosPostales.length : z.provincias.length
+export async function PATCH(request: Request) {
+  const auth = await getAdminOr401()
+  if (!auth.ok) return auth.response
 
-  return [...zonas].sort((a, b) => nivel(a) - nivel(b) || amplitud(a) - amplitud(b))
+  const body = await request.json().catch(() => ({}))
+  const ids: string[] = Array.isArray(body.ids) ? body.ids : []
+  if (ids.length === 0) {
+    return NextResponse.json({ error: 'No llegó el orden nuevo' }, { status: 400 })
+  }
+
+  const zonas = await leerZonas()
+  const movibles = new Set(zonas.filter((z) => z.tipo === 'normal').map((z) => z.id))
+
+  // Los descartes no se mueven: su lugar es el final, y arriba taparían a todo lo demás.
+  const aGuardar = ids.filter((id) => movibles.has(id))
+
+  for (let i = 0; i < aGuardar.length; i++) {
+    const { error } = await auth.db
+      .from('envio_zonas')
+      .update({ orden: i, updated_at: new Date().toISOString() })
+      .eq('id', aGuardar[i])
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  // Detrás de cualquier zona propia, y en su orden fijo entre sí.
+  for (const [tipo, posicion] of [['resto-bsas', 9000], ['resto-pais', 9001]] as const) {
+    await auth.db.from('envio_zonas').update({ orden: posicion }).eq('tipo', tipo)
+  }
+
+  return NextResponse.json({ ok: true, guardadas: aGuardar.length })
 }

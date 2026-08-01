@@ -43,6 +43,43 @@ export default function AdminEnviosPage() {
   const [loading, setLoading] = useState(true)
   const [msg, setMsg] = useState<Msg>(null)
   const [creando, setCreando] = useState(false)
+  /** Id de la zona que se está arrastrando, o null. */
+  const [arrastrando, setArrastrando] = useState<string | null>(null)
+
+  /**
+   * Mueve la zona arrastrada al lugar de `destinoId` y guarda el orden nuevo. Se actualiza la
+   * pantalla primero para que el arrastre se sienta inmediato, y si el guardado falla se
+   * recarga del server para no quedar mostrando un orden que no existe.
+   */
+  async function reordenar(destinoId: string) {
+    const origenId = arrastrando
+    setArrastrando(null)
+    if (!origenId || origenId === destinoId) return
+
+    const movibles = zonas.filter((z) => !z.esDescarte)
+    const desde = movibles.findIndex((z) => z.id === origenId)
+    const hasta = movibles.findIndex((z) => z.id === destinoId)
+    if (desde < 0 || hasta < 0) return
+
+    const nuevas = [...movibles]
+    const [movida] = nuevas.splice(desde, 1)
+    nuevas.splice(hasta, 0, movida)
+
+    setZonas([...nuevas, ...zonas.filter((z) => z.esDescarte)])
+
+    const res = await fetch('/api/admin/envio-zonas', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids: nuevas.map((z) => z.id) }),
+    })
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      setMsg({ ok: false, text: data.error || 'No se pudo guardar el orden' })
+      await cargar()
+      return
+    }
+    setMsg({ ok: true, text: 'Orden actualizado' })
+  }
 
   const cargar = useCallback(async () => {
     const r = await fetch('/api/admin/envio-zonas').then((r) => r.json())
@@ -79,9 +116,9 @@ export default function AdminEnviosPage() {
       </div>
 
       <p className="font-montserrat text-[11px] text-gray-400 mb-8 max-w-2xl leading-relaxed">
-        Se evalúan de arriba hacia abajo: primero las que definís por código postal, después las
-        de provincia, y al final las dos que recogen lo que no entró en ninguna. La primera que
-        coincide con la dirección es la que se cobra.
+        Se evalúan de arriba hacia abajo y gana la primera que coincide con la dirección, así que
+        conviene dejar arriba las más específicas. Arrastrá desde <span className="text-gray-500">⠿</span> para
+        cambiar el orden. Las dos últimas recogen lo que no entró en ninguna y por eso no se mueven.
       </p>
 
       {msg && (
@@ -99,6 +136,10 @@ export default function AdminEnviosPage() {
             zona={zona}
             orden={i + 1}
             provincias={provincias}
+            arrastrando={arrastrando === zona.id}
+            onArrastrarInicio={() => setArrastrando(zona.id)}
+            onArrastrarFin={() => setArrastrando(null)}
+            onSoltar={() => reordenar(zona.id)}
             onGuardado={async (texto) => {
               await cargar()
               setMsg({ ok: true, text: texto })
@@ -146,16 +187,25 @@ function FilaZona({
   zona,
   orden,
   provincias,
+  arrastrando,
+  onArrastrarInicio,
+  onArrastrarFin,
+  onSoltar,
   onGuardado,
   onError,
 }: {
   zona: Zona
   orden: number
   provincias: Provincia[]
+  arrastrando: boolean
+  onArrastrarInicio: () => void
+  onArrastrarFin: () => void
+  onSoltar: () => void
   onGuardado: (texto: string) => Promise<void>
   onError: (texto: string) => void
 }) {
   const [abierta, setAbierta] = useState(false)
+  const [encima, setEncima] = useState(false)
 
   async function borrar() {
     const res = await fetch(`/api/admin/envio-zonas/${zona.id}`, { method: 'DELETE' })
@@ -166,16 +216,45 @@ function FilaZona({
 
   return (
     <div
+      id={zona.id}
+      onDragOver={(e) => {
+        if (zona.esDescarte) return
+        e.preventDefault()
+        setEncima(true)
+      }}
+      onDragLeave={() => setEncima(false)}
+      onDrop={(e) => {
+        e.preventDefault()
+        setEncima(false)
+        if (!zona.esDescarte) onSoltar()
+      }}
       className={`border bg-white transition-colors ${
-        zona.activo ? 'border-glow-navy/30' : 'border-gray-200'
-      }`}
+        encima
+          ? 'border-glow-navy border-dashed'
+          : zona.activo
+            ? 'border-glow-navy/30'
+            : 'border-gray-200'
+      } ${arrastrando ? 'opacity-40' : ''}`}
     >
-      <button
-        type="button"
-        onClick={() => setAbierta((v) => !v)}
-        className="w-full px-5 py-4 flex items-center gap-4 text-left hover:bg-gray-50 transition-colors"
-      >
+      <div className="px-5 py-4 flex items-center gap-4">
+        {zona.esDescarte ? (
+          <span className="w-4 text-center font-montserrat text-[10px] text-gray-200" title="Esta zona va siempre al final">
+            —
+          </span>
+        ) : (
+          <span
+            draggable
+            onDragStart={onArrastrarInicio}
+            onDragEnd={onArrastrarFin}
+            className="w-4 text-center cursor-grab active:cursor-grabbing text-gray-300 hover:text-glow-navy select-none"
+            title="Arrastrá para cambiar la prioridad"
+          >
+            ⠿
+          </span>
+        )}
+
         <span className="font-montserrat text-[10px] text-gray-300 w-4">{orden}</span>
+
         <div className="flex-1 min-w-0">
           <p className="font-montserrat text-[11px] tracking-widest uppercase text-glow-navy truncate">
             {zona.nombre || <span className="text-gray-300">Sin nombre</span>}
@@ -184,9 +263,11 @@ function FilaZona({
             {zona.cobertura}
           </p>
         </div>
+
         <span className="font-cormorant text-xl text-glow-navy">
           ${Number(zona.precio).toLocaleString('es-AR')}
         </span>
+
         <span
           className={`font-montserrat text-[9px] tracking-wide uppercase px-2 py-1 ${
             zona.activo ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-400'
@@ -194,7 +275,15 @@ function FilaZona({
         >
           {zona.activo ? 'Activa' : 'Inactiva'}
         </span>
-      </button>
+
+        <button
+          type="button"
+          onClick={() => setAbierta((v) => !v)}
+          className="font-montserrat text-[10px] tracking-wide uppercase text-glow-navy hover:opacity-60 transition-opacity"
+        >
+          {abierta ? 'Cerrar' : 'Editar'}
+        </button>
+      </div>
 
       {abierta && (
         <div className="border-t border-gray-100 p-5">

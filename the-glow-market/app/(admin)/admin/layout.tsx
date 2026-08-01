@@ -1,21 +1,13 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { LayoutDashboard, Package, BookOpen, ShoppingBag } from 'lucide-react'
+import { LayoutDashboard, Package, BookOpen, ShoppingBag, Truck } from 'lucide-react'
 import { ADMIN_EMAIL } from '@/lib/admin/email'
-import MenuZonasEnvio from '@/components/admin/MenuZonasEnvio'
-import { leerZonas } from '@/lib/envios/server'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user || user.email !== ADMIN_EMAIL) redirect('/')
-
-  const zonas = (await leerZonas()).map((z) => ({
-    id: z.id,
-    nombre: z.nombre,
-    activo: z.activo,
-  }))
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
@@ -31,6 +23,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             { href: '/admin/productos', label: 'Productos', icon: Package },
             { href: '/admin/cursos', label: 'Cursos', icon: BookOpen },
             { href: '/admin/ordenes', label: 'Órdenes', icon: ShoppingBag },
+            { href: '/admin/envios', label: 'Zona de envíos', icon: Truck },
           ].map(({ href, label, icon: Icon }) => (
             <Link
               key={href}
@@ -41,8 +34,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               {label}
             </Link>
           ))}
-
-          <MenuZonasEnvio zonas={zonas} />
         </nav>
 
         <div className="p-4 border-t border-white/10">

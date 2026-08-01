@@ -61,18 +61,26 @@ export function servicio() {
 
 const COLUMNAS = 'id, nombre, descripcion, precio, activo, tipo, provincias, codigos_postales'
 
-/** Todas las zonas, ya normalizadas. */
+/**
+ * Todas las zonas en el orden en que se evalúan: el que definió el admin arrastrándolas, con
+ * los dos descartes al final. `created_at` solo desempata zonas que quedaron con el mismo
+ * número de orden.
+ */
 export async function leerZonas(): Promise<Zona[]> {
   const { data, error } = await servicio()
     .from('envio_zonas')
     .select(COLUMNAS)
+    .order('orden', { ascending: true })
     .order('created_at', { ascending: true })
 
   if (error) {
     console.error('leerZonas → error:', error.message)
     return []
   }
-  return (data || []).map(filaAZona)
+
+  const zonas = (data || []).map(filaAZona)
+  const nivel = (z: Zona) => (z.tipo === 'resto-pais' ? 2 : z.tipo === 'resto-bsas' ? 1 : 0)
+  return zonas.sort((a, b) => nivel(a) - nivel(b))
 }
 
 /**

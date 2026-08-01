@@ -5,13 +5,15 @@
  * archivo solo tiene la mecánica del matcheo y la lista de provincias del país, que es lo
  * único que no depende de cómo esté configurada la tienda.
  *
- * El orden de evaluación va de lo más específico a lo más general, y es automático para que no
- * se pueda dejar una zona tapada por otra:
+ * Las zonas se evalúan en el orden que el admin definió arrastrándolas en el panel, y gana la
+ * primera que coincide con la dirección. Conviene ordenarlas de la más específica a la más
+ * general, porque una zona amplia arriba tapa a las que están debajo.
  *
- *   1. Zonas con códigos postales   (GBA 1, GBA 2)
- *   2. Zonas por provincia          (CABA, Tucumán)
- *   3. Resto de Buenos Aires        (descarte, solo si la provincia es Buenos Aires)
- *   4. Resto del país               (descarte final: nunca queda una dirección sin zona)
+ * Las dos zonas de descarte quedan siempre al final y no se pueden mover:
+ *
+ *   … las zonas propias, en el orden elegido
+ *   Resto de Buenos Aires   (solo si la provincia es Buenos Aires)
+ *   Resto del país          (nunca queda una dirección sin zona)
  */
 
 /** Las 24 jurisdicciones del país, tal como aparecen en el checkout. */
@@ -92,29 +94,20 @@ export function resolverZona(
 
   const cubreProvincia = (z: Zona) => z.provincias.length === 0 || z.provincias.includes(prov)
 
-  // Dentro de cada nivel gana la zona que abarca menos: una que cubre solo Córdoba tiene que
-  // ganarle a una que cubre veinte provincias, sin importar cuál se creó antes.
-  const masChicaPrimero = (a: Zona, b: Zona) => a.provincias.length - b.provincias.length
-
-  // 1. Lo más específico: zonas que enumeran códigos postales.
-  const porCP = usables
-    .filter((z) => z.tipo === 'normal' && z.codigosPostales.length > 0)
-    .sort((a, b) => a.codigosPostales.length - b.codigosPostales.length)
-  if (cp) {
-    for (const zona of porCP) {
-      if (cubreProvincia(zona) && zona.codigosPostales.includes(cp)) return zona
+  // Las zonas propias se recorren en el orden que definió el admin arrastrándolas, y gana la
+  // primera que coincide. Los descartes no entran acá: van siempre al final, porque cubren
+  // todo lo que sobra y arriba de cualquier otra zona se la comerían.
+  for (const zona of usables.filter((z) => z.tipo === 'normal')) {
+    if (!cubreProvincia(zona)) continue
+    if (zona.codigosPostales.length > 0) {
+      // Con lista de CP la zona cubre solo esos, y sin CP legible no se puede decidir.
+      if (cp && zona.codigosPostales.includes(cp)) return zona
+      continue
     }
-  }
-
-  // 2. Zonas que cubren provincias enteras.
-  const porProvincia = usables
-    .filter((z) => z.tipo === 'normal' && z.codigosPostales.length === 0 && z.provincias.length > 0)
-    .sort(masChicaPrimero)
-  for (const zona of porProvincia) {
     if (zona.provincias.includes(prov)) return zona
   }
 
-  // 3 y 4. Descartes. Buenos Aires tiene el suyo; todo lo demás cae en el del país.
+  // Descartes. Buenos Aires tiene el suyo; todo lo demás cae en el del país.
   if (prov === PROVINCIA_BUENOS_AIRES) {
     const restoBsAs = usables.find((z) => z.tipo === 'resto-bsas')
     if (restoBsAs) return restoBsAs
