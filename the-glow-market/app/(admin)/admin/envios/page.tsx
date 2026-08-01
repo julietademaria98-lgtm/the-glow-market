@@ -7,8 +7,10 @@ interface ZonaForm {
   id: string
   grupo: 'buenos-aires' | 'provincia'
   etiqueta: string
-  /** CP que cubre la zona. null en las que matchean por provincia o por descarte. */
-  codigosPostales: string[] | null
+  /** Si esta zona se define por lista de CP (GBA y GBA2) o por provincia. */
+  editaCodigosPostales: boolean
+  /** CP separados por coma, tal como se editan en el textarea. */
+  codigosPostales: string
   nombre: string
   descripcion: string
   precio: string
@@ -21,6 +23,11 @@ const INPUT =
   'border border-gray-200 focus:border-glow-navy outline-none px-3 py-2 font-montserrat text-sm text-glow-navy bg-white transition-colors w-full placeholder:text-gray-300'
 
 const LABEL = 'font-montserrat text-[9px] tracking-widest uppercase text-gray-400 mb-1 block'
+
+/** Cuenta los CP válidos que hay escritos en el textarea, para el contador del encabezado. */
+function contarCodigos(texto: string): number {
+  return (texto.match(/\d{4}/g) || []).length
+}
 
 export default function AdminEnviosPage() {
   const [zonas, setZonas] = useState<ZonaForm[]>([])
@@ -51,9 +58,11 @@ export default function AdminEnviosPage() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'No se pudo guardar')
+      // Recargar en vez de asumir: el server apaga las zonas sin nombre y normaliza las
+      // listas de CP, así que lo que queda en pantalla es lo que realmente se guardó.
+      const recargadas = await fetch('/api/admin/envio-zonas').then((r) => r.json())
+      if (recargadas.zonas) setZonas(recargadas.zonas)
       setMsg({ ok: true, text: 'Cambios guardados' })
-      // El server apaga las zonas sin nombre; reflejarlo para no mostrar algo distinto.
-      setZonas((prev) => prev.map((z) => (z.nombre.trim() ? z : { ...z, activo: false })))
     } catch (e) {
       setMsg({ ok: false, text: e instanceof Error ? e.message : 'Error al guardar' })
     } finally {
@@ -152,9 +161,9 @@ function Seccion({
                 <p className="font-montserrat text-[11px] tracking-widest uppercase text-glow-navy">
                   {z.etiqueta}
                 </p>
-                {z.codigosPostales && (
+                {z.editaCodigosPostales && (
                   <span className="font-montserrat text-[10px] text-gray-400">
-                    {z.codigosPostales.length} códigos postales
+                    {contarCodigos(z.codigosPostales)} códigos postales
                   </span>
                 )}
               </div>
@@ -213,14 +222,25 @@ function Seccion({
               />
             </div>
 
-            {z.codigosPostales && (
+            {z.editaCodigosPostales && (
               <details className="mt-4">
                 <summary className="cursor-pointer font-montserrat text-[10px] tracking-widest uppercase text-glow-navy/50 hover:text-glow-navy transition-colors">
-                  Ver los {z.codigosPostales.length} códigos postales
+                  Editar los {contarCodigos(z.codigosPostales)} códigos postales
                 </summary>
-                <p className="mt-2 bg-gray-50 p-3 max-h-36 overflow-y-auto font-montserrat text-[10px] text-gray-500 leading-relaxed break-words">
-                  {z.codigosPostales.join(' · ')}
-                </p>
+                <div className="mt-2">
+                  <textarea
+                    value={z.codigosPostales}
+                    onChange={(e) => onChange(z.id, { codigosPostales: e.target.value })}
+                    rows={6}
+                    spellCheck={false}
+                    placeholder="1602, 1603, 1604…"
+                    className={INPUT + ' resize-y font-mono text-[11px] leading-relaxed'}
+                  />
+                  <p className="font-montserrat text-[10px] text-gray-400 mt-1">
+                    Uno cada 4 dígitos, separados por coma, espacio o renglón. Lo que no sea un
+                    código de 4 dígitos se descarta al guardar, y los repetidos se unifican.
+                  </p>
+                </div>
               </details>
             )}
 
