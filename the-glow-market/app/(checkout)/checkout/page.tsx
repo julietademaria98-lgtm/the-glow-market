@@ -35,7 +35,7 @@ const checkoutSchemaFisico = z.object({
   provincia: z.string().min(2, 'Requerido'),
   ciudad: z.string().min(2, 'Requerido'),
   direccion: z.string().min(5, 'Dirección inválida'),
-  codigo_postal: z.string().min(4, 'Código postal inválido'),
+  codigo_postal: z.string().regex(/^\d{4}$/, 'Son 4 números, sin letras'),
   notas: z.string().optional(),
 })
 
@@ -89,6 +89,10 @@ export default function CheckoutPage() {
   } = useForm<CheckoutForm>({
     resolver: zodResolver(soloDigital ? checkoutSchema : checkoutSchemaFisico),
   })
+
+  // Se guarda aparte para poder encadenar el onChange propio (filtrar las letras) con el de
+  // react-hook-form, que si no se pierde el registro del campo.
+  const campoCP = register('codigo_postal')
 
   const provincia = watch('provincia')
   const codigoPostal = watch('codigo_postal')
@@ -335,7 +339,19 @@ export default function CheckoutPage() {
                     <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
                       Código Postal
                     </label>
-                    <input {...register('codigo_postal')} placeholder="1000" className={INPUT_CLASS} />
+                    {/* Solo números: se filtra al tipear en vez de avisar después, y el
+                        teclado numérico en el celular evita que aparezcan letras. */}
+                    <input
+                      {...campoCP}
+                      onChange={(e) => {
+                        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4)
+                        campoCP.onChange(e)
+                      }}
+                      placeholder="1000"
+                      inputMode="numeric"
+                      maxLength={4}
+                      className={INPUT_CLASS}
+                    />
                     {errors.codigo_postal && (
                       <p className="font-montserrat text-[10px] text-red-400">{errors.codigo_postal.message}</p>
                     )}

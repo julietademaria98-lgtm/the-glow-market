@@ -44,10 +44,14 @@ export function slugProvincia(valor: string): string {
     .replace(/\s+/g, '-')
 }
 
-/** Extrae los 4 dígitos del CP. Acepta '1602' y el formato CPA 'B1602ABC'. */
+/**
+ * Devuelve el CP solo si son exactamente 4 dígitos. Los códigos postales de la tienda son
+ * numéricos: no se acepta el formato CPA con letras ('B1602ABC'), así que lo que entra por
+ * la API tiene que cumplir lo mismo que pide el formulario.
+ */
 export function normalizarCP(valor: string): string | null {
-  const match = String(valor || '').match(/\d{4}/)
-  return match ? match[0] : null
+  const limpio = String(valor || '').trim()
+  return /^\d{4}$/.test(limpio) ? limpio : null
 }
 
 export const ZONA_BUENOS_AIRES = 'buenos-aires'
