@@ -51,6 +51,21 @@ export function normalizarCP(valor: string): string | null {
 export const PROVINCIA_BUENOS_AIRES = slugProvincia('Buenos Aires')
 
 /**
+ * Las provincias con su id, para el selector del checkout y el del panel. El `id` es lo que
+ * viaja y con lo que matchean las zonas; el `nombre` es solo lo que se muestra, así que se
+ * puede cambiar sin tocar nada más.
+ */
+export const PROVINCIAS_OPCIONES: { id: string; nombre: string }[] = PROVINCIAS.map((nombre) => ({
+  id: slugProvincia(nombre),
+  nombre,
+}))
+
+/** Nombre visible de una provincia a partir de su id. */
+export function nombreProvincia(id: string): string {
+  return PROVINCIAS_OPCIONES.find((p) => p.id === id)?.nombre ?? id
+}
+
+/**
  * Qué clase de zona es. Los dos descartes son únicos, no se borran y no se les elige región:
  * se calculan con lo que no cubran las demás, y por eso ninguna dirección queda sin zona.
  */

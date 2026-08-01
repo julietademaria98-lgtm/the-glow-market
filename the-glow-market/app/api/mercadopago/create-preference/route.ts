@@ -40,8 +40,10 @@ export async function POST(request: Request) {
     let envioZona: string | null = null
 
     if (!soloDigital) {
+      // Se prefiere el id; el nombre queda de respaldo para pedidos hechos antes del cambio,
+      // que igual se normaliza al mismo slug.
       const envio = await cotizarEnvio(
-        datosEnvio?.provincia || '',
+        datosEnvio?.provincia_id || datosEnvio?.provincia || '',
         datosEnvio?.codigo_postal || '',
       )
       if (!envio.disponible) {

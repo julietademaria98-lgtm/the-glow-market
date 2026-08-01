@@ -77,7 +77,10 @@ export interface DatosEnvio {
   apellido: string
   email: string
   telefono: string
+  /** Nombre visible: 'Entre Ríos'. Es lo que se lee en el panel y en la etiqueta. */
   provincia: string
+  /** Id con el que matchean las zonas: 'entre-rios'. Falta en las órdenes viejas. */
+  provincia_id?: string
   ciudad: string
   direccion: string
   codigo_postal: string

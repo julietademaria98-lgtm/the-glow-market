@@ -13,6 +13,7 @@ import Link from 'next/link'
 import StarIcon from '@/components/ui/StarIcon'
 import Button from '@/components/ui/Button'
 import { useHasMounted } from '@/hooks/useHasMounted'
+import { PROVINCIAS_OPCIONES, nombreProvincia } from '@/lib/envios/zonas'
 
 const baseSchema = {
   nombre: z.string().min(2, 'Requerido'),
@@ -49,13 +50,8 @@ interface EnvioCotizado {
   precio: number
 }
 
-const PROVINCIAS = [
-  'Buenos Aires', 'CABA', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba',
-  'Corrientes', 'Entre Ríos', 'Formosa', 'Jujuy', 'La Pampa', 'La Rioja',
-  'Mendoza', 'Misiones', 'Neuquén', 'Río Negro', 'Salta', 'San Juan',
-  'San Luis', 'Santa Cruz', 'Santa Fe', 'Santiago del Estero',
-  'Tierra del Fuego', 'Tucumán',
-]
+// La lista sale de lib/envios/zonas.ts, que es la misma que usa el matcheo. Tenerla duplicada
+// acá hacía que editar una sin la otra rompiera la cotización sin que nada lo avisara.
 
 const INPUT_CLASS =
   'border border-glow-navy/20 focus:border-glow-navy outline-none px-4 py-3 font-montserrat text-sm text-glow-navy bg-transparent transition-colors duration-300 placeholder:text-glow-navy/30 w-full'
@@ -220,9 +216,17 @@ export default function CheckoutPage() {
     )
   }
 
-  const onSubmit = async (datosEnvio: CheckoutForm) => {
+  const onSubmit = async (datos: CheckoutForm) => {
     setLoading(true)
     setError(null)
+
+    // El formulario maneja la provincia por id. La orden guarda las dos formas: el id es con
+    // lo que matchean las zonas, y el nombre es lo que se lee en el panel y en la etiqueta.
+    const datosEnvio = {
+      ...datos,
+      provincia_id: datos.provincia,
+      provincia: nombreProvincia(datos.provincia),
+    }
 
     try {
       const res = await fetch('/api/mercadopago/create-preference', {
@@ -316,10 +320,12 @@ export default function CheckoutPage() {
                     <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
                       Provincia
                     </label>
+                    {/* El value es el id de la provincia, no su nombre: es lo que viaja al
+                        server y con lo que matchean las zonas. */}
                     <select {...register('provincia')} className={INPUT_CLASS + ' cursor-pointer'}>
                       <option value="">Seleccionar...</option>
-                      {PROVINCIAS.map((p) => (
-                        <option key={p} value={p}>{p}</option>
+                      {PROVINCIAS_OPCIONES.map((p) => (
+                        <option key={p.id} value={p.id}>{p.nombre}</option>
                       ))}
                     </select>
                     {errors.provincia && (
