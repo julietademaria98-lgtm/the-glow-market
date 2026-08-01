@@ -1,10 +1,15 @@
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import {
   resolverZona,
+  ZONAS,
   ZONAS_POR_CP,
   ZONA_BUENOS_AIRES_RESTO,
+  ZONA_INTERIOR,
   type CodigosPorZona,
 } from './zonas'
+
+const PROVINCIAS = new Set(ZONAS.filter((z) => z.grupo === 'provincia').map((z) => z.id))
+const esProvincia = (id: string) => PROVINCIAS.has(id)
 
 export interface EnvioCotizado {
   /** false si no hay envío a esa dirección: zona desconocida, sin configurar o apagada. */
@@ -58,15 +63,32 @@ export async function cotizarEnvio(
   let zonaId = resolverZona(provincia, codigoPostal, codigosPorZona)
   if (!zonaId) return NO_DISPONIBLE
 
-  let zona = filas.find((f) => f.id === zonaId)
+  const buscar = (id: string) => filas.find((f) => f.id === id)
+  const interior = buscar(ZONA_INTERIOR)
+  let zona = buscar(zonaId)
 
-  // Si se apaga GBA o GBA2, sus códigos postales no se quedan sin envío: pasan a cobrarse
-  // como el resto de la provincia. Apagar una zona es dejar de darle trato especial, no
-  // dejar de vender ahí. Las provincias no tienen este descarte: si Chaco está apagada, no
-  // hay envío a Chaco.
-  if (ZONAS_POR_CP.includes(zonaId as (typeof ZONAS_POR_CP)[number]) && !estaConfigurada(zona)) {
-    zonaId = ZONA_BUENOS_AIRES_RESTO
-    zona = filas.find((f) => f.id === zonaId)
+  // Una zona apagada no deja a nadie sin envío: cae en la zona que la contiene. Apagarla es
+  // dejar de darle trato especial, no dejar de vender ahí.
+  if (esProvincia(zonaId)) {
+    // Las provincias son excepciones al precio del interior: solo valen si están prendidas.
+    if (!zona?.activo) {
+      zonaId = ZONA_INTERIOR
+      zona = interior
+    } else if (!String(zona.nombre || '').trim()) {
+      // Excepción sin texto propio: se cobra su precio pero se muestra el texto del interior,
+      // así agregar una provincia es poner un precio y nada más.
+      zona = {
+        ...zona,
+        nombre: interior?.nombre ?? '',
+        descripcion: interior?.descripcion ?? null,
+      }
+    }
+  } else if (ZONAS_POR_CP.includes(zonaId as (typeof ZONAS_POR_CP)[number])) {
+    // GBA y GBA2 caen en el resto de la provincia.
+    if (!estaConfigurada(zona)) {
+      zonaId = ZONA_BUENOS_AIRES_RESTO
+      zona = buscar(zonaId)
+    }
   }
 
   if (!estaConfigurada(zona)) {

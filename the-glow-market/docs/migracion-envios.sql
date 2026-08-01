@@ -42,7 +42,7 @@ create policy "envio_zonas_public_read"
 -- 4. Las 26 zonas, vacías e inactivas. Son casilleros a completar desde /admin/envios, no
 --    valores sugeridos. `do nothing` para no pisar lo que ya haya cargado.
 insert into envio_zonas (id, orden) values
-  ('gba', 1), ('gba2', 2), ('bsas-resto', 3),
+  ('gba', 1), ('gba2', 2), ('bsas-resto', 3), ('interior', 4),
   ('caba', 10), ('catamarca', 11), ('chaco', 12), ('chubut', 13), ('cordoba', 14),
   ('corrientes', 15), ('entre-rios', 16), ('formosa', 17), ('jujuy', 18), ('la-pampa', 19),
   ('la-rioja', 20), ('mendoza', 21), ('misiones', 22), ('neuquen', 23), ('rio-negro', 24),
@@ -79,5 +79,13 @@ update envio_zonas set codigos_postales = array[
     '1835','1858','1862','1864','1865','1866','1984'
   ] where id = 'gba2' and codigos_postales is null;
 
+-- 5. Las provincias pasaron de tener precio propio a ser excepciones al precio del interior.
+--    Las que ya tuvieran uno cargado se conservan como excepción (activo = true), así no se
+--    pierde nada de lo que estuviera configurado.
+update envio_zonas
+   set activo = true
+ where id not in ('gba', 'gba2', 'bsas-resto', 'interior')
+   and nombre <> ''
+   and precio > 0;
 
 commit;

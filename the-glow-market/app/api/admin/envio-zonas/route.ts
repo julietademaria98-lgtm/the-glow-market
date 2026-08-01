@@ -4,6 +4,9 @@ import { ZONAS, parsearCodigosPostales } from '@/lib/envios/zonas'
 
 const IDS_VALIDOS = new Set(ZONAS.map((z) => z.id))
 const EDITA_CP = new Set(ZONAS.filter((z) => z.editaCodigosPostales).map((z) => z.id))
+// Las provincias son excepciones al precio del interior: alcanza con el precio, el texto lo
+// heredan. Las demás zonas sí necesitan nombre propio para poder mostrarse.
+const PROVINCIAS = new Set(ZONAS.filter((z) => z.grupo === 'provincia').map((z) => z.id))
 
 /**
  * Lista las 26 zonas para el panel. Se arma sobre el catálogo de `zonas.ts` y no sobre lo
@@ -78,8 +81,9 @@ export async function POST(request: Request) {
         nombre,
         descripcion: String(z.descripcion ?? '').trim() || null,
         precio: precio < 0 ? 0 : precio,
-        // Sin nombre no hay método que mostrar, así que no se puede dejar activa.
-        activo: Boolean(z.activo) && nombre.length > 0,
+        // Sin nombre no hay método que mostrar, salvo en las provincias, que heredan el
+        // texto del interior y solo aportan el precio.
+        activo: Boolean(z.activo) && (nombre.length > 0 || PROVINCIAS.has(z.id)),
         // Solo GBA y GBA2 tienen lista propia; en el resto la columna queda intacta.
         ...(EDITA_CP.has(z.id)
           ? { codigos_postales: parsearCodigosPostales(z.codigosPostales ?? '') }

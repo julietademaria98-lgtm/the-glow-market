@@ -180,7 +180,7 @@ create policy "envio_zonas_public_read"
 -- completar. El precio y los textos los carga la dueña desde /admin/envios, y hasta que una
 -- zona no tenga nombre y precio queda inactiva y el checkout la trata como "sin envío".
 insert into envio_zonas (id, orden) values
-  ('gba', 1), ('gba2', 2), ('bsas-resto', 3),
+  ('gba', 1), ('gba2', 2), ('bsas-resto', 3), ('interior', 4),
   ('caba', 10), ('catamarca', 11), ('chaco', 12), ('chubut', 13), ('cordoba', 14),
   ('corrientes', 15), ('entre-rios', 16), ('formosa', 17), ('jujuy', 18), ('la-pampa', 19),
   ('la-rioja', 20), ('mendoza', 21), ('misiones', 22), ('neuquen', 23), ('rio-negro', 24),

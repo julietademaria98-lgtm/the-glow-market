@@ -5,7 +5,7 @@ import Button from '@/components/ui/Button'
 
 interface ZonaForm {
   id: string
-  grupo: 'buenos-aires' | 'provincia'
+  grupo: 'buenos-aires' | 'interior' | 'provincia'
   etiqueta: string
   /** Si esta zona se define por lista de CP (GBA y GBA2) o por provincia. */
   editaCodigosPostales: boolean
@@ -71,7 +71,10 @@ export default function AdminEnviosPage() {
   }
 
   const buenosAires = zonas.filter((z) => z.grupo === 'buenos-aires')
-  const provincias = zonas.filter((z) => z.grupo === 'provincia')
+  const interior = zonas.filter((z) => z.grupo === 'interior')
+  // Una provincia solo aparece si tiene precio propio: el resto se cobra con el del interior.
+  const excepciones = zonas.filter((z) => z.grupo === 'provincia' && z.activo)
+  const sinExcepcion = zonas.filter((z) => z.grupo === 'provincia' && !z.activo)
   const activas = zonas.filter((z) => z.activo).length
 
   if (loading) {
@@ -110,9 +113,15 @@ export default function AdminEnviosPage() {
       />
 
       <Seccion
-        titulo="Resto del país"
-        ayuda="Se detecta por la provincia que elige el comprador en el checkout."
-        zonas={provincias}
+        titulo="Interior del país"
+        ayuda="Un solo precio para todas las provincias. Es el que se cobra salvo que la provincia tenga una excepción cargada abajo."
+        zonas={interior}
+        onChange={actualizar}
+      />
+
+      <Excepciones
+        excepciones={excepciones}
+        disponibles={sinExcepcion}
         onChange={actualizar}
       />
 
@@ -129,6 +138,113 @@ export default function AdminEnviosPage() {
         </Button>
       </div>
     </div>
+  )
+}
+
+/**
+ * Precios que se apartan del interior. Vive aparte de `Seccion` porque acá no se edita el
+ * texto del método: la provincia solo aporta un precio y hereda el resto del interior.
+ */
+function Excepciones({
+  excepciones,
+  disponibles,
+  onChange,
+}: {
+  excepciones: ZonaForm[]
+  disponibles: ZonaForm[]
+  onChange: (id: string, cambios: Partial<ZonaForm>) => void
+}) {
+  const [eligiendo, setEligiendo] = useState(false)
+  const [seleccion, setSeleccion] = useState('')
+
+  function agregar() {
+    if (!seleccion) return
+    onChange(seleccion, { activo: true })
+    setSeleccion('')
+    setEligiendo(false)
+  }
+
+  return (
+    <section className="mb-12">
+      <h2 className="font-cormorant text-xl text-glow-navy mb-1">Precios por provincia</h2>
+      <p className="font-montserrat text-[10px] text-gray-400 mb-5 max-w-2xl">
+        Solo para las que no van al precio del interior, como Tierra del Fuego. Las que no estén
+        acá se cobran con el precio de arriba, así cambiar el general es tocar un solo número.
+      </p>
+
+      {excepciones.length > 0 && (
+        <div className="flex flex-col gap-2 mb-4">
+          {excepciones.map((z) => (
+            <div
+              key={z.id}
+              className="border border-glow-navy/30 bg-white px-5 py-3 flex items-center gap-4"
+            >
+              <p className="font-montserrat text-[11px] tracking-widest uppercase text-glow-navy flex-1">
+                {z.etiqueta}
+              </p>
+              <div className="flex items-center gap-2">
+                <span className="font-montserrat text-[10px] text-gray-400">$</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={z.precio}
+                  onChange={(e) => onChange(z.id, { precio: e.target.value })}
+                  className={INPUT + ' w-32'}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => onChange(z.id, { activo: false })}
+                className="font-montserrat text-[10px] tracking-wide uppercase text-gray-400 hover:text-red-500 transition-colors"
+                title="Vuelve al precio del interior"
+              >
+                Quitar
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {eligiendo ? (
+        <div className="flex items-center gap-3">
+          <select
+            value={seleccion}
+            onChange={(e) => setSeleccion(e.target.value)}
+            className={INPUT + ' cursor-pointer max-w-xs'}
+          >
+            <option value="">Elegí una provincia…</option>
+            {disponibles.map((z) => (
+              <option key={z.id} value={z.id}>
+                {z.etiqueta}
+              </option>
+            ))}
+          </select>
+          <Button onClick={agregar} size="sm" variant="primary" disabled={!seleccion}>
+            Agregar
+          </Button>
+          <button
+            type="button"
+            onClick={() => {
+              setEligiendo(false)
+              setSeleccion('')
+            }}
+            className="font-montserrat text-[10px] tracking-wide uppercase text-gray-400 hover:text-glow-navy"
+          >
+            Cancelar
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setEligiendo(true)}
+          disabled={disponibles.length === 0}
+          className="font-montserrat text-[11px] tracking-wide text-glow-navy hover:opacity-60 disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
+        >
+          + Precio por provincia
+        </button>
+      )}
+    </section>
   )
 }
 

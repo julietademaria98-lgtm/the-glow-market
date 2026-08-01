@@ -8,7 +8,7 @@
  * Buenos Aires se parte en tres zonas según el CP; el resto del país matchea por provincia.
  */
 
-export type GrupoZona = 'buenos-aires' | 'provincia'
+export type GrupoZona = 'buenos-aires' | 'interior' | 'provincia'
 
 export interface Zona {
   id: string
@@ -66,11 +66,21 @@ export const ZONAS_POR_CP = ['gba', 'gba2'] as const
 /** Zona bonaerense por descarte: todo CP que no esté en ninguna lista. */
 export const ZONA_BUENOS_AIRES_RESTO = 'bsas-resto'
 
-/** Las 26 zonas: 3 de Buenos Aires + 23 provincias. */
+/**
+ * Zona única para todo lo que no es Buenos Aires. Es el precio que se cobra salvo que la
+ * provincia tenga una excepción cargada: así se cambia un solo número en vez de 23.
+ */
+export const ZONA_INTERIOR = 'interior'
+
+/**
+ * Las 27 zonas: 3 de Buenos Aires, el interior, y las 23 provincias, que existen solo como
+ * excepción opcional al precio del interior.
+ */
 export const ZONAS: Zona[] = [
   { id: 'gba', grupo: 'buenos-aires', etiqueta: 'GBA', editaCodigosPostales: true },
   { id: 'gba2', grupo: 'buenos-aires', etiqueta: 'GBA2', editaCodigosPostales: true },
   { id: ZONA_BUENOS_AIRES_RESTO, grupo: 'buenos-aires', etiqueta: 'Resto de Buenos Aires' },
+  { id: ZONA_INTERIOR, grupo: 'interior', etiqueta: 'Interior del país' },
   ...PROVINCIAS_POR_NOMBRE.map((p): Zona => ({
     id: slugProvincia(p),
     grupo: 'provincia',
