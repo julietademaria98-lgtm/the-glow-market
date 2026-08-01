@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createPreference } from '@/lib/mercadopago'
+import { cotizarEnvio } from '@/lib/envios/server'
 import { createClient } from '@/lib/supabase/server'
 import type { CartItem, DatosEnvio } from '@/types'
 
@@ -18,10 +19,33 @@ export async function POST(request: Request) {
       data: { user },
     } = await supabase.auth.getUser()
 
-    const total = items.reduce(
+    const subtotal = items.reduce(
       (acc: number, item: CartItem) => acc + item.precio * item.quantity,
       0
     )
+
+    // El envío se recalcula acá y no se toma del cliente: es lo único que evita que alguien
+    // mande un precio propio desde el navegador. Los cursos no se envían.
+    const soloDigital = items.every((item) => item.tipo === 'curso')
+    let costoEnvio = 0
+    let envioZona: string | null = null
+
+    if (!soloDigital) {
+      const envio = await cotizarEnvio(
+        datosEnvio?.provincia || '',
+        datosEnvio?.codigo_postal || '',
+      )
+      if (!envio.disponible) {
+        return NextResponse.json(
+          { error: 'No hay envío disponible para esa dirección' },
+          { status: 400 },
+        )
+      }
+      costoEnvio = envio.precio
+      envioZona = envio.zonaId
+    }
+
+    const total = subtotal + costoEnvio
 
     const { data: orden, error: ordenError } = await supabase
       .from('ordenes')
@@ -29,6 +53,8 @@ export async function POST(request: Request) {
         user_id: user?.id || null,
         estado: 'pendiente',
         total,
+        costo_envio: costoEnvio,
+        envio_zona: envioZona,
         items: items.map((item) => ({
           id: item.id,
           slug: item.slug,
@@ -47,8 +73,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Error al crear la orden' }, { status: 500 })
     }
 
-    // Crear preferencia de MercadoPago
-    const preference = await createPreference(items, orden.id)
+    // Crear preferencia de MercadoPago (con el envío ya incluido)
+    const preference = await createPreference(items, orden.id, costoEnvio)
 
     // Actualizar orden con ID de preferencia
     await supabase

@@ -40,6 +40,14 @@ const checkoutSchemaFisico = z.object({
 
 type CheckoutForm = z.infer<typeof checkoutSchemaFisico>
 
+/** Lo que devuelve /api/envio/cotizar. El precio se recalcula en el server al cobrar. */
+interface EnvioCotizado {
+  disponible: boolean
+  nombre: string
+  descripcion: string | null
+  precio: number
+}
+
 const PROVINCIAS = [
   'Buenos Aires', 'CABA', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba',
   'Corrientes', 'Entre Ríos', 'Formosa', 'Jujuy', 'La Pampa', 'La Rioja',
@@ -57,6 +65,8 @@ export default function CheckoutPage() {
   const [error, setError] = useState<string | null>(null)
   const [user, setUser] = useState<User | null>(null)
   const [checkingAuth, setCheckingAuth] = useState(true)
+  const [envio, setEnvio] = useState<EnvioCotizado | null>(null)
+  const [envioLoading, setEnvioLoading] = useState(false)
 
   const soloDigital = items.length > 0 && items.every((i) => i.tipo === 'curso')
   const hasCurso = items.some((i) => i.tipo === 'curso')
@@ -72,10 +82,57 @@ export default function CheckoutPage() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<CheckoutForm>({
     resolver: zodResolver(soloDigital ? checkoutSchema : checkoutSchemaFisico),
   })
+
+  const provincia = watch('provincia')
+  const codigoPostal = watch('codigo_postal')
+  const subtotal = total()
+  const costoEnvio = envio?.disponible ? envio.precio : 0
+
+  // Con productos físicos no se puede pagar hasta que el envío esté resuelto: si no, la
+  // orden saldría sin costo de envío y habría que reclamarlo después.
+  const envioPendiente = !soloDigital && !envio?.disponible
+
+  // Cotizar el envío cuando ya hay provincia y CP. Los cursos no se envían, así que un
+  // carrito solo digital no cotiza nada.
+  useEffect(() => {
+    if (soloDigital) {
+      setEnvio(null)
+      return
+    }
+    const cp = (codigoPostal || '').trim()
+    if (!provincia || cp.length < 4) {
+      setEnvio(null)
+      return
+    }
+
+    let cancelado = false
+    setEnvioLoading(true)
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch('/api/envio/cotizar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ provincia, codigoPostal: cp }),
+        })
+        const data = await res.json()
+        if (!cancelado) setEnvio(data.ok ? data : null)
+      } catch {
+        if (!cancelado) setEnvio(null)
+      } finally {
+        if (!cancelado) setEnvioLoading(false)
+      }
+    }, 600)
+
+    return () => {
+      cancelado = true
+      clearTimeout(t)
+    }
+  }, [provincia, codigoPostal, soloDigital])
 
   if (items.length === 0) {
     return (
@@ -322,10 +379,59 @@ export default function CheckoutPage() {
 
             <div className="h-px bg-glow-navy/10" />
 
+            {!soloDigital && (
+              <>
+                {envio?.disponible && (
+                  <div className="bg-glow-cream/60 px-4 py-3">
+                    <p className="font-montserrat text-xs text-glow-navy">{envio.nombre}</p>
+                    {envio.descripcion && (
+                      <p className="font-montserrat text-[10px] text-glow-navy/50 leading-relaxed mt-1">
+                        {envio.descripcion}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                <div className="flex justify-between items-baseline">
+                  <span className="font-montserrat text-xs tracking-[0.15em] uppercase text-glow-navy/60">
+                    Subtotal
+                  </span>
+                  <span className="font-montserrat text-sm text-glow-navy">
+                    {formatPrice(subtotal)}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-baseline gap-4">
+                  <span className="font-montserrat text-xs tracking-[0.15em] uppercase text-glow-navy/60">
+                    Envío
+                  </span>
+                  <span className="font-montserrat text-sm text-glow-navy text-right">
+                    {envioLoading
+                      ? 'Calculando…'
+                      : !envio
+                        ? <span className="text-glow-navy/40">Completá tu dirección</span>
+                        : !envio.disponible
+                          ? <span className="text-red-400 text-xs">Sin envío a esa zona</span>
+                          : envio.precio === 0
+                            ? 'Gratis'
+                            : formatPrice(envio.precio)}
+                  </span>
+                </div>
+              </>
+            )}
+
             <div className="flex justify-between items-baseline">
               <span className="font-montserrat text-xs tracking-[0.15em] uppercase text-glow-navy/60">Total</span>
-              <span className="font-cormorant text-3xl text-glow-navy">{formatPrice(total())}</span>
+              <span className="font-cormorant text-3xl text-glow-navy">
+                {formatPrice(subtotal + costoEnvio)}
+              </span>
             </div>
+
+            {!soloDigital && envio && !envio.disponible && (
+              <p className="font-montserrat text-[10px] text-red-400 leading-relaxed">
+                Todavía no hacemos envíos a esa dirección. Escribinos y lo vemos.
+              </p>
+            )}
 
             <Button
               type="submit"
@@ -333,6 +439,7 @@ export default function CheckoutPage() {
               className="w-full"
               size="md"
               loading={loading}
+              disabled={envioPendiente || envioLoading}
             >
               Pagar con MercadoPago
             </Button>

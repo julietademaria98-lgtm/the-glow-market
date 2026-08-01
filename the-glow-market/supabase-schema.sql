@@ -89,9 +89,26 @@ create table ordenes (
   mp_payment_id     text,
   estado            text default 'pendiente',
   total             decimal(10,2) not null,
+  costo_envio       decimal(10,2) default 0,
+  envio_zona        text,             -- id de la zona aplicada (deja rastro de qué se cobró)
   items             jsonb not null,
   datos_envio       jsonb,
   created_at        timestamptz default now()
+);
+
+-- ============================================
+-- TABLA: envio_zonas (precios y textos de envío)
+-- ============================================
+-- Una fila por zona. El matcheo dirección → zona vive en lib/envios/zonas.ts; acá solo está
+-- lo que decide la dueña del negocio: cuánto cuesta y qué texto ve el comprador.
+create table envio_zonas (
+  id          text primary key,               -- 'gba', 'gba2', 'bsas-resto', 'caba', ...
+  nombre      text not null default '',       -- lo que ve el comprador: "Envíos GBA | Rapiboy"
+  descripcion text,                           -- "Envíos en el día comprando antes de las 12hs."
+  precio      decimal(10,2) not null default 0,
+  activo      boolean not null default false, -- se prende recién cuando tiene nombre y precio
+  orden       int not null default 0,         -- posición en el panel
+  updated_at  timestamptz default now()
 );
 
 -- ============================================
@@ -140,12 +157,33 @@ create policy "ordenes_propias_select"
 create policy "ordenes_insert"
   on ordenes for insert with check (true);
 
+-- Zonas de envío: lectura pública (el checkout necesita el precio y el texto).
+-- La escritura no tiene policy a propósito: solo se toca con service-role desde el admin.
+alter table envio_zonas enable row level security;
+create policy "envio_zonas_public_read"
+  on envio_zonas for select using (true);
+
 -- ============================================
 -- STORAGE BUCKETS
 -- (Crear manualmente en Supabase > Storage)
 -- ============================================
 -- 1. "product-images" — PÚBLICO — para fotos de productos
 -- 2. "videos-privados" — PRIVADO — para videos de cursos
+
+-- ============================================
+-- ZONAS DE ENVÍO (no es opcional: el panel lista estas filas)
+-- ============================================
+-- Se siembran vacías e inactivas a propósito. No son valores sugeridos: son casilleros a
+-- completar. El precio y los textos los carga la dueña desde /admin/envios, y hasta que una
+-- zona no tenga nombre y precio queda inactiva y el checkout la trata como "sin envío".
+insert into envio_zonas (id, orden) values
+  ('gba', 1), ('gba2', 2), ('bsas-resto', 3),
+  ('caba', 10), ('catamarca', 11), ('chaco', 12), ('chubut', 13), ('cordoba', 14),
+  ('corrientes', 15), ('entre-rios', 16), ('formosa', 17), ('jujuy', 18), ('la-pampa', 19),
+  ('la-rioja', 20), ('mendoza', 21), ('misiones', 22), ('neuquen', 23), ('rio-negro', 24),
+  ('salta', 25), ('san-juan', 26), ('san-luis', 27), ('santa-cruz', 28), ('santa-fe', 29),
+  ('santiago-del-estero', 30), ('tierra-del-fuego', 31), ('tucuman', 32)
+on conflict (id) do nothing;
 
 -- ============================================
 -- DATOS DE EJEMPLO (opcional, para testing)

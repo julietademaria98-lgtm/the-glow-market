@@ -100,6 +100,9 @@ export interface Orden {
   mp_payment_id: string | null
   estado: EstadoOrden
   total: number
+  costo_envio?: number
+  /** Id de la zona de envío que se aplicó (ver lib/envios/zonas.ts). */
+  envio_zona?: string | null
   items: OrdenItem[]
   datos_envio: DatosEnvio | null
   created_at: string
