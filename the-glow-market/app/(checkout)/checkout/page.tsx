@@ -102,17 +102,25 @@ export default function CheckoutPage() {
   // Cotizar el envío cuando ya hay provincia y CP. Los cursos no se envían, así que un
   // carrito solo digital no cotiza nada.
   useEffect(() => {
+    // Ojo: apagar el loading en cada salida temprana. Si se sale sin apagarlo (por ejemplo al
+    // borrar un dígito del CP mientras se estaba cotizando), el cleanup cancela el fetch en
+    // curso, su `finally` ya no corre y la pantalla queda en "Calculando…" para siempre.
     if (soloDigital) {
       setEnvio(null)
+      setEnvioLoading(false)
       return
     }
     const cp = (codigoPostal || '').trim()
     if (!provincia || cp.length < 4) {
       setEnvio(null)
+      setEnvioLoading(false)
       return
     }
 
     let cancelado = false
+    // Limpiar la cotización anterior: si no, mientras carga Chaco se sigue viendo el método y
+    // el precio de la provincia anterior.
+    setEnvio(null)
     setEnvioLoading(true)
     const t = setTimeout(async () => {
       try {
