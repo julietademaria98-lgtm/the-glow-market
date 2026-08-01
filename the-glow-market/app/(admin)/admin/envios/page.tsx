@@ -244,10 +244,17 @@ function Seccion({
               </details>
             )}
 
+            {z.editaCodigosPostales && !z.activo && (
+              <p className="mt-4 font-montserrat text-[10px] text-glow-navy/50 leading-relaxed">
+                Con la zona apagada, estos códigos postales se cobran como “Resto de Buenos
+                Aires”. Se dejan de tratar aparte, pero se sigue enviando ahí.
+              </p>
+            )}
+
             {z.id === 'bsas-resto' && (
               <p className="mt-4 font-montserrat text-[10px] text-gray-400 leading-relaxed">
-                Cubre todo código postal bonaerense que no esté en GBA ni en GBA2, así que no
-                tiene una lista propia.
+                Cubre todo código postal bonaerense que no esté en GBA ni en GBA2, y también los
+                de las zonas que estén apagadas. Por eso no tiene una lista propia.
               </p>
             )}
           </div>

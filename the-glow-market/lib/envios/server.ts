@@ -1,5 +1,10 @@
 import { createClient as createServiceClient } from '@supabase/supabase-js'
-import { resolverZona, type CodigosPorZona } from './zonas'
+import {
+  resolverZona,
+  ZONAS_POR_CP,
+  ZONA_BUENOS_AIRES_RESTO,
+  type CodigosPorZona,
+} from './zonas'
 
 export interface EnvioCotizado {
   /** false si no hay envío a esa dirección: zona desconocida, sin configurar o apagada. */
@@ -50,22 +55,37 @@ export async function cotizarEnvio(
   const codigosPorZona: CodigosPorZona = {}
   for (const fila of filas) codigosPorZona[fila.id] = fila.codigos_postales
 
-  const zonaId = resolverZona(provincia, codigoPostal, codigosPorZona)
+  let zonaId = resolverZona(provincia, codigoPostal, codigosPorZona)
   if (!zonaId) return NO_DISPONIBLE
 
-  const zona = filas.find((f) => f.id === zonaId)
+  let zona = filas.find((f) => f.id === zonaId)
 
-  // Sin nombre no hay nada que mostrarle al comprador, así que cuenta como no configurada.
-  // Un precio en 0 con la zona activa sí es válido: es envío gratis a propósito.
-  if (!zona || !zona.activo || !String(zona.nombre || '').trim()) {
+  // Si se apaga GBA o GBA2, sus códigos postales no se quedan sin envío: pasan a cobrarse
+  // como el resto de la provincia. Apagar una zona es dejar de darle trato especial, no
+  // dejar de vender ahí. Las provincias no tienen este descarte: si Chaco está apagada, no
+  // hay envío a Chaco.
+  if (ZONAS_POR_CP.includes(zonaId as (typeof ZONAS_POR_CP)[number]) && !estaConfigurada(zona)) {
+    zonaId = ZONA_BUENOS_AIRES_RESTO
+    zona = filas.find((f) => f.id === zonaId)
+  }
+
+  if (!estaConfigurada(zona)) {
     return { ...NO_DISPONIBLE, zonaId }
   }
 
   return {
     disponible: true,
     zonaId,
-    nombre: zona.nombre,
-    descripcion: zona.descripcion,
-    precio: Number(zona.precio) || 0,
+    nombre: zona!.nombre,
+    descripcion: zona!.descripcion,
+    precio: Number(zona!.precio) || 0,
   }
+}
+
+/**
+ * Una zona sirve si está prendida y tiene nombre: sin nombre no hay nada que mostrarle al
+ * comprador. Un precio en 0 con la zona activa sí es válido, es envío gratis a propósito.
+ */
+function estaConfigurada(zona?: { nombre?: string | null; activo?: boolean | null }): boolean {
+  return Boolean(zona && zona.activo && String(zona.nombre || '').trim())
 }
