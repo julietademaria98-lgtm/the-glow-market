@@ -47,7 +47,7 @@ export default async function AdminOrdenesPage() {
         <table className="w-full">
           <thead>
             <tr className="border-b border-gray-100">
-              {['Fecha', 'Cliente', 'Items', 'Total', 'Estado'].map((h) => (
+              {['Fecha', 'Cliente', 'Items', 'Subtotal', 'Envío', 'Total', 'Estado'].map((h) => (
                 <th key={h} className="text-left px-4 py-3 font-montserrat text-[9px] tracking-[0.2em] uppercase text-gray-400">
                   {h}
                 </th>
@@ -81,7 +81,21 @@ export default async function AdminOrdenesPage() {
                     ))}
                   </div>
                 </td>
-                <td className="px-4 py-3 font-montserrat text-xs text-gray-700">
+                {/* El subtotal no se guarda: la orden tiene el total y el envío, así que se
+                    despeja restando. Así no puede quedar en desacuerdo con lo que se cobró. */}
+                <td className="px-4 py-3 font-montserrat text-xs text-gray-500">
+                  ${(o.total - (o.costo_envio ?? 0)).toLocaleString('es-AR')}
+                </td>
+                <td className="px-4 py-3 font-montserrat text-xs text-gray-500">
+                  {o.costo_envio == null ? (
+                    <span className="text-gray-300">—</span>
+                  ) : o.costo_envio === 0 ? (
+                    'Gratis'
+                  ) : (
+                    `$${o.costo_envio.toLocaleString('es-AR')}`
+                  )}
+                </td>
+                <td className="px-4 py-3 font-montserrat text-xs text-gray-700 font-medium">
                   ${o.total.toLocaleString('es-AR')}
                 </td>
                 <td className="px-4 py-3">
