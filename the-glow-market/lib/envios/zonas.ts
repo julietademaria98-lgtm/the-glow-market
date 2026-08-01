@@ -1,32 +1,24 @@
 /**
  * Zonas de envío: dado provincia + código postal, decide a qué zona pertenece una dirección.
  *
- * Acá no hay ni precios, ni textos, ni códigos postales. Todo eso lo carga el admin y vive en
- * la tabla `envio_zonas`; este archivo solo tiene la mecánica del matcheo, que es la misma
- * pase lo que pase con esos datos.
+ * Las zonas no están definidas acá: las crea el admin y viven en la tabla `envio_zonas`. Este
+ * archivo solo tiene la mecánica del matcheo y la lista de provincias del país, que es lo
+ * único que no depende de cómo esté configurada la tienda.
  *
- * Buenos Aires se parte en tres zonas según el CP; el resto del país matchea por provincia.
+ * El orden de evaluación va de lo más específico a lo más general, y es automático para que no
+ * se pueda dejar una zona tapada por otra:
+ *
+ *   1. Zonas con códigos postales   (GBA 1, GBA 2)
+ *   2. Zonas por provincia          (CABA, Tucumán)
+ *   3. Resto de Buenos Aires        (descarte, solo si la provincia es Buenos Aires)
+ *   4. Resto del país               (descarte final: nunca queda una dirección sin zona)
  */
 
-export type GrupoZona = 'buenos-aires' | 'interior' | 'provincia'
-
-export interface Zona {
-  id: string
-  grupo: GrupoZona
-  /**
-   * Etiqueta interna, solo para que el admin identifique la fila en el panel. Lo que ve el
-   * comprador es siempre el `nombre` que se carga en la base.
-   */
-  etiqueta: string
-  /** Si su lista de códigos postales se edita desde el panel. */
-  editaCodigosPostales?: boolean
-}
-
-/** Provincias que matchean por nombre (todas menos Buenos Aires, que va por CP). */
-const PROVINCIAS_POR_NOMBRE = [
-  'CABA', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba', 'Corrientes', 'Entre Ríos',
-  'Formosa', 'Jujuy', 'La Pampa', 'La Rioja', 'Mendoza', 'Misiones', 'Neuquén',
-  'Río Negro', 'Salta', 'San Juan', 'San Luis', 'Santa Cruz', 'Santa Fe',
+/** Las 24 jurisdicciones del país, tal como aparecen en el checkout. */
+export const PROVINCIAS = [
+  'Buenos Aires', 'CABA', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba', 'Corrientes',
+  'Entre Ríos', 'Formosa', 'Jujuy', 'La Pampa', 'La Rioja', 'Mendoza', 'Misiones',
+  'Neuquén', 'Río Negro', 'Salta', 'San Juan', 'San Luis', 'Santa Cruz', 'Santa Fe',
   'Santiago del Estero', 'Tierra del Fuego', 'Tucumán',
 ]
 
@@ -46,78 +38,82 @@ export function slugProvincia(valor: string): string {
 
 /**
  * Devuelve el CP solo si son exactamente 4 dígitos. Los códigos postales de la tienda son
- * numéricos: no se acepta el formato CPA con letras ('B1602ABC'), así que lo que entra por
- * la API tiene que cumplir lo mismo que pide el formulario.
+ * numéricos: no se acepta el formato CPA con letras ('B1602ABC').
  */
 export function normalizarCP(valor: string): string | null {
   const limpio = String(valor || '').trim()
   return /^\d{4}$/.test(limpio) ? limpio : null
 }
 
-export const ZONA_BUENOS_AIRES = 'buenos-aires'
+/** Provincia cuyo descarte es "Resto de Buenos Aires". */
+export const PROVINCIA_BUENOS_AIRES = slugProvincia('Buenos Aires')
 
 /**
- * Zonas bonaerenses que matchean por lista de CP, en orden de prioridad: si un código llegara
- * a estar cargado en las dos, gana la primera. El panel avisa cuando eso pasa, pero el orden
- * acá garantiza que el resultado sea siempre el mismo.
+ * Qué clase de zona es. Los dos descartes son únicos, no se borran y no se les elige región:
+ * se calculan con lo que no cubran las demás, y por eso ninguna dirección queda sin zona.
  */
-export const ZONAS_POR_CP = ['gba', 'gba2'] as const
+export type TipoZona = 'normal' | 'resto-bsas' | 'resto-pais'
 
-/** Zona bonaerense por descarte: todo CP que no esté en ninguna lista. */
-export const ZONA_BUENOS_AIRES_RESTO = 'bsas-resto'
+export interface Zona {
+  id: string
+  nombre: string
+  descripcion: string | null
+  precio: number
+  activo: boolean
+  tipo: TipoZona
+  /** Slugs de provincia que cubre. Vacío en los descartes. */
+  provincias: string[]
+  /** Si tiene, la zona cubre solo esos CP dentro de sus provincias. */
+  codigosPostales: string[]
+}
 
-/**
- * Zona única para todo lo que no es Buenos Aires. Es el precio que se cobra salvo que la
- * provincia tenga una excepción cargada: así se cambia un solo número en vez de 23.
- */
-export const ZONA_INTERIOR = 'interior'
-
-/**
- * Las 27 zonas: 3 de Buenos Aires, el interior, y las 23 provincias, que existen solo como
- * excepción opcional al precio del interior.
- */
-export const ZONAS: Zona[] = [
-  { id: 'gba', grupo: 'buenos-aires', etiqueta: 'GBA', editaCodigosPostales: true },
-  { id: 'gba2', grupo: 'buenos-aires', etiqueta: 'GBA2', editaCodigosPostales: true },
-  { id: ZONA_BUENOS_AIRES_RESTO, grupo: 'buenos-aires', etiqueta: 'Resto de Buenos Aires' },
-  { id: ZONA_INTERIOR, grupo: 'interior', etiqueta: 'Interior del país' },
-  ...PROVINCIAS_POR_NOMBRE.map((p): Zona => ({
-    id: slugProvincia(p),
-    grupo: 'provincia',
-    etiqueta: p,
-  })),
-]
-
-const ZONA_IDS = new Set(ZONAS.map((z) => z.id))
-
-/** Códigos postales de cada zona, tal como están cargados en la base. */
-export type CodigosPorZona = Record<string, string[] | null | undefined>
+/** Una zona sirve si está prendida y tiene nombre: sin nombre no hay qué mostrarle al comprador. */
+export function estaConfigurada(zona?: Zona | null): boolean {
+  return Boolean(zona && zona.activo && zona.nombre.trim())
+}
 
 /**
- * Devuelve el id de zona para una dirección, o null si no se puede determinar (provincia
- * desconocida, o Buenos Aires sin un CP legible).
+ * Elige la zona que corresponde a una dirección, o null si no se puede determinar (sin
+ * provincia, o Buenos Aires sin un CP legible).
  *
- * Las listas de CP se pasan como argumento en lugar de leerlas acá: así la función queda pura
- * y el llamador decide de dónde vienen (hoy, de `envio_zonas`).
+ * Solo se consideran las zonas configuradas: una zona apagada es como si no existiera, así que
+ * sus direcciones caen en la zona más general que las contenga.
  */
 export function resolverZona(
   provincia: string,
   codigoPostal: string,
-  codigosPorZona: CodigosPorZona,
-): string | null {
+  zonas: Zona[],
+): Zona | null {
   const prov = slugProvincia(provincia)
   if (!prov) return null
 
-  if (prov === ZONA_BUENOS_AIRES) {
-    const cp = normalizarCP(codigoPostal)
-    if (!cp) return null
-    for (const zonaId of ZONAS_POR_CP) {
-      if ((codigosPorZona[zonaId] || []).includes(cp)) return zonaId
+  const cp = normalizarCP(codigoPostal)
+  const usables = zonas.filter(estaConfigurada)
+
+  const cubreProvincia = (z: Zona) => z.provincias.length === 0 || z.provincias.includes(prov)
+
+  // 1. Lo más específico: zonas que enumeran códigos postales.
+  const porCP = usables.filter((z) => z.tipo === 'normal' && z.codigosPostales.length > 0)
+  if (cp) {
+    for (const zona of porCP) {
+      if (cubreProvincia(zona) && zona.codigosPostales.includes(cp)) return zona
     }
-    return ZONA_BUENOS_AIRES_RESTO
   }
 
-  return ZONA_IDS.has(prov) ? prov : null
+  // 2. Zonas que cubren provincias enteras.
+  const porProvincia = usables.filter(
+    (z) => z.tipo === 'normal' && z.codigosPostales.length === 0 && z.provincias.length > 0,
+  )
+  for (const zona of porProvincia) {
+    if (zona.provincias.includes(prov)) return zona
+  }
+
+  // 3 y 4. Descartes. Buenos Aires tiene el suyo; todo lo demás cae en el del país.
+  if (prov === PROVINCIA_BUENOS_AIRES) {
+    const restoBsAs = usables.find((z) => z.tipo === 'resto-bsas')
+    if (restoBsAs) return restoBsAs
+  }
+  return usables.find((z) => z.tipo === 'resto-pais') ?? null
 }
 
 /**
@@ -134,4 +130,20 @@ export function parsearCodigosPostales(texto: string): string[] {
     limpios.push(cp)
   }
   return limpios
+}
+
+/** Texto corto de qué cubre una zona, para la lista del panel. */
+export function describirCobertura(zona: Zona): string {
+  if (zona.tipo === 'resto-bsas') return 'Todo Buenos Aires que no cubran las zonas de arriba'
+  if (zona.tipo === 'resto-pais') return 'Todo lo que no cubra ninguna otra zona'
+
+  const provincias = zona.provincias
+    .map((slug) => PROVINCIAS.find((p) => slugProvincia(p) === slug) ?? slug)
+    .join(', ')
+
+  if (zona.codigosPostales.length > 0) {
+    const donde = provincias ? ` de ${provincias}` : ''
+    return `${zona.codigosPostales.length} códigos postales${donde}`
+  }
+  return provincias || 'Sin región asignada'
 }

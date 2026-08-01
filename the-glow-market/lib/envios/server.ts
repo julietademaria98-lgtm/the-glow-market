@@ -1,18 +1,8 @@
 import { createClient as createServiceClient } from '@supabase/supabase-js'
-import {
-  resolverZona,
-  ZONAS,
-  ZONAS_POR_CP,
-  ZONA_BUENOS_AIRES_RESTO,
-  ZONA_INTERIOR,
-  type CodigosPorZona,
-} from './zonas'
-
-const PROVINCIAS = new Set(ZONAS.filter((z) => z.grupo === 'provincia').map((z) => z.id))
-const esProvincia = (id: string) => PROVINCIAS.has(id)
+import { resolverZona, estaConfigurada, type Zona, type TipoZona } from './zonas'
 
 export interface EnvioCotizado {
-  /** false si no hay envío a esa dirección: zona desconocida, sin configurar o apagada. */
+  /** false si no hay envío a esa dirección: sin provincia, o zona sin configurar. */
   disponible: boolean
   zonaId: string | null
   nombre: string
@@ -28,10 +18,67 @@ const NO_DISPONIBLE: EnvioCotizado = {
   precio: 0,
 }
 
+interface FilaZona {
+  id: string
+  nombre: string | null
+  descripcion: string | null
+  precio: string | number | null
+  activo: boolean | null
+  tipo: string | null
+  provincias: string[] | null
+  codigos_postales: string[] | null
+}
+
+/** Pasa una fila de `envio_zonas` al tipo que entiende el matcheo. */
+export function filaAZona(fila: FilaZona): Zona {
+  return {
+    id: fila.id,
+    nombre: fila.nombre ?? '',
+    descripcion: fila.descripcion,
+    precio: Number(fila.precio) || 0,
+    activo: Boolean(fila.activo),
+    tipo: (fila.tipo ?? 'normal') as TipoZona,
+    provincias: fila.provincias ?? [],
+    codigosPostales: fila.codigos_postales ?? [],
+  }
+}
+
+export function servicio() {
+  return createServiceClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      // Next 14 cachea los fetch por defecto, y supabase-js consulta con fetch. Sin esto, el
+      // checkout sigue cotizando con los precios y las zonas que había la primera vez, y los
+      // cambios del panel no aparecen hasta redeployar.
+      global: {
+        fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+          fetch(input, { ...init, cache: 'no-store' }),
+      },
+    },
+  )
+}
+
+const COLUMNAS = 'id, nombre, descripcion, precio, activo, tipo, provincias, codigos_postales'
+
+/** Todas las zonas, ya normalizadas. */
+export async function leerZonas(): Promise<Zona[]> {
+  const { data, error } = await servicio()
+    .from('envio_zonas')
+    .select(COLUMNAS)
+    .order('created_at', { ascending: true })
+
+  if (error) {
+    console.error('leerZonas → error:', error.message)
+    return []
+  }
+  return (data || []).map(filaAZona)
+}
+
 /**
- * Cotiza el envío para una dirección. Es la única fuente de verdad del precio: la usan
- * tanto el checkout (para mostrar) como create-preference (para cobrar), así que lo que se
- * muestra y lo que se cobra no pueden separarse.
+ * Cotiza el envío para una dirección. Es la única fuente de verdad del precio: la usan tanto
+ * el checkout (para mostrar) como create-preference (para cobrar), así que lo que se muestra y
+ * lo que se cobra no pueden separarse.
  *
  * Nunca inventa un precio: si la zona no está configurada devuelve `disponible: false` en
  * lugar de caer en un valor por defecto.
@@ -40,74 +87,18 @@ export async function cotizarEnvio(
   provincia: string,
   codigoPostal: string,
 ): Promise<EnvioCotizado> {
-  const db = createServiceClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  )
+  const zonas = await leerZonas()
+  const zona = resolverZona(provincia, codigoPostal, zonas)
 
-  // Se traen todas las zonas de una: los códigos postales de GBA/GBA2 se editan desde el
-  // panel, así que hay que leerlos para saber a qué zona cae la dirección.
-  const { data, error } = await db
-    .from('envio_zonas')
-    .select('id, nombre, descripcion, precio, activo, codigos_postales')
-
-  if (error) {
-    console.error('cotizarEnvio → error leyendo las zonas:', error.message)
-    return NO_DISPONIBLE
-  }
-
-  const filas = data || []
-  const codigosPorZona: CodigosPorZona = {}
-  for (const fila of filas) codigosPorZona[fila.id] = fila.codigos_postales
-
-  let zonaId = resolverZona(provincia, codigoPostal, codigosPorZona)
-  if (!zonaId) return NO_DISPONIBLE
-
-  const buscar = (id: string) => filas.find((f) => f.id === id)
-  const interior = buscar(ZONA_INTERIOR)
-  let zona = buscar(zonaId)
-
-  // Una zona apagada no deja a nadie sin envío: cae en la zona que la contiene. Apagarla es
-  // dejar de darle trato especial, no dejar de vender ahí.
-  if (esProvincia(zonaId)) {
-    // Las provincias son excepciones al precio del interior: solo valen si están prendidas.
-    if (!zona?.activo) {
-      zonaId = ZONA_INTERIOR
-      zona = interior
-    } else if (!String(zona.nombre || '').trim()) {
-      // Excepción sin texto propio: se cobra su precio pero se muestra el texto del interior,
-      // así agregar una provincia es poner un precio y nada más.
-      zona = {
-        ...zona,
-        nombre: interior?.nombre ?? '',
-        descripcion: interior?.descripcion ?? null,
-      }
-    }
-  } else if (ZONAS_POR_CP.includes(zonaId as (typeof ZONAS_POR_CP)[number])) {
-    // GBA y GBA2 caen en el resto de la provincia.
-    if (!estaConfigurada(zona)) {
-      zonaId = ZONA_BUENOS_AIRES_RESTO
-      zona = buscar(zonaId)
-    }
-  }
-
-  if (!estaConfigurada(zona)) {
-    return { ...NO_DISPONIBLE, zonaId }
+  if (!zona || !estaConfigurada(zona)) {
+    return { ...NO_DISPONIBLE, zonaId: zona?.id ?? null }
   }
 
   return {
     disponible: true,
-    zonaId,
-    nombre: zona!.nombre,
-    descripcion: zona!.descripcion,
-    precio: Number(zona!.precio) || 0,
+    zonaId: zona.id,
+    nombre: zona.nombre,
+    descripcion: zona.descripcion,
+    precio: zona.precio,
   }
-}
-
-/**
- * Una zona sirve si está prendida y tiene nombre: sin nombre no hay nada que mostrarle al
- * comprador. Un precio en 0 con la zona activa sí es válido, es envío gratis a propósito.
- */
-function estaConfigurada(zona?: { nombre?: string | null; activo?: boolean | null }): boolean {
-  return Boolean(zona && zona.activo && String(zona.nombre || '').trim())
 }

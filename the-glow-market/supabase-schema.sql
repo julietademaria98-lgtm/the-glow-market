@@ -101,16 +101,24 @@ create table ordenes (
 -- ============================================
 -- Una fila por zona. El matcheo dirección → zona vive en lib/envios/zonas.ts; acá solo está
 -- lo que decide la dueña del negocio: cuánto cuesta y qué texto ve el comprador.
+-- Las zonas las crea el admin desde /admin/envios, al estilo de las shipping zones de
+-- WooCommerce. Cada una dice qué cubre; el matcheo va de lo más específico a lo más general
+-- (ver lib/envios/zonas.ts) y las dos zonas de descarte aseguran que ninguna dirección quede
+-- sin envío.
 create table envio_zonas (
-  id               text primary key,          -- 'gba', 'gba2', 'bsas-resto', 'caba', ...
+  id               text primary key,
   nombre           text not null default '',  -- lo que ve el comprador: "Envíos GBA | Rapiboy"
   descripcion      text,                      -- "Envíos en el día comprando antes de las 12hs."
   precio           decimal(10,2) not null default 0,
-  activo           boolean not null default false, -- se prende cuando tiene nombre y precio
-  -- CP que cubre la zona, editables desde el panel. Solo GBA y GBA2: las provincias matchean
-  -- por nombre y "Resto de Buenos Aires" es el descarte, así que en esas queda null.
+  activo           boolean not null default false,
+  -- 'normal' | 'resto-bsas' | 'resto-pais'. Los dos descartes son únicos y no se borran.
+  tipo             text not null default 'normal',
+  -- Slugs de provincia que cubre ('buenos-aires', 'cordoba'). Vacío en los descartes.
+  provincias       text[] not null default '{}',
+  -- Si tiene, la zona cubre solo esos CP dentro de sus provincias.
   codigos_postales text[],
-  orden            int not null default 0,    -- posición en el panel
+  orden            int not null default 0,
+  created_at       timestamptz default now(),
   updated_at       timestamptz default now()
 );
 
@@ -176,16 +184,17 @@ create policy "envio_zonas_public_read"
 -- ============================================
 -- ZONAS DE ENVÍO (no es opcional: el panel lista estas filas)
 -- ============================================
--- Se siembran vacías e inactivas a propósito. No son valores sugeridos: son casilleros a
--- completar. El precio y los textos los carga la dueña desde /admin/envios, y hasta que una
+-- Se siembran vacías e inactivas a propósito: son casilleros a completar, no valores
+-- sugeridos. El precio y los textos los carga la dueña desde /admin/envios, y hasta que una
 -- zona no tenga nombre y precio queda inactiva y el checkout la trata como "sin envío".
-insert into envio_zonas (id, orden) values
-  ('gba', 1), ('gba2', 2), ('bsas-resto', 3), ('interior', 4),
-  ('caba', 10), ('catamarca', 11), ('chaco', 12), ('chubut', 13), ('cordoba', 14),
-  ('corrientes', 15), ('entre-rios', 16), ('formosa', 17), ('jujuy', 18), ('la-pampa', 19),
-  ('la-rioja', 20), ('mendoza', 21), ('misiones', 22), ('neuquen', 23), ('rio-negro', 24),
-  ('salta', 25), ('san-juan', 26), ('san-luis', 27), ('santa-cruz', 28), ('santa-fe', 29),
-  ('santiago-del-estero', 30), ('tierra-del-fuego', 31), ('tucuman', 32)
+--
+-- Solo se crean cuatro. Las demás zonas (CABA, Córdoba, Tierra del Fuego…) las agrega ella
+-- cuando las necesita: las que no existan se cobran con el precio de "Resto del país".
+insert into envio_zonas (id, tipo, provincias, orden) values
+  ('gba',        'normal',     array['buenos-aires'], 1),
+  ('gba2',       'normal',     array['buenos-aires'], 2),
+  ('bsas-resto', 'resto-bsas', '{}',                  3),
+  ('interior',   'resto-pais', '{}',                  4)
 on conflict (id) do nothing;
 
 -- Punto de partida de las listas de CP de GBA y GBA2 (166 y 37). Son editables desde
