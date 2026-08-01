@@ -89,10 +89,60 @@ create table ordenes (
   mp_payment_id     text,
   estado            text default 'pendiente',
   total             decimal(10,2) not null,
+  costo_envio       decimal(10,2) default 0,
   items             jsonb not null,
   datos_envio       jsonb,
   created_at        timestamptz default now()
 );
+
+-- ============================================
+-- TABLA: andreani_config (una sola fila)
+-- ============================================
+create table andreani_config (
+  id                    text primary key default 'default' check (id = 'default'),
+  entorno               text not null default 'sandbox' check (entorno in ('sandbox', 'prod')),
+  base_url              text not null,
+  usuario               text not null,
+  password              text not null,
+  contrato              text not null,
+  cp_origen             text not null,
+  sucursal_origen       text,
+  tipo_servicio         text,             -- tipoDeServicio (lo da Andreani)
+  sucursal_cliente_id   text,             -- sucursalClienteID (lo da Andreani)
+  peso_default_kg       decimal(10,3) default 0.5,  -- peso para cotizar el envío
+  costo_envio_fallback  decimal(10,2) default 0,    -- costo si la cotización falla
+  updated_at            timestamptz default now()
+);
+
+-- Sin políticas públicas: solo se accede con service-role desde el server.
+alter table andreani_config enable row level security;
+
+-- ============================================
+-- TABLA: andreani_envios (registro/respaldo de envíos)
+-- ============================================
+create table andreani_envios (
+  id              uuid default uuid_generate_v4() primary key,
+  orden_id        uuid references ordenes(id) on delete set null,
+  cliente_nombre  text,
+  cliente_email   text,
+  cp_destino      text,
+  numero_andreani text,                 -- bultos[].numeroDeEnvio; null si falló
+  agrupador       text,                 -- agrupadorDeBultos (respuesta del alta)
+  etiquetas_link  text,                 -- etiquetasPorAgrupador (viene en el alta, no hay GET aparte)
+  estado          text not null default 'pendiente'
+                    check (estado in ('pendiente', 'creado', 'error')),
+  kilos           decimal(10,3),
+  valor_declarado decimal(10,2),
+  dni_destino     text,
+  error_message   text,
+  raw_request     jsonb,
+  raw_response    jsonb,
+  created_at      timestamptz default now(),
+  updated_at      timestamptz default now()
+);
+
+-- Sin políticas públicas: solo se accede con service-role desde el server.
+alter table andreani_envios enable row level security;
 
 -- ============================================
 -- ROW LEVEL SECURITY

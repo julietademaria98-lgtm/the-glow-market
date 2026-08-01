@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createPreference } from '@/lib/mercadopago'
+import { cotizarCostoEnvio } from '@/lib/andreani-server'
 import { createClient } from '@/lib/supabase/server'
 import type { CartItem, DatosEnvio } from '@/types'
 
@@ -18,10 +19,17 @@ export async function POST(request: Request) {
       data: { user },
     } = await supabase.auth.getUser()
 
-    const total = items.reduce(
+    const subtotal = items.reduce(
       (acc: number, item: CartItem) => acc + item.precio * item.quantity,
       0
     )
+
+    // Cotizar el envío server-side (fuente de verdad). Con fallback: nunca bloquea el pago.
+    const { costo: costoEnvio } = await cotizarCostoEnvio(
+      datosEnvio?.codigo_postal || '',
+      subtotal,
+    )
+    const total = subtotal + costoEnvio
 
     const { data: orden, error: ordenError } = await supabase
       .from('ordenes')
@@ -29,6 +37,7 @@ export async function POST(request: Request) {
         user_id: user?.id || null,
         estado: 'pendiente',
         total,
+        costo_envio: costoEnvio,
         items: items.map((item) => ({
           id: item.id,
           slug: item.slug,
@@ -47,8 +56,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Error al crear la orden' }, { status: 500 })
     }
 
-    // Crear preferencia de MercadoPago
-    const preference = await createPreference(items, orden.id)
+    // Crear preferencia de MercadoPago (incluye el costo de envío)
+    const preference = await createPreference(items, orden.id, costoEnvio)
 
     // Actualizar orden con ID de preferencia
     await supabase

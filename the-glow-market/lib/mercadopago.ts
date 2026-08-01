@@ -5,7 +5,7 @@ const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN!,
 })
 
-export async function createPreference(items: CartItem[], orderId: string) {
+export async function createPreference(items: CartItem[], orderId: string, costoEnvio = 0) {
   const preference = new Preference(client)
 
   const response = await preference.create({
@@ -18,6 +18,7 @@ export async function createPreference(items: CartItem[], orderId: string) {
         currency_id: 'ARS',
         picture_url: item.imagen_url,
       })),
+      shipments: { cost: Number(costoEnvio) || 0, mode: 'not_specified' },
       back_urls: {
         success: `${process.env.NEXT_PUBLIC_URL}/success?order=${orderId}`,
         failure: `${process.env.NEXT_PUBLIC_URL}/failure?order=${orderId}`,

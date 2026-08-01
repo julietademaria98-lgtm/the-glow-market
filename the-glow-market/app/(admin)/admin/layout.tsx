@@ -1,9 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { LayoutDashboard, Package, BookOpen, ShoppingBag } from 'lucide-react'
-
-const ADMIN_EMAIL = 'julietademaria98@gmail.com'
+import { LayoutDashboard, Package, BookOpen, ShoppingBag, Truck, ClipboardList } from 'lucide-react'
+import { ADMIN_EMAIL } from '@/lib/admin/email'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -24,6 +23,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             { href: '/admin/productos', label: 'Productos', icon: Package },
             { href: '/admin/cursos', label: 'Cursos', icon: BookOpen },
             { href: '/admin/ordenes', label: 'Órdenes', icon: ShoppingBag },
+            { href: '/admin/andreani', label: 'Andreani', icon: Truck },
+            { href: '/admin/andreani/envios', label: 'Envíos', icon: ClipboardList },
           ].map(({ href, label, icon: Icon }) => (
             <Link
               key={href}

@@ -1,22 +1,41 @@
 import { createClient as createServiceClient } from '@supabase/supabase-js'
-import { updateEstadoOrden } from '@/lib/admin/actions'
 import type { Orden } from '@/types'
+import GenerarEnvioButton from '@/components/admin/GenerarEnvioButton'
 
-async function getOrdenes() {
-  const db = createServiceClient(
+type EstadoEnvio = 'pendiente' | 'creado' | 'error'
+interface EnvioResumen { estado: EstadoEnvio; numero: string | null }
+
+function serviceClient() {
+  return createServiceClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
-  const [ordenesRes, { data: authData }] = await Promise.all([
-    db.from('ordenes').select('*').order('created_at', { ascending: false }).limit(100),
-    db.auth.admin.listUsers(),
-  ])
-  const users = authData?.users || []
-  const ordenes = (ordenesRes.data || []) as Orden[]
-  return ordenes.map((o) => ({
-    ...o,
-    userEmail: users.find((u) => u.id === o.user_id)?.email || null,
-  }))
+}
+
+async function getOrdenes(): Promise<Orden[]> {
+  const { data } = await serviceClient()
+    .from('ordenes')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(100)
+  return (data || []) as Orden[]
+}
+
+// Mapa orden_id -> mejor envío (prefiere 'creado', si no el más reciente).
+async function getEnviosMap(): Promise<Map<string, EnvioResumen>> {
+  const { data } = await serviceClient()
+    .from('andreani_envios')
+    .select('orden_id, estado, numero_andreani')
+    .order('created_at', { ascending: false })
+  const map = new Map<string, EnvioResumen>()
+  for (const e of (data || []) as { orden_id: string | null; estado: EstadoEnvio; numero_andreani: string | null }[]) {
+    if (!e.orden_id) continue
+    const cur = map.get(e.orden_id)
+    if (!cur || (e.estado === 'creado' && cur.estado !== 'creado')) {
+      map.set(e.orden_id, { estado: e.estado, numero: e.numero_andreani })
+    }
+  }
+  return map
 }
 
 const ESTADO_COLORS: Record<string, string> = {
@@ -27,14 +46,14 @@ const ESTADO_COLORS: Record<string, string> = {
 }
 
 export default async function AdminOrdenesPage() {
-  const ordenes = await getOrdenes()
+  const [ordenes, enviosMap] = await Promise.all([getOrdenes(), getEnviosMap()])
 
   const total = ordenes
     .filter((o) => o.estado === 'aprobado')
     .reduce((sum, o) => sum + o.total, 0)
 
   return (
-    <div className="p-8">
+    <div className="p-8 pt-20">
       <div className="flex items-center justify-between mb-8">
         <h1 className="font-cormorant text-3xl text-glow-navy font-light">Órdenes</h1>
         <div className="text-right">
@@ -47,7 +66,7 @@ export default async function AdminOrdenesPage() {
         <table className="w-full">
           <thead>
             <tr className="border-b border-gray-100">
-              {['Fecha', 'Cliente', 'Items', 'Total', 'Estado'].map((h) => (
+              {['Fecha', 'Cliente', 'Items', 'Total', 'Estado', 'Envío'].map((h) => (
                 <th key={h} className="text-left px-4 py-3 font-montserrat text-[9px] tracking-[0.2em] uppercase text-gray-400">
                   {h}
                 </th>
@@ -69,12 +88,12 @@ export default async function AdminOrdenesPage() {
                       <p className="font-montserrat text-[9px] text-gray-400">{o.datos_envio.email}</p>
                     </div>
                   ) : (
-                    <p className="font-montserrat text-[9px] text-gray-400">{(o as any).userEmail || '—'}</p>
+                    <span className="font-montserrat text-[10px] text-gray-400">—</span>
                   )}
                 </td>
                 <td className="px-4 py-3">
                   <div className="space-y-0.5">
-                    {(o.items || []).map((item: any, i: number) => (
+                    {(o.items || []).map((item, i) => (
                       <p key={i} className="font-montserrat text-[10px] text-gray-600">
                         {item.cantidad}x {item.nombre}
                       </p>
@@ -85,21 +104,22 @@ export default async function AdminOrdenesPage() {
                   ${o.total.toLocaleString('es-AR')}
                 </td>
                 <td className="px-4 py-3">
-                  <form action={updateEstadoOrden.bind(null, o.id)} className="flex items-center gap-2">
-                    <select
-                      name="estado"
-                      defaultValue={o.estado}
-                      className="text-[9px] font-montserrat tracking-wide uppercase rounded px-2 py-1 border border-gray-200 cursor-pointer bg-white"
-                    >
-                      <option value="pendiente">Pendiente</option>
-                      <option value="aprobado">Aprobado</option>
-                      <option value="en_proceso">En proceso</option>
-                      <option value="rechazado">Rechazado</option>
-                    </select>
-                    <button type="submit" className="font-montserrat text-[9px] text-glow-navy hover:underline">
-                      ✓
-                    </button>
-                  </form>
+                  <span className={`px-2 py-1 rounded font-montserrat text-[9px] tracking-wide uppercase ${ESTADO_COLORS[o.estado] || 'bg-gray-100 text-gray-400'}`}>
+                    {o.estado}
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  {o.datos_envio ? (
+                    <GenerarEnvioButton
+                      ordenId={o.id}
+                      total={o.total}
+                      clienteNombre={`${o.datos_envio.nombre} ${o.datos_envio.apellido}`}
+                      envioEstado={enviosMap.get(o.id)?.estado ?? null}
+                      numeroAndreani={enviosMap.get(o.id)?.numero ?? null}
+                    />
+                  ) : (
+                    <span className="font-montserrat text-[10px] text-gray-300">—</span>
+                  )}
                 </td>
               </tr>
             ))}
@@ -108,7 +128,7 @@ export default async function AdminOrdenesPage() {
 
         {ordenes.length === 0 && (
           <div className="text-center py-16">
-            <p className="font-montserrat text-sm text-gray-400">No hay órdenes aún</p>
+            <p className="font-montserrat text-xs text-gray-400">No hay órdenes aún</p>
           </div>
         )}
       </div>
