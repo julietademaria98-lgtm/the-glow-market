@@ -92,8 +92,14 @@ export function resolverZona(
 
   const cubreProvincia = (z: Zona) => z.provincias.length === 0 || z.provincias.includes(prov)
 
+  // Dentro de cada nivel gana la zona que abarca menos: una que cubre solo Córdoba tiene que
+  // ganarle a una que cubre veinte provincias, sin importar cuál se creó antes.
+  const masChicaPrimero = (a: Zona, b: Zona) => a.provincias.length - b.provincias.length
+
   // 1. Lo más específico: zonas que enumeran códigos postales.
-  const porCP = usables.filter((z) => z.tipo === 'normal' && z.codigosPostales.length > 0)
+  const porCP = usables
+    .filter((z) => z.tipo === 'normal' && z.codigosPostales.length > 0)
+    .sort((a, b) => a.codigosPostales.length - b.codigosPostales.length)
   if (cp) {
     for (const zona of porCP) {
       if (cubreProvincia(zona) && zona.codigosPostales.includes(cp)) return zona
@@ -101,9 +107,9 @@ export function resolverZona(
   }
 
   // 2. Zonas que cubren provincias enteras.
-  const porProvincia = usables.filter(
-    (z) => z.tipo === 'normal' && z.codigosPostales.length === 0 && z.provincias.length > 0,
-  )
+  const porProvincia = usables
+    .filter((z) => z.tipo === 'normal' && z.codigosPostales.length === 0 && z.provincias.length > 0)
+    .sort(masChicaPrimero)
   for (const zona of porProvincia) {
     if (zona.provincias.includes(prov)) return zona
   }

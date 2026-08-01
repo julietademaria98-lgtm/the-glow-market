@@ -44,11 +44,17 @@ export async function POST(request: Request) {
  * Ordena como se evalúan: primero las de códigos postales, después las de provincia, y los
  * dos descartes al final. Así la lista del panel se lee de lo más chico a lo más grande.
  */
-function ordenarParaPanel<T extends { tipo: string; codigosPostales: string[] }>(zonas: T[]): T[] {
-  const peso = (z: T) => {
+function ordenarParaPanel<T extends { tipo: string; codigosPostales: string[]; provincias: string[] }>(
+  zonas: T[],
+): T[] {
+  const nivel = (z: T) => {
     if (z.tipo === 'resto-pais') return 3
     if (z.tipo === 'resto-bsas') return 2
     return z.codigosPostales.length > 0 ? 0 : 1
   }
-  return [...zonas].sort((a, b) => peso(a) - peso(b))
+  // Dentro del mismo nivel, primero la que abarca menos: es el orden real de evaluación.
+  const amplitud = (z: T) =>
+    z.codigosPostales.length > 0 ? z.codigosPostales.length : z.provincias.length
+
+  return [...zonas].sort((a, b) => nivel(a) - nivel(b) || amplitud(a) - amplitud(b))
 }
