@@ -29,7 +29,14 @@ export async function PUT(request: Request, { params }: Contexto) {
   // Los descartes cubren lo que no cubre nadie: si se les pudiera elegir región, dejarían de
   // ser la red que atrapa todo y habría direcciones sin zona.
   const cambios = esDescarte
-    ? { nombre: zona.nombre, descripcion: zona.descripcion, precio: zona.precio, activo: zona.activo }
+    ? {
+        nombre: zona.nombre,
+        descripcion: zona.descripcion,
+        precio: zona.precio,
+        activo: zona.activo,
+        envio_gratis: zona.envio_gratis,
+        envio_gratis_desde: zona.envio_gratis_desde,
+      }
     : zona
 
   const { error: dbError } = await auth.db

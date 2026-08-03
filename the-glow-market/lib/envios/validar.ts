@@ -7,6 +7,8 @@ export interface ZonaEntrada {
   activo?: boolean
   provincias?: string[]
   codigosPostales?: string
+  envioGratis?: boolean
+  envioGratisDesde?: unknown
 }
 
 export interface ZonaLimpia {
@@ -16,6 +18,8 @@ export interface ZonaLimpia {
   activo: boolean
   provincias: string[]
   codigos_postales: string[]
+  envio_gratis: boolean
+  envio_gratis_desde: number
 }
 
 const SLUGS_VALIDOS = new Set(PROVINCIAS.map(slugProvincia))
@@ -28,6 +32,11 @@ export function limpiarZona(entrada: ZonaEntrada): ZonaLimpia {
     .map((p) => slugProvincia(String(p)))
     .filter((p, i, todas) => SLUGS_VALIDOS.has(p) && todas.indexOf(p) === i)
 
+  // Con la promo apagada el mínimo vuelve a 0, para no dejar guardado el importe de una promo
+  // vieja que reaparecería sola al volver a prenderla.
+  const envioGratis = Boolean(entrada.envioGratis)
+  const desde = Number(entrada.envioGratisDesde)
+
   return {
     nombre,
     descripcion: String(entrada.descripcion ?? '').trim() || null,
@@ -35,6 +44,8 @@ export function limpiarZona(entrada: ZonaEntrada): ZonaLimpia {
     activo: Boolean(entrada.activo) && nombre.length > 0,
     provincias,
     codigos_postales: parsearCodigosPostales(entrada.codigosPostales ?? ''),
+    envio_gratis: envioGratis,
+    envio_gratis_desde: envioGratis && Number.isFinite(desde) && desde > 0 ? desde : 0,
   }
 }
 

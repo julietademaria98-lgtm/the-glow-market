@@ -9,10 +9,12 @@
  * primera que coincide con la dirección. Conviene ordenarlas de la más específica a la más
  * general, porque una zona amplia arriba tapa a las que están debajo.
  *
- * Las dos zonas de descarte quedan siempre al final y no se pueden mover:
+ * "Resto de Buenos Aires" se ordena como cualquier otra: es un descarte en el sentido de que no
+ * se le eligen provincias ni CP, pero su lugar en la lista decide su prioridad, y puesta arriba
+ * se queda con todo Buenos Aires. "Resto del país" es la única anclada al final: no cubre una
+ * provincia sino todo lo que sobra, así que en cualquier otro lugar taparía a las de abajo.
  *
- *   … las zonas propias, en el orden elegido
- *   Resto de Buenos Aires   (solo si la provincia es Buenos Aires)
+ *   … las zonas propias y "Resto de Buenos Aires", en el orden elegido
  *   Resto del país          (nunca queda una dirección sin zona)
  */
 
@@ -82,6 +84,10 @@ export interface Zona {
   provincias: string[]
   /** Si tiene, la zona cubre solo esos CP dentro de sus provincias. */
   codigosPostales: string[]
+  /** Promo: el envío sale 0 cuando la compra llega a `envioGratisDesde`. */
+  envioGratis: boolean
+  /** Mínimo de compra para el envío gratis. En 0 lo alcanza cualquier compra. */
+  envioGratisDesde: number
 }
 
 /** Una zona sirve si está prendida y tiene nombre: sin nombre no hay qué mostrarle al comprador. */
@@ -109,10 +115,16 @@ export function resolverZona(
 
   const cubreProvincia = (z: Zona) => z.provincias.length === 0 || z.provincias.includes(prov)
 
-  // Las zonas propias se recorren en el orden que definió el admin arrastrándolas, y gana la
-  // primera que coincide. Los descartes no entran acá: van siempre al final, porque cubren
-  // todo lo que sobra y arriba de cualquier otra zona se la comerían.
-  for (const zona of usables.filter((z) => z.tipo === 'normal')) {
+  // Se recorren en el orden que definió el admin arrastrándolas y gana la primera que coincide.
+  // "Resto del país" no entra acá: va siempre al final, porque cubre todo lo que sobra y arriba
+  // de cualquier otra zona se la comería.
+  for (const zona of usables.filter((z) => z.tipo !== 'resto-pais')) {
+    // El descarte de Buenos Aires se resuelve donde lo haya dejado el admin: atrapa cualquier
+    // dirección bonaerense que haya llegado hasta acá sin coincidir con las de arriba.
+    if (zona.tipo === 'resto-bsas') {
+      if (prov === PROVINCIA_BUENOS_AIRES) return zona
+      continue
+    }
     if (!cubreProvincia(zona)) continue
     if (zona.codigosPostales.length > 0) {
       // Con lista de CP la zona cubre solo esos, y sin CP legible no se puede decidir.
@@ -122,11 +134,6 @@ export function resolverZona(
     if (zona.provincias.includes(prov)) return zona
   }
 
-  // Descartes. Buenos Aires tiene el suyo; todo lo demás cae en el del país.
-  if (prov === PROVINCIA_BUENOS_AIRES) {
-    const restoBsAs = usables.find((z) => z.tipo === 'resto-bsas')
-    if (restoBsAs) return restoBsAs
-  }
   return usables.find((z) => z.tipo === 'resto-pais') ?? null
 }
 

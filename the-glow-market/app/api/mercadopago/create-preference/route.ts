@@ -45,6 +45,7 @@ export async function POST(request: Request) {
       const envio = await cotizarEnvio(
         datosEnvio?.provincia_id || datosEnvio?.provincia || '',
         datosEnvio?.codigo_postal || '',
+        subtotal,
       )
       if (!envio.disponible) {
         return NextResponse.json(

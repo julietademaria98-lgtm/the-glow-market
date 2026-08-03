@@ -14,7 +14,12 @@ interface Zona {
   /** CP separados por coma, como se editan en el textarea. */
   codigosPostales: string
   cobertura: string
+  envioGratis: boolean
+  envioGratisDesde: number
+  /** No se le eligen provincias ni CP y no se borra. */
   esDescarte: boolean
+  /** No se arrastra: su lugar es siempre el final. */
+  fija: boolean
 }
 
 interface Provincia {
@@ -35,6 +40,8 @@ const ZONA_NUEVA = {
   activo: true,
   provincias: [] as string[],
   codigosPostales: '',
+  envioGratis: false,
+  envioGratisDesde: 0,
 }
 
 export default function AdminEnviosPage() {
@@ -56,7 +63,7 @@ export default function AdminEnviosPage() {
     setArrastrando(null)
     if (!origenId || origenId === destinoId) return
 
-    const movibles = zonas.filter((z) => !z.esDescarte)
+    const movibles = zonas.filter((z) => !z.fija)
     const desde = movibles.findIndex((z) => z.id === origenId)
     const hasta = movibles.findIndex((z) => z.id === destinoId)
     if (desde < 0 || hasta < 0) return
@@ -65,7 +72,7 @@ export default function AdminEnviosPage() {
     const [movida] = nuevas.splice(desde, 1)
     nuevas.splice(hasta, 0, movida)
 
-    setZonas([...nuevas, ...zonas.filter((z) => z.esDescarte)])
+    setZonas([...nuevas, ...zonas.filter((z) => z.fija)])
 
     const res = await fetch('/api/admin/envio-zonas', {
       method: 'PATCH',
@@ -118,7 +125,7 @@ export default function AdminEnviosPage() {
       <p className="font-montserrat text-[11px] text-gray-400 mb-8 max-w-2xl leading-relaxed">
         Se evalúan de arriba hacia abajo y gana la primera que coincide con la dirección, así que
         conviene dejar arriba las más específicas. Arrastrá desde <span className="text-gray-500">⠿</span> para
-        cambiar el orden. Las dos últimas recogen lo que no entró en ninguna y por eso no se mueven.
+        cambiar el orden. La última recoge todo lo que no entró en ninguna y por eso no se mueve.
       </p>
 
       {msg && (
@@ -218,7 +225,7 @@ function FilaZona({
     <div
       id={zona.id}
       onDragOver={(e) => {
-        if (zona.esDescarte) return
+        if (zona.fija) return
         e.preventDefault()
         setEncima(true)
       }}
@@ -226,7 +233,7 @@ function FilaZona({
       onDrop={(e) => {
         e.preventDefault()
         setEncima(false)
-        if (!zona.esDescarte) onSoltar()
+        if (!zona.fija) onSoltar()
       }}
       className={`border bg-white transition-colors ${
         encima
@@ -237,7 +244,7 @@ function FilaZona({
       } ${arrastrando ? 'opacity-40' : ''}`}
     >
       <div className="px-5 py-4 flex items-center gap-4">
-        {zona.esDescarte ? (
+        {zona.fija ? (
           <span className="w-4 text-center font-montserrat text-[10px] text-gray-200" title="Esta zona va siempre al final">
             —
           </span>
@@ -264,9 +271,18 @@ function FilaZona({
           </p>
         </div>
 
-        <span className="font-cormorant text-xl text-glow-navy">
-          ${Number(zona.precio).toLocaleString('es-AR')}
-        </span>
+        <div className="text-right">
+          <span className="font-cormorant text-xl text-glow-navy">
+            ${Number(zona.precio).toLocaleString('es-AR')}
+          </span>
+          {zona.envioGratis && (
+            <p className="font-montserrat text-[9px] tracking-wide uppercase text-green-700 whitespace-nowrap">
+              {zona.envioGratisDesde > 0
+                ? `Gratis desde $${Number(zona.envioGratisDesde).toLocaleString('es-AR')}`
+                : 'Siempre gratis'}
+            </p>
+          )}
+        </div>
 
         <span
           className={`font-montserrat text-[9px] tracking-wide uppercase px-2 py-1 ${
@@ -296,6 +312,8 @@ function FilaZona({
               activo: zona.activo,
               provincias: zona.provincias,
               codigosPostales: zona.codigosPostales,
+              envioGratis: zona.envioGratis,
+              envioGratisDesde: zona.envioGratisDesde,
             }}
             provincias={provincias}
             esDescarte={zona.esDescarte}
@@ -391,6 +409,40 @@ function Editor({
             En 0 se cobra envío gratis.
           </p>
         </div>
+      </div>
+
+      <div className="mt-4 border border-gray-100 bg-gray-50/60 px-4 py-3">
+        <label className="flex items-center gap-2 cursor-pointer w-fit">
+          <input
+            type="checkbox"
+            checked={datos.envioGratis}
+            onChange={(e) => set('envioGratis', e.target.checked)}
+            className="cursor-pointer accent-glow-navy"
+          />
+          <span className="font-montserrat text-[10px] tracking-wide uppercase text-gray-500">
+            Activar envío gratis
+          </span>
+        </label>
+
+        {datos.envioGratis && (
+          <div className="mt-3 flex items-end gap-3">
+            <div className="w-[180px]">
+              <label className={LABEL}>Desde una compra de</label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={datos.envioGratisDesde}
+                onChange={(e) => set('envioGratisDesde', Number(e.target.value))}
+                className={INPUT}
+              />
+            </div>
+            <p className="font-montserrat text-[10px] text-gray-400 mb-2.5 max-w-sm leading-relaxed">
+              Si la compra llega a ese monto, esta zona no cobra envío. En 0 el envío es gratis
+              siempre, que es como se arma una promo para una zona puntual.
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="mt-4">

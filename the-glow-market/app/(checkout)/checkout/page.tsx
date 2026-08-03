@@ -127,7 +127,7 @@ export default function CheckoutPage() {
         const res = await fetch('/api/envio/cotizar', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ provincia, codigoPostal: cp }),
+          body: JSON.stringify({ provincia, codigoPostal: cp, subtotal }),
         })
         const data = await res.json()
         if (!cancelado) setEnvio(data.ok ? data : null)
@@ -142,7 +142,10 @@ export default function CheckoutPage() {
       cancelado = true
       clearTimeout(t)
     }
-  }, [provincia, codigoPostal, soloDigital])
+    // `subtotal` entra en las dependencias porque de él depende la promo de envío gratis: si
+    // cambia el carrito hay que volver a preguntar, o el envío quedaría gratis (o cobrado) por
+    // un monto que ya no es el que se va a pagar.
+  }, [provincia, codigoPostal, soloDigital, subtotal])
 
   // El carrito vive en localStorage: hasta montar en el cliente no sabemos qué tiene, y sin
   // este guard el checkout diría "carrito vacío" aunque haya productos.

@@ -16,7 +16,10 @@ export async function GET() {
       ...z,
       codigosPostales: z.codigosPostales.join(', '),
       cobertura: describirCobertura(z),
+      // `esDescarte` es "no se le elige región ni se borra"; `fija` es "no se arrastra". Solo
+      // "Resto del país" es las dos cosas: el descarte bonaerense sí se ordena a mano.
       esDescarte: z.tipo !== 'normal',
+      fija: z.tipo === 'resto-pais',
     })),
     provincias: PROVINCIAS.map((p) => ({ slug: slugProvincia(p), nombre: p })),
   })
@@ -56,9 +59,9 @@ export async function PATCH(request: Request) {
   }
 
   const zonas = await leerZonas()
-  const movibles = new Set(zonas.filter((z) => z.tipo === 'normal').map((z) => z.id))
+  const movibles = new Set(zonas.filter((z) => z.tipo !== 'resto-pais').map((z) => z.id))
 
-  // Los descartes no se mueven: su lugar es el final, y arriba taparían a todo lo demás.
+  // "Resto del país" no se mueve: cubre todo lo que sobra, así que arriba taparía al resto.
   const aGuardar = ids.filter((id) => movibles.has(id))
 
   for (let i = 0; i < aGuardar.length; i++) {
@@ -69,10 +72,8 @@ export async function PATCH(request: Request) {
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  // Detrás de cualquier zona propia, y en su orden fijo entre sí.
-  for (const [tipo, posicion] of [['resto-bsas', 9000], ['resto-pais', 9001]] as const) {
-    await auth.db.from('envio_zonas').update({ orden: posicion }).eq('tipo', tipo)
-  }
+  // Detrás de cualquier otra zona, pase lo que pase con el resto del orden.
+  await auth.db.from('envio_zonas').update({ orden: 9001 }).eq('tipo', 'resto-pais')
 
   return NextResponse.json({ ok: true, guardadas: aGuardar.length })
 }

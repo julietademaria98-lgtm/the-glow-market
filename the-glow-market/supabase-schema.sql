@@ -117,6 +117,10 @@ create table envio_zonas (
   provincias       text[] not null default '{}',
   -- Si tiene, la zona cubre solo esos CP dentro de sus provincias.
   codigos_postales text[],
+  -- Promo de envío gratis: con `envio_gratis` prendido, el envío sale 0 cuando la compra llega
+  -- a `envio_gratis_desde`. En 0 cualquier compra lo alcanza, o sea gratis siempre.
+  envio_gratis       boolean not null default false,
+  envio_gratis_desde decimal(10,2) not null default 0,
   orden            int not null default 0,
   created_at       timestamptz default now(),
   updated_at       timestamptz default now()

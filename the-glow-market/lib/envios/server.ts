@@ -27,6 +27,8 @@ interface FilaZona {
   tipo: string | null
   provincias: string[] | null
   codigos_postales: string[] | null
+  envio_gratis: boolean | null
+  envio_gratis_desde: string | number | null
 }
 
 /** Pasa una fila de `envio_zonas` al tipo que entiende el matcheo. */
@@ -40,6 +42,8 @@ export function filaAZona(fila: FilaZona): Zona {
     tipo: (fila.tipo ?? 'normal') as TipoZona,
     provincias: fila.provincias ?? [],
     codigosPostales: fila.codigos_postales ?? [],
+    envioGratis: Boolean(fila.envio_gratis),
+    envioGratisDesde: Number(fila.envio_gratis_desde) || 0,
   }
 }
 
@@ -59,11 +63,12 @@ export function servicio() {
   )
 }
 
-const COLUMNAS = 'id, nombre, descripcion, precio, activo, tipo, provincias, codigos_postales'
+const COLUMNAS =
+  'id, nombre, descripcion, precio, activo, tipo, provincias, codigos_postales, envio_gratis, envio_gratis_desde'
 
 /**
  * Todas las zonas en el orden en que se evalúan: el que definió el admin arrastrándolas, con
- * los dos descartes al final. `created_at` solo desempata zonas que quedaron con el mismo
+ * "Resto del país" al final. `created_at` solo desempata zonas que quedaron con el mismo
  * número de orden.
  */
 export async function leerZonas(): Promise<Zona[]> {
@@ -78,9 +83,10 @@ export async function leerZonas(): Promise<Zona[]> {
     return []
   }
 
+  // "Resto del país" va al final aunque su `orden` diga otra cosa: cubre todo lo que sobra, así
+  // que en cualquier otra posición dejaría sin efecto a las zonas de abajo.
   const zonas = (data || []).map(filaAZona)
-  const nivel = (z: Zona) => (z.tipo === 'resto-pais' ? 2 : z.tipo === 'resto-bsas' ? 1 : 0)
-  return zonas.sort((a, b) => nivel(a) - nivel(b))
+  return zonas.sort((a, b) => Number(a.tipo === 'resto-pais') - Number(b.tipo === 'resto-pais'))
 }
 
 /**
@@ -88,12 +94,16 @@ export async function leerZonas(): Promise<Zona[]> {
  * el checkout (para mostrar) como create-preference (para cobrar), así que lo que se muestra y
  * lo que se cobra no pueden separarse.
  *
+ * `subtotal` es lo que suman los productos del carrito, y solo se usa para la promo de envío
+ * gratis. Va en 0 por defecto porque una zona sin promo no lo mira.
+ *
  * Nunca inventa un precio: si la zona no está configurada devuelve `disponible: false` en
  * lugar de caer en un valor por defecto.
  */
 export async function cotizarEnvio(
   provincia: string,
   codigoPostal: string,
+  subtotal = 0,
 ): Promise<EnvioCotizado> {
   const zonas = await leerZonas()
   const zona = resolverZona(provincia, codigoPostal, zonas)
@@ -102,11 +112,13 @@ export async function cotizarEnvio(
     return { ...NO_DISPONIBLE, zonaId: zona?.id ?? null }
   }
 
+  const gratis = zona.envioGratis && subtotal >= zona.envioGratisDesde
+
   return {
     disponible: true,
     zonaId: zona.id,
     nombre: zona.nombre,
     descripcion: zona.descripcion,
-    precio: zona.precio,
+    precio: gratis ? 0 : zona.precio,
   }
 }
