@@ -1,9 +1,11 @@
 import { createClient as createServiceClient } from '@supabase/supabase-js'
+import { updateEstadoOrden } from '@/lib/admin/actions'
 import type { Orden } from '@/types'
 import GenerarEnvioButton from '@/components/admin/GenerarEnvioButton'
 
 type EstadoEnvio = 'pendiente' | 'creado' | 'error'
 interface EnvioResumen { estado: EstadoEnvio; numero: string | null }
+type OrdenConEmail = Orden & { userEmail: string | null }
 
 function serviceClient() {
   return createServiceClient(
@@ -12,13 +14,18 @@ function serviceClient() {
   )
 }
 
-async function getOrdenes(): Promise<Orden[]> {
-  const { data } = await serviceClient()
-    .from('ordenes')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(100)
-  return (data || []) as Orden[]
+async function getOrdenes(): Promise<OrdenConEmail[]> {
+  const db = serviceClient()
+  const [ordenesRes, { data: authData }] = await Promise.all([
+    db.from('ordenes').select('*').order('created_at', { ascending: false }).limit(100),
+    db.auth.admin.listUsers(),
+  ])
+  const users = authData?.users || []
+  const ordenes = (ordenesRes.data || []) as Orden[]
+  return ordenes.map((o) => ({
+    ...o,
+    userEmail: users.find((u) => u.id === o.user_id)?.email || null,
+  }))
 }
 
 // Mapa orden_id -> mejor envío (prefiere 'creado', si no el más reciente).
@@ -88,7 +95,7 @@ export default async function AdminOrdenesPage() {
                       <p className="font-montserrat text-[9px] text-gray-400">{o.datos_envio.email}</p>
                     </div>
                   ) : (
-                    <span className="font-montserrat text-[10px] text-gray-400">—</span>
+                    <p className="font-montserrat text-[9px] text-gray-400">{o.userEmail || '—'}</p>
                   )}
                 </td>
                 <td className="px-4 py-3">
@@ -104,9 +111,21 @@ export default async function AdminOrdenesPage() {
                   ${o.total.toLocaleString('es-AR')}
                 </td>
                 <td className="px-4 py-3">
-                  <span className={`px-2 py-1 rounded font-montserrat text-[9px] tracking-wide uppercase ${ESTADO_COLORS[o.estado] || 'bg-gray-100 text-gray-400'}`}>
-                    {o.estado}
-                  </span>
+                  <form action={updateEstadoOrden.bind(null, o.id)} className="flex items-center gap-2">
+                    <select
+                      name="estado"
+                      defaultValue={o.estado}
+                      className={`text-[9px] font-montserrat tracking-wide uppercase rounded px-2 py-1 border border-gray-200 cursor-pointer ${ESTADO_COLORS[o.estado] || 'bg-white text-gray-400'}`}
+                    >
+                      <option value="pendiente">Pendiente</option>
+                      <option value="aprobado">Aprobado</option>
+                      <option value="en_proceso">En proceso</option>
+                      <option value="rechazado">Rechazado</option>
+                    </select>
+                    <button type="submit" className="font-montserrat text-[9px] text-glow-navy hover:underline">
+                      ✓
+                    </button>
+                  </form>
                 </td>
                 <td className="px-4 py-3">
                   {o.datos_envio ? (
