@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import StarIcon from '@/components/ui/StarIcon'
-import LogoutButton from '@/components/ui/LogoutButton'
 import type { Curso } from '@/types'
 
 async function getMisCursos(userId: string): Promise<Curso[]> {
@@ -44,14 +43,11 @@ export default async function MiCursoPage() {
       <div className="max-w-[1200px] mx-auto px-6 py-12">
         {/* Header */}
         <div className="mb-10">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-3">
-              <StarIcon size={10} className="text-glow-navy" />
-              <span className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-navy/60">
-                Mi espacio
-              </span>
-            </div>
-            <LogoutButton />
+          <div className="flex items-center gap-3 mb-2">
+            <StarIcon size={10} className="text-glow-navy" />
+            <span className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-navy/60">
+              Mi espacio
+            </span>
           </div>
           <h1 className="font-cormorant text-4xl md:text-5xl text-glow-navy font-light tracking-wide">
             Hola, {nombreCapitalizado}
