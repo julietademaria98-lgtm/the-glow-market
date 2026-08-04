@@ -4,7 +4,7 @@ import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { sendOrderConfirmation } from '@/lib/email'
+import { sendOrderConfirmation, sendSeguimientoEmail } from '@/lib/email'
 
 const ADMIN_EMAIL = 'julietademaria98@gmail.com'
 
@@ -30,12 +30,9 @@ function toSlug(nombre: string) {
     .replace(/[^a-z0-9-]/g, '')
 }
 
-// ============ PRODUCTOS ============
-
 export async function createProducto(formData: FormData) {
   const db = await checkAdmin()
   const nombre = formData.get('nombre') as string
-
   const { data, error } = await db.from('productos').insert({
     nombre,
     slug: toSlug(nombre) + '-' + Date.now(),
@@ -49,19 +46,11 @@ export async function createProducto(formData: FormData) {
     activo: formData.get('activo') === 'on',
     destacado: formData.get('destacado') === 'on',
   }).select().single()
-
   if (error) throw new Error(error.message)
-
   const imageUrl = formData.get('imagen_url') as string
   if (imageUrl) {
-    await db.from('producto_imagenes').insert({
-      producto_id: data.id,
-      url: imageUrl,
-      orden: 0,
-      es_principal: true,
-    })
+    await db.from('producto_imagenes').insert({ producto_id: data.id, url: imageUrl, orden: 0, es_principal: true })
   }
-
   revalidatePath('/admin/productos')
   revalidatePath('/productos')
   redirect('/admin/productos')
@@ -69,7 +58,6 @@ export async function createProducto(formData: FormData) {
 
 export async function updateProducto(id: string, formData: FormData) {
   const db = await checkAdmin()
-
   const { error } = await db.from('productos').update({
     nombre: formData.get('nombre') as string,
     descripcion: (formData.get('descripcion') as string) || null,
@@ -82,20 +70,12 @@ export async function updateProducto(id: string, formData: FormData) {
     activo: formData.get('activo') === 'on',
     destacado: formData.get('destacado') === 'on',
   }).eq('id', id)
-
   if (error) throw new Error(error.message)
-
   const imageUrl = formData.get('imagen_url') as string
   if (imageUrl) {
     await db.from('producto_imagenes').delete().eq('producto_id', id)
-    await db.from('producto_imagenes').insert({
-      producto_id: id,
-      url: imageUrl,
-      orden: 0,
-      es_principal: true,
-    })
+    await db.from('producto_imagenes').insert({ producto_id: id, url: imageUrl, orden: 0, es_principal: true })
   }
-
   revalidatePath('/admin/productos')
   revalidatePath('/productos')
   redirect('/admin/productos')
@@ -119,11 +99,8 @@ export async function toggleActivoFromForm(formData: FormData) {
   revalidatePath('/productos')
 }
 
-// ============ CURSOS ============
-
 export async function updateCurso(id: string, formData: FormData) {
   const db = await checkAdmin()
-
   const { error } = await db.from('cursos').update({
     titulo: formData.get('titulo') as string,
     descripcion: (formData.get('descripcion') as string) || null,
@@ -133,7 +110,6 @@ export async function updateCurso(id: string, formData: FormData) {
     imagen_url: (formData.get('imagen_url') as string) || null,
     activo: formData.get('activo') === 'on',
   }).eq('id', id)
-
   if (error) throw new Error(error.message)
   revalidatePath('/admin/cursos')
   revalidatePath('/cursos')
@@ -142,7 +118,6 @@ export async function updateCurso(id: string, formData: FormData) {
 
 export async function updateLeccion(id: string, formData: FormData) {
   const db = await checkAdmin()
-
   const { error } = await db.from('lecciones').update({
     titulo: formData.get('titulo') as string,
     descripcion: (formData.get('descripcion') as string) || null,
@@ -152,7 +127,6 @@ export async function updateLeccion(id: string, formData: FormData) {
     modulo: (formData.get('modulo') as string) || null,
     es_preview: formData.get('es_preview') === 'on',
   }).eq('id', id)
-
   if (error) throw new Error(error.message)
   revalidatePath('/admin/cursos')
 }
@@ -168,11 +142,7 @@ export async function grantAccesoFromForm(formData: FormData) {
     if (!user) throw new Error(`No existe una cuenta con el email ${input}`)
     userId = user.id
   }
-  await db.from('accesos_curso').upsert({
-    user_id: userId,
-    curso_id: cursoId,
-    activo: true,
-  }, { onConflict: 'user_id,curso_id' })
+  await db.from('accesos_curso').upsert({ user_id: userId, curso_id: cursoId, activo: true }, { onConflict: 'user_id,curso_id' })
   revalidatePath('/admin/cursos')
 }
 
@@ -181,8 +151,6 @@ export async function revokeAcceso(id: string) {
   await db.from('accesos_curso').update({ activo: false }).eq('id', id)
   revalidatePath('/admin/cursos')
 }
-
-// ============ ORDENES ============
 
 export async function updateEstadoOrden(id: string, formData: FormData) {
   const db = await checkAdmin()
@@ -200,37 +168,46 @@ export async function updateEstadoEnvio(id: string, formData: FormData) {
 
 export async function resendOrderEmail(id: string) {
   const db = await checkAdmin()
-
   const { data: orden } = await db.from('ordenes').select('*').eq('id', id).single()
   if (!orden) throw new Error('Orden no encontrada')
-
   let usuarioEmail: string | undefined
   let usuarioNombre: string | undefined
-
   if (orden.user_id) {
     const { data: usuario } = await db.auth.admin.getUserById(orden.user_id)
     usuarioEmail = usuario?.user?.email
     usuarioNombre = usuario?.user?.user_metadata?.nombre
   }
-
   const email = usuarioEmail || orden.datos_envio?.email
   if (!email) throw new Error('No se encontró email para esta orden')
-
   const nombreCliente = usuarioNombre || orden.datos_envio?.nombre || email.split('@')[0]
-
-  const cursosIds = new Set(
-    (await db.from('cursos').select('id')).data?.map((c: any) => c.id) || []
-  )
+  const cursosIds = new Set((await db.from('cursos').select('id')).data?.map((c: any) => c.id) || [])
   const hasCurso = (orden.items || []).some((item: any) => cursosIds.has(item.id))
   const hasProductoFisico = (orden.items || []).some((item: any) => !cursosIds.has(item.id))
+  await sendOrderConfirmation({ to: email, nombreCliente, ordenId: orden.id, items: orden.items || [], total: orden.total || 0, hasCurso, hasProductoFisico })
+}
 
-  await sendOrderConfirmation({
-    to: email,
-    nombreCliente,
-    ordenId: orden.id,
-    items: orden.items || [],
-    total: orden.total || 0,
-    hasCurso,
-    hasProductoFisico,
-  })
+export async function guardarSeguimiento(id: string, formData: FormData) {
+  const db = await checkAdmin()
+  const numeroSeguimiento = (formData.get('numero_seguimiento') as string).trim()
+  if (!numeroSeguimiento) return
+  const { data: orden } = await db
+    .from('ordenes')
+    .update({ numero_seguimiento: numeroSeguimiento, estado_envio: 'despachado' })
+    .eq('id', id)
+    .select()
+    .single()
+  if (!orden) throw new Error('Orden no encontrada')
+  let usuarioEmail: string | undefined
+  let usuarioNombre: string | undefined
+  if (orden.user_id) {
+    const { data: usuario } = await db.auth.admin.getUserById(orden.user_id)
+    usuarioEmail = usuario?.user?.email
+    usuarioNombre = usuario?.user?.user_metadata?.nombre
+  }
+  const email = usuarioEmail || orden.datos_envio?.email
+  if (email) {
+    const nombreCliente = usuarioNombre || orden.datos_envio?.nombre || email.split('@')[0]
+    await sendSeguimientoEmail({ to: email, nombreCliente, ordenId: orden.id, numeroSeguimiento })
+  }
+  revalidatePath('/admin/ordenes')
 }
