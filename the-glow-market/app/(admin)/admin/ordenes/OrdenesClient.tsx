@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { updateEstadoEnvio } from '@/lib/admin/actions'
+import { updateEstadoEnvio, resendOrderEmail } from '@/lib/admin/actions'
 
 interface DatosEnvio {
   nombre: string
@@ -48,6 +48,30 @@ function CopiarBtn({ texto }: { texto: string }) {
       className="font-montserrat text-[9px] tracking-widest uppercase text-glow-navy/50 hover:text-glow-navy border border-glow-navy/20 px-2 py-1 transition-colors"
     >
       {copiado ? '✓ Copiado' : 'Copiar para Andreani'}
+    </button>
+  )
+}
+
+function ReenviarEmailBtn({ ordenId }: { ordenId: string }) {
+  const [estado, setEstado] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle')
+  const handleClick = async () => {
+    setEstado('loading')
+    try {
+      await resendOrderEmail(ordenId)
+      setEstado('ok')
+      setTimeout(() => setEstado('idle'), 3000)
+    } catch {
+      setEstado('error')
+      setTimeout(() => setEstado('idle'), 3000)
+    }
+  }
+  return (
+    <button
+      onClick={handleClick}
+      disabled={estado === 'loading'}
+      className="font-montserrat text-[9px] tracking-widest uppercase text-glow-navy/50 hover:text-glow-navy border border-glow-navy/20 px-2 py-1 transition-colors disabled:opacity-40"
+    >
+      {estado === 'loading' ? 'Enviando...' : estado === 'ok' ? '✓ Email enviado' : estado === 'error' ? 'Error al enviar' : 'Reenviar email'}
     </button>
   )
 }
@@ -166,14 +190,16 @@ export default function OrdenesClient({ ordenes }: { ordenes: Orden[] }) {
                             <span className="font-montserrat text-[10px] text-gray-700 text-right">{value}</span>
                           </div>
                         ))}
-                        {direccionCompleta && (
-                          <div className="pt-3">
-                            <CopiarBtn texto={direccionCompleta} />
-                          </div>
-                        )}
+                        <div className="pt-3 flex gap-2">
+                          {direccionCompleta && <CopiarBtn texto={direccionCompleta} />}
+                          <ReenviarEmailBtn ordenId={o.id} />
+                        </div>
                       </div>
                     ) : (
-                      <p className="font-montserrat text-[10px] text-gray-400">Producto digital — sin dirección</p>
+                      <div className="space-y-3">
+                        <p className="font-montserrat text-[10px] text-gray-400">Producto digital — sin dirección</p>
+                        <ReenviarEmailBtn ordenId={o.id} />
+                      </div>
                     )}
                   </div>
 
