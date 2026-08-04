@@ -111,10 +111,16 @@ export async function POST(request: Request) {
     // Enviar email de confirmación
     try {
       const { data: usuario } = await adminClient.auth.admin.getUserById(orden.user_id || '')
-      const email = usuario?.user?.email || payment.payer?.email
+      const email =
+        usuario?.user?.email ||
+        payment.payer?.email ||
+        orden.datos_envio?.email
 
       if (email) {
-        const nombreCliente = usuario?.user?.user_metadata?.nombre || email.split('@')[0]
+        const nombreCliente =
+          usuario?.user?.user_metadata?.nombre ||
+          orden.datos_envio?.nombre ||
+          email.split('@')[0]
 
         const cursosIds = new Set(
           (await adminClient.from('cursos').select('id')).data?.map((c: any) => c.id) || []
