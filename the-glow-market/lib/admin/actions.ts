@@ -4,6 +4,7 @@ import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { sendOrderConfirmation } from '@/lib/email'
 
 const ADMIN_EMAIL = 'julietademaria98@gmail.com'
 
@@ -195,4 +196,39 @@ export async function updateEstadoEnvio(id: string, formData: FormData) {
   const estado_envio = formData.get('estado_envio') as string
   await db.from('ordenes').update({ estado_envio }).eq('id', id)
   revalidatePath('/admin/ordenes')
+}
+
+export async function resendOrderEmail(id: string) {
+  const db = await checkAdmin()
+
+  const { data: orden } = await db.from('ordenes').select('*').eq('id', id).single()
+  if (!orden) throw new Error('Orden no encontrada')
+
+  const { data: usuario } = await db.auth.admin.getUserById(orden.user_id || '')
+  const email =
+    usuario?.user?.email ||
+    orden.datos_envio?.email
+
+  if (!email) throw new Error('No se encontró email para esta orden')
+
+  const nombreCliente =
+    usuario?.user?.user_metadata?.nombre ||
+    orden.datos_envio?.nombre ||
+    email.split('@')[0]
+
+  const cursosIds = new Set(
+    (await db.from('cursos').select('id')).data?.map((c: any) => c.id) || []
+  )
+  const hasCurso = (orden.items || []).some((item: any) => cursosIds.has(item.id))
+  const hasProductoFisico = (orden.items || []).some((item: any) => !cursosIds.has(item.id))
+
+  await sendOrderConfirmation({
+    to: email,
+    nombreCliente,
+    ordenId: orden.id,
+    items: orden.items || [],
+    total: orden.total || 0,
+    hasCurso,
+    hasProductoFisico,
+  })
 }
