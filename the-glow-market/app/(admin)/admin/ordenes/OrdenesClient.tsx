@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { updateEstadoEnvio } from '@/lib/admin/actions'
 
 interface DatosEnvio {
   nombre: string
@@ -18,6 +19,7 @@ interface Orden {
   id: string
   created_at: string
   estado: string
+  estado_envio: string | null
   total: number
   costo_envio: number
   items: { nombre: string; cantidad: number; precio: number }[]
@@ -90,7 +92,7 @@ export default function OrdenesClient({ ordenes }: { ordenes: Orden[] }) {
           return (
             <div key={o.id} className="bg-white rounded shadow-sm overflow-hidden">
               <div
-                className="grid grid-cols-[auto_1fr_auto_auto_auto] gap-4 items-center px-5 py-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                className="grid grid-cols-[auto_1fr_auto_auto_auto_auto] gap-4 items-center px-5 py-4 cursor-pointer hover:bg-gray-50 transition-colors"
                 onClick={() => setExpandida(expandida === o.id ? null : o.id)}
               >
                 <div>
@@ -121,6 +123,20 @@ export default function OrdenesClient({ ordenes }: { ordenes: Orden[] }) {
                 <span className={`font-montserrat text-[9px] tracking-widest uppercase px-3 py-1 rounded-full ${ESTADO_COLORS[o.estado] || 'bg-gray-100 text-gray-500'}`}>
                   {o.estado}
                 </span>
+
+                <form action={updateEstadoEnvio.bind(null, o.id)} onClick={e => e.stopPropagation()}>
+                  <select
+                    name="estado_envio"
+                    defaultValue={o.estado_envio || 'pendiente'}
+                    onChange={e => e.currentTarget.form?.requestSubmit()}
+                    className="font-montserrat text-[9px] tracking-wide uppercase rounded px-2 py-1 border border-gray-200 cursor-pointer bg-white text-gray-600"
+                  >
+                    <option value="pendiente">Pendiente</option>
+                    <option value="generado">Generado</option>
+                    <option value="despachado">Despachado</option>
+                    <option value="recibido">Recibido</option>
+                  </select>
+                </form>
 
                 <span className="text-gray-300 text-xs">{expandida === o.id ? '▲' : '▼'}</span>
               </div>
