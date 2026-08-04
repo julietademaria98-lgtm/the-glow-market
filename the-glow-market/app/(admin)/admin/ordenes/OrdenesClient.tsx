@@ -8,6 +8,7 @@ interface DatosEnvio {
   apellido: string
   email: string
   telefono: string
+  dni?: string
   direccion?: string
   ciudad?: string
   provincia?: string
@@ -86,7 +87,7 @@ export default function OrdenesClient({ ordenes }: { ordenes: Orden[] }) {
         {ordenesFiltradas.map(o => {
           const d = o.datos_envio
           const direccionCompleta = d?.direccion
-            ? `${d.nombre} ${d.apellido}\n${d.direccion}\n${d.ciudad}, ${d.provincia} (${d.codigo_postal})\nTel: ${d.telefono}\nEmail: ${d.email}`
+            ? `${d.nombre} ${d.apellido}\nDNI: ${d.dni || '—'}\n${d.direccion}\n${d.ciudad}, ${d.provincia} (${d.codigo_postal})\nTel: ${d.telefono}\nEmail: ${d.email}`
             : ''
 
           return (
@@ -149,6 +150,7 @@ export default function OrdenesClient({ ordenes }: { ordenes: Orden[] }) {
                       <div className="space-y-1.5">
                         {[
                           ['Nombre', `${d.nombre} ${d.apellido}`],
+                          ['DNI', d.dni ?? '—'],
                           ['Email', d.email],
                           ['Teléfono', d.telefono],
                           ...(d.direccion ? [
