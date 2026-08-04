@@ -28,8 +28,8 @@ export async function sendOrderConfirmation({
   hasProductoFisico = true,
 }: SendOrderConfirmationParams) {
   const subject = hasCurso && !hasProductoFisico
-    ? '¡Tu curso está listo! ✨ The Glow Market'
-    : '¡Tu pedido está confirmado! ✨ The Glow Market'
+    ? '¡Tu curso está listo! ✦ The Glow Market'
+    : 'Tu pedido está en camino ✦ The Glow Market'
 
   const itemsHtml = items
     .map((item) => `
@@ -44,19 +44,16 @@ export async function sendOrderConfirmation({
     .join('')
 
   const cursoSection = hasCurso ? `
-    <div style="background: #1a2340; padding: 24px 32px; margin-bottom: 32px; border-radius: 2px; text-align: center;">
+    <div style="background: #192149; padding: 24px 32px; margin-bottom: 32px; border-radius: 2px; text-align: center;">
       <p style="font-family: 'Georgia', serif; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #e8b4b8; margin: 0 0 8px 0;">
         Tu curso está disponible ahora
       </p>
-      <p style="font-family: 'Georgia', serif; font-size: 22px; font-weight: 300; color: #ffffff; margin: 0 0 12px 0;">
+      <p style="font-family: 'Georgia', serif; font-size: 20px; font-weight: 300; color: #ffffff; margin: 0 0 20px 0;">
         Accedé cuando quieras, de por vida.
       </p>
-      <p style="font-family: 'Georgia', serif; font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.7; margin: 0 0 24px 0;">
-        Para ingresar al curso, entrá a la web con el <strong style="color: #e8b4b8;">usuario y contraseña</strong> que creaste al momento de la compra. Tu contenido ya está listo para disfrutar.
-      </p>
-      <a href="https://theglowmarket.com.ar/login"
-        style="display: inline-block; background: #e8b4b8; color: #1a2340; font-family: 'Georgia', serif; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; padding: 14px 32px; text-decoration: none;">
-        Ingresar al curso →
+      <a href="https://theglowmarket.com.ar/mi-curso"
+        style="display: inline-block; background: #e9e2da; color: #192149; font-family: 'Georgia', serif; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; padding: 14px 32px; text-decoration: none;">
+        Ir a mi curso →
       </a>
     </div>
   ` : ''
@@ -74,14 +71,40 @@ export async function sendOrderConfirmation({
       </tr>
     </table>
     <div style="border-top: 1px solid #e8e0d8; margin: 32px 0;"></div>
-    <p style="font-size: 13px; color: #1a2340; opacity: 0.6; line-height: 1.7; margin: 0;">
-      Te avisaremos cuando tu pedido esté en camino. Si tenés alguna pregunta, respondé este mail o escribinos por Instagram.
+    <p style="font-size: 14px; color: #1a2340; line-height: 1.7; margin: 0 0 24px 0;">
+      Pronto va a estar en tus manos.
     </p>
-  ` : `
-    <p style="font-size: 13px; color: #1a2340; opacity: 0.6; line-height: 1.7; margin: 0;">
+    <p style="font-size: 13px; color: #1a2340; opacity: 0.6; line-height: 1.7; margin: 0 0 32px 0;">
       Si tenés alguna pregunta, respondé este mail o escribinos por Instagram.
     </p>
+    <p style="font-size: 13px; color: #1a2340; line-height: 1.6; margin: 0;">
+      Own Your Glow,<br/>
+      <span style="font-style: italic;">Nina - The Glow Market Team</span>
+    </p>
+  ` : `
+    <p style="font-size: 13px; color: #1a2340; opacity: 0.6; line-height: 1.7; margin: 0 0 32px 0;">
+      Si tenés alguna pregunta, respondé este mail o escribinos por Instagram.
+    </p>
+    <p style="font-size: 13px; color: #1a2340; line-height: 1.6; margin: 0;">
+      Own Your Glow,<br/>
+      <span style="font-style: italic;">Nina - The Glow Market Team</span>
+    </p>
   `
+
+  const introText = hasCurso && !hasProductoFisico
+    ? `
+      <p style="font-size: 14px; color: #1a2340; opacity: 0.7; margin: 0 0 16px 0; line-height: 1.6;">
+        Tu compra fue confirmada. Ya podés acceder a tu curso.
+      </p>
+      <p style="font-size: 14px; color: #1a2340; opacity: 0.7; margin: 0 0 32px 0; line-height: 1.6;">
+        Acordate que tenés que iniciar sesión con el mismo mail y contraseña que te creaste, ¡y listo! Ya podés comenzar a disfrutar el curso.
+      </p>
+    `
+    : `
+      <p style="font-size: 14px; color: #1a2340; opacity: 0.7; margin: 0 0 32px 0; line-height: 1.6;">
+        Recibimos tu pedido y ya está siendo preparado. Gracias por ser parte del glow team.
+      </p>
+    `
 
   await resend.emails.send({
     from: 'The Glow Market <hola@theglowmarket.com.ar>',
@@ -102,21 +125,15 @@ export async function sendOrderConfirmation({
 
     <div style="background: #ffffff; padding: 48px 40px; border-radius: 2px;">
       <p style="font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #1a2340; opacity: 0.5; margin: 0 0 16px 0;">
-        Confirmación de compra
-      </p>
-      <h1 style="font-size: 28px; font-weight: 300; color: #1a2340; margin: 0 0 8px 0; letter-spacing: 0.05em;">
-        Hola, ${nombreCliente}
-      </h1>
-      <p style="font-size: 14px; color: #1a2340; opacity: 0.6; margin: 0 0 32px 0; line-height: 1.6;">
-        ${hasCurso && !hasProductoFisico
-          ? 'Tu compra fue confirmada. Ya podés acceder a tu curso.'
-          : 'Recibimos tu pedido y ya está siendo preparado con todo el cuidado que merece.'}
-      </p>
-
-      <div style="border-top: 1px solid #e8e0d8; margin-bottom: 24px;"></div>
-      <p style="font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #1a2340; opacity: 0.4; margin: 0 0 24px 0;">
         Pedido #${ordenId.slice(0, 8).toUpperCase()}
       </p>
+      <h1 style="font-size: 28px; font-weight: 300; color: #1a2340; margin: 0 0 16px 0; letter-spacing: 0.05em;">
+        Hola, ${nombreCliente}
+      </h1>
+
+      ${introText}
+
+      <div style="border-top: 1px solid #e8e0d8; margin-bottom: 24px;"></div>
 
       ${cursoSection}
       ${productosSection}
