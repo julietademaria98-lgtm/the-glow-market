@@ -79,22 +79,8 @@ function ReenviarEmailBtn({ ordenId }: { ordenId: string }) {
 export default function OrdenesClient({ ordenes }: { ordenes: Orden[] }) {
   const [filtro, setFiltro] = useState<'todas' | 'aprobado' | 'pendiente'>('todas')
   const [expandida, setExpandida] = useState<string | null>(null)
-  const [busqueda, setBusqueda] = useState('')
 
-  const ordenesFiltradas = ordenes
-    .filter(o => filtro === 'todas' || o.estado === filtro)
-    .filter(o => {
-      if (!busqueda.trim()) return true
-      const q = busqueda.toLowerCase()
-      const d = o.datos_envio
-      return (
-        o.id.slice(0, 8).toLowerCase().includes(q) ||
-        (d?.nombre + ' ' + d?.apellido).toLowerCase().includes(q) ||
-        d?.email?.toLowerCase().includes(q) ||
-        o.userEmail?.toLowerCase().includes(q)
-      )
-    })
-
+  const ordenesFiltradas = filtro === 'todas' ? ordenes : ordenes.filter(o => o.estado === filtro)
   const totalAprobado = ordenes.filter(o => o.estado === 'aprobado').reduce((sum, o) => sum + o.total, 0)
 
   return (
@@ -105,16 +91,6 @@ export default function OrdenesClient({ ordenes }: { ordenes: Orden[] }) {
           <p className="font-montserrat text-[9px] tracking-widest uppercase text-gray-400">Total aprobado</p>
           <p className="font-cormorant text-2xl text-glow-navy">${totalAprobado.toLocaleString('es-AR')}</p>
         </div>
-      </div>
-
-      <div className="flex gap-3 mb-6">
-        <input
-          type="text"
-          value={busqueda}
-          onChange={e => setBusqueda(e.target.value)}
-          placeholder="Buscar por nombre, email o número de pedido..."
-          className="flex-1 border border-gray-200 px-4 py-2 font-montserrat text-xs text-gray-700 placeholder:text-gray-300 outline-none focus:border-glow-navy/40 transition-colors bg-white"
-        />
       </div>
 
       <div className="flex gap-2 mb-6">
@@ -267,9 +243,7 @@ export default function OrdenesClient({ ordenes }: { ordenes: Orden[] }) {
 
         {ordenesFiltradas.length === 0 && (
           <div className="text-center py-16 bg-white rounded shadow-sm">
-            <p className="font-montserrat text-sm text-gray-400">
-              {busqueda ? 'No se encontraron órdenes' : 'No hay órdenes'}
-            </p>
+            <p className="font-montserrat text-sm text-gray-400">No hay órdenes</p>
           </div>
         )}
       </div>
