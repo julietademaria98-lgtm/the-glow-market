@@ -9,16 +9,9 @@ import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [user, setUser] = useState<User | null>(null)
   const itemCount = useCartStore((state) => state.itemCount())
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50)
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
 
   useEffect(() => {
     const supabase = createClient()
@@ -35,22 +28,16 @@ export default function Navbar() {
     window.location.href = '/'
   }
 
-  const navLinkClass = `nav-link transition-colors duration-300 ${!scrolled ? 'text-white/90 hover:text-white' : ''}`
-
   return (
     <>
-      <nav
-        className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-          scrolled ? 'bg-glow-cream shadow-sm' : 'bg-transparent'
-        }`}
-      >
+      <nav className="fixed top-0 w-full z-50 bg-glow-cream shadow-sm">
         <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
           {/* LEFT LINKS — desktop */}
           <div className="hidden md:flex gap-8">
-            <Link href="/productos" className={navLinkClass}>
+            <Link href="/productos" className="nav-link">
               Market
             </Link>
-            <Link href="/cursos" className={navLinkClass}>
+            <Link href="/cursos" className="nav-link">
               Cursos Online
             </Link>
           </div>
@@ -58,9 +45,7 @@ export default function Navbar() {
           {/* CENTER LOGO */}
           <Link
             href="/"
-            className={`hidden md:block absolute left-1/2 -translate-x-1/2 whitespace-nowrap transition-all duration-500 ${
-              scrolled ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
-            }`}
+            className="hidden md:block absolute left-1/2 -translate-x-1/2 whitespace-nowrap"
           >
             <span className="font-cormorant text-xl md:text-2xl tracking-widest text-glow-navy font-light select-none">
               THE{' '}
@@ -71,7 +56,7 @@ export default function Navbar() {
 
           {/* RIGHT ACTIONS — desktop */}
           <div className="hidden md:flex gap-6 items-center">
-            <Link href="/carrito" className={`relative ${navLinkClass}`}>
+            <Link href="/carrito" className="relative nav-link">
               Carrito
               {itemCount > 0 && (
                 <span className="absolute -top-2 -right-4 bg-glow-navy text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-montserrat">
@@ -83,7 +68,7 @@ export default function Navbar() {
             <div className="relative group">
               <Link
                 href={user ? '/mi-curso' : '/login?redirect=%2Fmi-curso'}
-                className={navLinkClass}
+                className="nav-link"
               >
                 {user ? 'Mi Curso' : 'Mi Cuenta'}
               </Link>
