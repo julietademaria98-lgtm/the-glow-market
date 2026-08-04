@@ -19,6 +19,7 @@ interface Orden {
   created_at: string
   estado: string
   total: number
+  costo_envio: number
   items: { nombre: string; cantidad: number; precio: number }[]
   datos_envio: DatosEnvio | null
   userEmail?: string | null
@@ -167,6 +168,23 @@ export default function OrdenesClient({ ordenes }: { ordenes: Orden[] }) {
                           <span className="font-montserrat text-[10px] text-gray-400">${(item.precio * item.cantidad).toLocaleString('es-AR')}</span>
                         </div>
                       ))}
+                      {(() => {
+                        const subtotal = (o.items || []).reduce((acc: number, i: any) => acc + i.precio * i.cantidad, 0)
+                        const envio = o.total - subtotal
+                        if (envio > 0) return (
+                          <div className="flex justify-between">
+                            <span className="font-montserrat text-[10px] text-gray-500">Envío</span>
+                            <span className="font-montserrat text-[10px] text-gray-500">${envio.toLocaleString('es-AR')}</span>
+                          </div>
+                        )
+                        if (envio === 0 && o.datos_envio?.direccion) return (
+                          <div className="flex justify-between">
+                            <span className="font-montserrat text-[10px] text-gray-500">Envío</span>
+                            <span className="font-montserrat text-[10px] text-green-600">Gratis</span>
+                          </div>
+                        )
+                        return null
+                      })()}
                       <div className="border-t border-gray-200 pt-2 flex justify-between">
                         <span className="font-montserrat text-[10px] font-medium text-gray-700">Total</span>
                         <span className="font-montserrat text-[10px] font-medium text-gray-700">${o.total.toLocaleString('es-AR')}</span>
