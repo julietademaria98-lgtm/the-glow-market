@@ -1,226 +1,357 @@
 'use client'
 
-import { useState } from 'react'
-import { updateEstadoEnvio } from '@/lib/admin/actions'
+import { useState, useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useCartStore } from '@/store/cartStore'
+import { formatPrice } from '@/lib/utils'
+import { createClient } from '@/lib/supabase/client'
+import type { User } from '@supabase/supabase-js'
+import Image from 'next/image'
+import Link from 'next/link'
+import StarIcon from '@/components/ui/StarIcon'
+import Button from '@/components/ui/Button'
 
-interface DatosEnvio {
-  nombre: string
-  apellido: string
-  email: string
-  telefono: string
-  dni?: string
-  direccion?: string
-  ciudad?: string
-  provincia?: string
-  codigo_postal?: string
-  notas?: string
+const baseSchema = {
+  nombre: z.string().min(2, 'Requerido'),
+  apellido: z.string().min(2, 'Requerido'),
+  email: z.string().email('Email inválido'),
+  telefono: z.string().min(8, 'Teléfono inválido'),
+  dni: z.string().min(7, 'DNI inválido'),
 }
 
-interface Orden {
-  id: string
-  created_at: string
-  estado: string
-  estado_envio: string | null
-  total: number
-  costo_envio: number
-  items: { nombre: string; cantidad: number; precio: number }[]
-  datos_envio: DatosEnvio | null
-  userEmail?: string | null
-}
+const checkoutSchema = z.object({
+  ...baseSchema,
+  provincia: z.string().optional(),
+  ciudad: z.string().optional(),
+  direccion: z.string().optional(),
+  codigo_postal: z.string().optional(),
+  notas: z.string().optional(),
+})
 
-const ESTADO_COLORS: Record<string, string> = {
-  aprobado: 'bg-green-100 text-green-700',
-  pendiente: 'bg-yellow-100 text-yellow-700',
-  rechazado: 'bg-red-100 text-red-700',
-  en_proceso: 'bg-blue-100 text-blue-700',
-}
+const checkoutSchemaFisico = z.object({
+  ...baseSchema,
+  provincia: z.string().min(2, 'Requerido'),
+  ciudad: z.string().min(2, 'Requerido'),
+  direccion: z.string().min(5, 'Dirección inválida'),
+  codigo_postal: z.string().min(4, 'Código postal inválido'),
+  notas: z.string().optional(),
+})
 
-function CopiarBtn({ texto }: { texto: string }) {
-  const [copiado, setCopiado] = useState(false)
-  const copiar = () => {
-    navigator.clipboard.writeText(texto)
-    setCopiado(true)
-    setTimeout(() => setCopiado(false), 2000)
-  }
-  return (
-    <button
-      onClick={copiar}
-      className="font-montserrat text-[9px] tracking-widest uppercase text-glow-navy/50 hover:text-glow-navy border border-glow-navy/20 px-2 py-1 transition-colors"
-    >
-      {copiado ? '✓ Copiado' : 'Copiar para Andreani'}
-    </button>
-  )
-}
+type CheckoutForm = z.infer<typeof checkoutSchemaFisico>
 
-export default function OrdenesClient({ ordenes }: { ordenes: Orden[] }) {
-  const [filtro, setFiltro] = useState<'todas' | 'aprobado' | 'pendiente'>('todas')
-  const [expandida, setExpandida] = useState<string | null>(null)
+const PROVINCIAS = [
+  'Buenos Aires', 'CABA', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba',
+  'Corrientes', 'Entre Ríos', 'Formosa', 'Jujuy', 'La Pampa', 'La Rioja',
+  'Mendoza', 'Misiones', 'Neuquén', 'Río Negro', 'Salta', 'San Juan',
+  'San Luis', 'Santa Cruz', 'Santa Fe', 'Santiago del Estero',
+  'Tierra del Fuego', 'Tucumán',
+]
 
-  const ordenesFiltradas = filtro === 'todas' ? ordenes : ordenes.filter(o => o.estado === filtro)
-  const totalAprobado = ordenes.filter(o => o.estado === 'aprobado').reduce((sum, o) => sum + o.total, 0)
+const INPUT_CLASS =
+  'border border-glow-navy/20 focus:border-glow-navy outline-none px-4 py-3 font-montserrat text-sm text-glow-navy bg-transparent transition-colors duration-300 placeholder:text-glow-navy/30 w-full'
 
-  return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="font-cormorant text-3xl text-glow-navy font-light">Órdenes</h1>
-        <div className="text-right">
-          <p className="font-montserrat text-[9px] tracking-widest uppercase text-gray-400">Total aprobado</p>
-          <p className="font-cormorant text-2xl text-glow-navy">${totalAprobado.toLocaleString('es-AR')}</p>
+export default function CheckoutPage() {
+  const { items, total, clearCart } = useCartStore()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [user, setUser] = useState<User | null>(null)
+  const [checkingAuth, setCheckingAuth] = useState(true)
+
+  const soloDigital = items.length > 0 && items.every((i) => i.tipo === 'curso')
+  const hasCurso = items.some((i) => i.tipo === 'curso')
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user)
+      setCheckingAuth(false)
+    })
+  }, [])
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<CheckoutForm>({
+    resolver: zodResolver(soloDigital ? checkoutSchema : checkoutSchemaFisico),
+  })
+
+  if (items.length === 0) {
+    return (
+      <main className="min-h-screen bg-glow-cream pt-24 flex items-center justify-center">
+        <div className="text-center flex flex-col items-center gap-6 px-6">
+          <StarIcon size={40} className="text-glow-navy/20" />
+          <p className="font-cormorant text-3xl text-glow-navy/40">
+            No hay productos en tu carrito
+          </p>
+          <Link href="/productos">
+            <Button variant="primary" size="md">Ver Tienda</Button>
+          </Link>
         </div>
-      </div>
+      </main>
+    )
+  }
 
-      <div className="flex gap-2 mb-6">
-        {(['todas', 'aprobado', 'pendiente'] as const).map(f => (
-          <button
-            key={f}
-            onClick={() => setFiltro(f)}
-            className={`font-montserrat text-[9px] tracking-widest uppercase px-4 py-2 transition-colors ${
-              filtro === f ? 'bg-glow-navy text-white' : 'bg-white text-glow-navy/50 border border-glow-navy/20 hover:text-glow-navy'
-            }`}
-          >
-            {f}
-          </button>
-        ))}
-      </div>
+  if (checkingAuth) {
+    return (
+      <main className="min-h-screen bg-glow-cream flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-glow-navy border-t-transparent rounded-full animate-spin" />
+      </main>
+    )
+  }
 
-      <div className="flex flex-col gap-3">
-        {ordenesFiltradas.map(o => {
-          const d = o.datos_envio
-          const direccionCompleta = d?.direccion
-            ? `${d.nombre} ${d.apellido}\nDNI: ${d.dni || '—'}\n${d.direccion}\n${d.ciudad}, ${d.provincia} (${d.codigo_postal})\nTel: ${d.telefono}\nEmail: ${d.email}`
-            : ''
+  if (hasCurso && !user) {
+    return (
+      <main className="min-h-screen bg-glow-cream pt-24 flex items-center justify-center px-6">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-10">
+            <div className="flex items-center justify-center gap-2 mb-6">
+              <StarIcon size={10} className="text-glow-navy" />
+              <StarIcon size={16} className="text-glow-navy" />
+              <StarIcon size={10} className="text-glow-navy" />
+            </div>
+            <h1 className="font-cormorant text-4xl text-glow-navy font-light tracking-wide mb-4">
+              Antes de continuar
+            </h1>
+            <p className="font-montserrat text-sm text-glow-navy/60 leading-relaxed max-w-sm mx-auto">
+              Estás comprando un curso online. Para poder acceder a él una vez acreditado el pago,
+              necesitás una cuenta en The Glow Market con el mismo email que uses para la compra.
+            </p>
+          </div>
 
-          return (
-            <div key={o.id} className="bg-white rounded shadow-sm overflow-hidden">
-              <div
-                className="grid grid-cols-[auto_1fr_auto_auto_auto_auto] gap-4 items-center px-5 py-4 cursor-pointer hover:bg-gray-50 transition-colors"
-                onClick={() => setExpandida(expandida === o.id ? null : o.id)}
-              >
-                <div>
-                  <p className="font-montserrat text-[10px] text-gray-400">
-                    {new Date(o.created_at).toLocaleDateString('es-AR')}
-                  </p>
-                  <p className="font-montserrat text-[9px] text-gray-300">
-                    #{o.id.slice(0, 8).toUpperCase()}
-                  </p>
-                </div>
+          <div className="bg-white p-8 flex flex-col gap-4">
+            <p className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/40 text-center">
+              ¿Cómo querés continuar?
+            </p>
+            <Link href="/registro?redirect=/checkout">
+              <Button variant="primary" className="w-full" size="md">
+                Crear cuenta nueva
+              </Button>
+            </Link>
+            <Link href="/login?redirect=/checkout">
+              <Button variant="outline" className="w-full" size="md">
+                Ya tengo cuenta — Iniciar sesión
+              </Button>
+            </Link>
+            <p className="font-montserrat text-xs text-glow-navy/70 text-center leading-relaxed pt-2">
+              Solo toma un minuto. Con ese usuario y contraseña vas a poder ver el curso desde cualquier dispositivo.
+            </p>
+          </div>
+        </div>
+      </main>
+    )
+  }
 
-                <div>
-                  {d ? (
-                    <div>
-                      <p className="font-montserrat text-xs text-gray-700 font-medium">{d.nombre} {d.apellido}</p>
-                      <p className="font-montserrat text-[9px] text-gray-400">{d.email}</p>
-                    </div>
-                  ) : (
-                    <p className="font-montserrat text-[9px] text-gray-400">{o.userEmail || '—'}</p>
-                  )}
-                </div>
+  const onSubmit = async (datosEnvio: CheckoutForm) => {
+    setLoading(true)
+    setError(null)
 
-                <div className="text-right">
-                  <p className="font-montserrat text-xs text-gray-700">${o.total.toLocaleString('es-AR')}</p>
-                  <p className="font-montserrat text-[9px] text-gray-400">{(o.items || []).length} items</p>
-                </div>
+    try {
+      const res = await fetch('/api/mercadopago/create-preference', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items, datosEnvio }),
+      })
 
-                <span className={`font-montserrat text-[9px] tracking-widest uppercase px-3 py-1 rounded-full ${ESTADO_COLORS[o.estado] || 'bg-gray-100 text-gray-500'}`}>
-                  {o.estado}
-                </span>
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Error al procesar el pago')
 
-                <form action={updateEstadoEnvio.bind(null, o.id)} onClick={e => e.stopPropagation()}>
-                  <select
-                    name="estado_envio"
-                    defaultValue={o.estado_envio || 'pendiente'}
-                    onChange={e => e.currentTarget.form?.requestSubmit()}
-                    className="font-montserrat text-[9px] tracking-wide uppercase rounded px-2 py-1 border border-gray-200 cursor-pointer bg-white text-gray-600"
-                  >
-                    <option value="pendiente">Pendiente</option>
-                    <option value="generado">Generado</option>
-                    <option value="despachado">Despachado</option>
-                    <option value="recibido">Recibido</option>
-                  </select>
-                </form>
+      window.location.href = data.init_point
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error inesperado')
+    } finally {
+      setLoading(false)
+    }
+  }
 
-                <span className="text-gray-300 text-xs">{expandida === o.id ? '▲' : '▼'}</span>
-              </div>
+  return (
+    <main className="min-h-screen bg-glow-cream pt-24">
+      <div className="max-w-[1200px] mx-auto px-6 py-12">
+        <div className="flex items-center gap-3 mb-10">
+          <StarIcon size={12} className="text-glow-navy" />
+          <h1 className="font-cormorant text-4xl md:text-5xl text-glow-navy font-light tracking-wide">
+            Checkout
+          </h1>
+        </div>
 
-              {expandida === o.id && (
-                <div className="border-t border-gray-100 px-5 py-5 grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50">
-                  <div>
-                    <p className="font-montserrat text-[9px] tracking-widest uppercase text-gray-400 mb-3">Datos de envío</p>
-                    {d ? (
-                      <div className="space-y-1.5">
-                        {[
-                          ['Nombre', `${d.nombre} ${d.apellido}`],
-                          ['DNI', d.dni ?? '—'],
-                          ['Email', d.email],
-                          ['Teléfono', d.telefono],
-                          ...(d.direccion ? [
-                            ['Dirección', d.direccion],
-                            ['Ciudad', d.ciudad ?? ''],
-                            ['Provincia', d.provincia ?? ''],
-                            ['Código Postal', d.codigo_postal ?? ''],
-                          ] : []),
-                          ...(d.notas ? [['Notas', d.notas]] : []),
-                        ].map(([label, value]) => (
-                          <div key={label} className="flex justify-between gap-4">
-                            <span className="font-montserrat text-[10px] text-gray-400 shrink-0">{label}</span>
-                            <span className="font-montserrat text-[10px] text-gray-700 text-right">{value}</span>
-                          </div>
-                        ))}
-                        {direccionCompleta && (
-                          <div className="pt-3">
-                            <CopiarBtn texto={direccionCompleta} />
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <p className="font-montserrat text-[10px] text-gray-400">Producto digital — sin dirección</p>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-12"
+        >
+          <div className="flex flex-col gap-8">
+            <div>
+              <h2 className="font-cormorant text-2xl text-glow-navy font-light mb-5">
+                Datos de Contacto
+              </h2>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { name: 'nombre' as const, label: 'Nombre', placeholder: 'María' },
+                  { name: 'apellido' as const, label: 'Apellido', placeholder: 'García' },
+                ].map(({ name, label, placeholder }) => (
+                  <div key={name} className="flex flex-col gap-1.5">
+                    <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
+                      {label}
+                    </label>
+                    <input {...register(name)} placeholder={placeholder} className={INPUT_CLASS} />
+                    {errors[name] && (
+                      <p className="font-montserrat text-[10px] text-red-400">{errors[name]?.message}</p>
                     )}
                   </div>
+                ))}
+                <div className="flex flex-col gap-1.5 col-span-2 md:col-span-1">
+                  <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
+                    Email
+                  </label>
+                  <input {...register('email')} type="email" placeholder="tu@email.com" className={INPUT_CLASS} />
+                  {errors.email && (
+                    <p className="font-montserrat text-[10px] text-red-400">{errors.email.message}</p>
+                  )}
+                </div>
+                <div className="flex flex-col gap-1.5 col-span-2 md:col-span-1">
+                  <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
+                    Teléfono
+                  </label>
+                  <input {...register('telefono')} placeholder="+54 11 1234-5678" className={INPUT_CLASS} />
+                  {errors.telefono && (
+                    <p className="font-montserrat text-[10px] text-red-400">{errors.telefono.message}</p>
+                  )}
+                </div>
+                <div className="flex flex-col gap-1.5 col-span-2 md:col-span-1">
+                  <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
+                    DNI
+                  </label>
+                  <input {...register('dni')} placeholder="12345678" className={INPUT_CLASS} />
+                  {errors.dni && (
+                    <p className="font-montserrat text-[10px] text-red-400">{errors.dni.message}</p>
+                  )}
+                </div>
+              </div>
+            </div>
 
-                  <div>
-                    <p className="font-montserrat text-[9px] tracking-widest uppercase text-gray-400 mb-3">Productos</p>
-                    <div className="space-y-2">
-                      {(o.items || []).map((item, i) => (
-                        <div key={i} className="flex justify-between">
-                          <span className="font-montserrat text-[10px] text-gray-700">{item.cantidad}x {item.nombre}</span>
-                          <span className="font-montserrat text-[10px] text-gray-400">${(item.precio * item.cantidad).toLocaleString('es-AR')}</span>
-                        </div>
+            {!soloDigital && (
+              <div>
+                <h2 className="font-cormorant text-2xl text-glow-navy font-light mb-5">
+                  Dirección de Envío
+                </h2>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-2 flex flex-col gap-1.5">
+                    <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
+                      Dirección
+                    </label>
+                    <input {...register('direccion')} placeholder="Av. Corrientes 1234" className={INPUT_CLASS} />
+                    {errors.direccion && (
+                      <p className="font-montserrat text-[10px] text-red-400">{errors.direccion.message}</p>
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
+                      Provincia
+                    </label>
+                    <select {...register('provincia')} className={INPUT_CLASS + ' cursor-pointer'}>
+                      <option value="">Seleccionar...</option>
+                      {PROVINCIAS.map((p) => (
+                        <option key={p} value={p}>{p}</option>
                       ))}
-                      {(() => {
-                        const subtotal = (o.items || []).reduce((acc: number, i: any) => acc + i.precio * i.cantidad, 0)
-                        const envio = o.total - subtotal
-                        if (envio > 0) return (
-                          <div className="flex justify-between">
-                            <span className="font-montserrat text-[10px] text-gray-500">Envío</span>
-                            <span className="font-montserrat text-[10px] text-gray-500">${envio.toLocaleString('es-AR')}</span>
-                          </div>
-                        )
-                        if (envio === 0 && o.datos_envio?.direccion) return (
-                          <div className="flex justify-between">
-                            <span className="font-montserrat text-[10px] text-gray-500">Envío</span>
-                            <span className="font-montserrat text-[10px] text-green-600">Gratis</span>
-                          </div>
-                        )
-                        return null
-                      })()}
-                      <div className="border-t border-gray-200 pt-2 flex justify-between">
-                        <span className="font-montserrat text-[10px] font-medium text-gray-700">Total</span>
-                        <span className="font-montserrat text-[10px] font-medium text-gray-700">${o.total.toLocaleString('es-AR')}</span>
-                      </div>
-                    </div>
+                    </select>
+                    {errors.provincia && (
+                      <p className="font-montserrat text-[10px] text-red-400">{errors.provincia.message}</p>
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
+                      Ciudad
+                    </label>
+                    <input {...register('ciudad')} placeholder="Buenos Aires" className={INPUT_CLASS} />
+                    {errors.ciudad && (
+                      <p className="font-montserrat text-[10px] text-red-400">{errors.ciudad.message}</p>
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
+                      Código Postal
+                    </label>
+                    <input {...register('codigo_postal')} placeholder="1000" className={INPUT_CLASS} />
+                    {errors.codigo_postal && (
+                      <p className="font-montserrat text-[10px] text-red-400">{errors.codigo_postal.message}</p>
+                    )}
+                  </div>
+                  <div className="col-span-2 flex flex-col gap-1.5">
+                    <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
+                      Notas (opcional)
+                    </label>
+                    <textarea
+                      {...register('notas')}
+                      rows={3}
+                      placeholder="Instrucciones especiales de entrega..."
+                      className={INPUT_CLASS + ' resize-none'}
+                    />
                   </div>
                 </div>
-              )}
-            </div>
-          )
-        })}
+              </div>
+            )}
 
-        {ordenesFiltradas.length === 0 && (
-          <div className="text-center py-16 bg-white rounded shadow-sm">
-            <p className="font-montserrat text-sm text-gray-400">No hay órdenes</p>
+            {error && (
+              <p className="font-montserrat text-xs text-red-500 bg-red-50 px-4 py-3">
+                {error}
+              </p>
+            )}
           </div>
-        )}
+
+          <div className="bg-white p-8 flex flex-col gap-6 h-fit sticky top-24">
+            <h2 className="font-cormorant text-2xl text-glow-navy font-light">
+              Tu Pedido
+            </h2>
+
+            <div className="flex flex-col gap-4">
+              {items.map((item) => (
+                <div key={item.id} className="flex gap-3 items-start">
+                  <div className="relative w-14 h-16 flex-shrink-0 overflow-hidden bg-glow-cream">
+                    <Image
+                      src={item.imagen_url || '/placeholder-product.jpg'}
+                      alt={item.nombre}
+                      fill
+                      className="object-cover"
+                      sizes="56px"
+                    />
+                    <span className="absolute -top-1.5 -right-1.5 bg-glow-navy text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-montserrat">
+                      {item.quantity}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-cormorant text-base text-glow-navy leading-tight">{item.nombre}</p>
+                    <p className="font-montserrat text-xs text-glow-navy/60 mt-0.5">
+                      {formatPrice(item.precio * item.quantity)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="h-px bg-glow-navy/10" />
+
+            <div className="flex justify-between items-baseline">
+              <span className="font-montserrat text-xs tracking-[0.15em] uppercase text-glow-navy/60">Total</span>
+              <span className="font-cormorant text-3xl text-glow-navy">{formatPrice(total())}</span>
+            </div>
+
+            <Button
+              type="submit"
+              variant="primary"
+              className="w-full"
+              size="md"
+              loading={loading}
+            >
+              Pagar con MercadoPago
+            </Button>
+
+            <p className="font-montserrat text-[9px] text-center text-glow-navy/30 leading-relaxed">
+              Serás redirigida a MercadoPago para completar el pago de forma segura.
+            </p>
+          </div>
+        </form>
       </div>
-    </div>
+    </main>
   )
 }
