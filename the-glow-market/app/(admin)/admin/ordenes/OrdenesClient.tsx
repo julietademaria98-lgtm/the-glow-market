@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { updateEstadoEnvio, resendOrderEmail } from '@/lib/admin/actions'
+import { updateEstadoEnvio, resendOrderEmail, guardarSeguimiento } from '@/lib/admin/actions'
 
 interface DatosEnvio {
   nombre: string
@@ -23,6 +23,7 @@ interface Orden {
   estado_envio: string | null
   total: number
   costo_envio: number
+  numero_seguimiento?: string | null
   items: { nombre: string; cantidad: number; precio: number }[]
   datos_envio: DatosEnvio | null
   userEmail?: string | null
@@ -43,10 +44,7 @@ function CopiarBtn({ texto }: { texto: string }) {
     setTimeout(() => setCopiado(false), 2000)
   }
   return (
-    <button
-      onClick={copiar}
-      className="font-montserrat text-[9px] tracking-widest uppercase text-glow-navy/50 hover:text-glow-navy border border-glow-navy/20 px-2 py-1 transition-colors"
-    >
+    <button onClick={copiar} className="font-montserrat text-[9px] tracking-widest uppercase text-glow-navy/50 hover:text-glow-navy border border-glow-navy/20 px-2 py-1 transition-colors">
       {copiado ? '✓ Copiado' : 'Copiar para Andreani'}
     </button>
   )
@@ -66,21 +64,55 @@ function ReenviarEmailBtn({ ordenId }: { ordenId: string }) {
     }
   }
   return (
-    <button
-      onClick={handleClick}
-      disabled={estado === 'loading'}
-      className="font-montserrat text-[9px] tracking-widest uppercase text-glow-navy/50 hover:text-glow-navy border border-glow-navy/20 px-2 py-1 transition-colors disabled:opacity-40"
-    >
+    <button onClick={handleClick} disabled={estado === 'loading'} className="font-montserrat text-[9px] tracking-widest uppercase text-glow-navy/50 hover:text-glow-navy border border-glow-navy/20 px-2 py-1 transition-colors disabled:opacity-40">
       {estado === 'loading' ? 'Enviando...' : estado === 'ok' ? '✓ Email enviado' : estado === 'error' ? 'Error al enviar' : 'Reenviar email'}
     </button>
+  )
+}
+
+function SeguimientoForm({ ordenId, numeroActual }: { ordenId: string; numeroActual?: string | null }) {
+  const [enviado, setEnviado] = useState(false)
+  return (
+    <form
+      action={async (formData) => {
+        await guardarSeguimiento(ordenId, formData)
+        setEnviado(true)
+        setTimeout(() => setEnviado(false), 3000)
+      }}
+      className="flex gap-2 items-center mt-4"
+    >
+      <input
+        name="numero_seguimiento"
+        defaultValue={numeroActual || ''}
+        placeholder="Nro. seguimiento Andreani"
+        className="flex-1 border border-gray-200 px-3 py-1.5 font-montserrat text-[11px] text-gray-700 placeholder:text-gray-300 outline-none focus:border-glow-navy/40 bg-white"
+      />
+      <button type="submit" className="font-montserrat text-[9px] tracking-widest uppercase bg-glow-navy text-white px-3 py-1.5 hover:bg-glow-navy/80 transition-colors whitespace-nowrap">
+        {enviado ? '✓ Enviado' : 'Guardar y notificar'}
+      </button>
+    </form>
   )
 }
 
 export default function OrdenesClient({ ordenes }: { ordenes: Orden[] }) {
   const [filtro, setFiltro] = useState<'todas' | 'aprobado' | 'pendiente'>('todas')
   const [expandida, setExpandida] = useState<string | null>(null)
+  const [busqueda, setBusqueda] = useState('')
 
-  const ordenesFiltradas = filtro === 'todas' ? ordenes : ordenes.filter(o => o.estado === filtro)
+  const ordenesFiltradas = ordenes
+    .filter(o => filtro === 'todas' || o.estado === filtro)
+    .filter(o => {
+      if (!busqueda.trim()) return true
+      const q = busqueda.toLowerCase()
+      const d = o.datos_envio
+      return (
+        o.id.slice(0, 8).toLowerCase().includes(q) ||
+        (d?.nombre + ' ' + d?.apellido).toLowerCase().includes(q) ||
+        d?.email?.toLowerCase().includes(q) ||
+        o.userEmail?.toLowerCase().includes(q)
+      )
+    })
+
   const totalAprobado = ordenes.filter(o => o.estado === 'aprobado').reduce((sum, o) => sum + o.total, 0)
 
   return (
@@ -93,15 +125,20 @@ export default function OrdenesClient({ ordenes }: { ordenes: Orden[] }) {
         </div>
       </div>
 
+      <div className="flex gap-3 mb-6">
+        <input
+          type="text"
+          value={busqueda}
+          onChange={e => setBusqueda(e.target.value)}
+          placeholder="Buscar por nombre, email o número de pedido..."
+          className="flex-1 border border-gray-200 px-4 py-2 font-montserrat text-xs text-gray-700 placeholder:text-gray-300 outline-none focus:border-glow-navy/40 transition-colors bg-white"
+        />
+      </div>
+
       <div className="flex gap-2 mb-6">
         {(['todas', 'aprobado', 'pendiente'] as const).map(f => (
-          <button
-            key={f}
-            onClick={() => setFiltro(f)}
-            className={`font-montserrat text-[9px] tracking-widest uppercase px-4 py-2 transition-colors ${
-              filtro === f ? 'bg-glow-navy text-white' : 'bg-white text-glow-navy/50 border border-glow-navy/20 hover:text-glow-navy'
-            }`}
-          >
+          <button key={f} onClick={() => setFiltro(f)}
+            className={`font-montserrat text-[9px] tracking-widest uppercase px-4 py-2 transition-colors ${filtro === f ? 'bg-glow-navy text-white' : 'bg-white text-glow-navy/50 border border-glow-navy/20 hover:text-glow-navy'}`}>
             {f}
           </button>
         ))}
@@ -121,14 +158,9 @@ export default function OrdenesClient({ ordenes }: { ordenes: Orden[] }) {
                 onClick={() => setExpandida(expandida === o.id ? null : o.id)}
               >
                 <div>
-                  <p className="font-montserrat text-[10px] text-gray-400">
-                    {new Date(o.created_at).toLocaleDateString('es-AR')}
-                  </p>
-                  <p className="font-montserrat text-[9px] text-gray-300">
-                    #{o.id.slice(0, 8).toUpperCase()}
-                  </p>
+                  <p className="font-montserrat text-[10px] text-gray-400">{new Date(o.created_at).toLocaleDateString('es-AR')}</p>
+                  <p className="font-montserrat text-[9px] text-gray-300">#{o.id.slice(0, 8).toUpperCase()}</p>
                 </div>
-
                 <div>
                   {d ? (
                     <div>
@@ -139,16 +171,13 @@ export default function OrdenesClient({ ordenes }: { ordenes: Orden[] }) {
                     <p className="font-montserrat text-[9px] text-gray-400">{o.userEmail || '—'}</p>
                   )}
                 </div>
-
                 <div className="text-right">
                   <p className="font-montserrat text-xs text-gray-700">${o.total.toLocaleString('es-AR')}</p>
                   <p className="font-montserrat text-[9px] text-gray-400">{(o.items || []).length} items</p>
                 </div>
-
                 <span className={`font-montserrat text-[9px] tracking-widest uppercase px-3 py-1 rounded-full ${ESTADO_COLORS[o.estado] || 'bg-gray-100 text-gray-500'}`}>
                   {o.estado}
                 </span>
-
                 <form action={updateEstadoEnvio.bind(null, o.id)} onClick={e => e.stopPropagation()}>
                   <select
                     name="estado_envio"
@@ -162,7 +191,6 @@ export default function OrdenesClient({ ordenes }: { ordenes: Orden[] }) {
                     <option value="recibido">Recibido</option>
                   </select>
                 </form>
-
                 <span className="text-gray-300 text-xs">{expandida === o.id ? '▲' : '▼'}</span>
               </div>
 
@@ -190,10 +218,11 @@ export default function OrdenesClient({ ordenes }: { ordenes: Orden[] }) {
                             <span className="font-montserrat text-[10px] text-gray-700 text-right">{value}</span>
                           </div>
                         ))}
-                        <div className="pt-3 flex gap-2">
+                        <div className="pt-3 flex gap-2 flex-wrap">
                           {direccionCompleta && <CopiarBtn texto={direccionCompleta} />}
                           <ReenviarEmailBtn ordenId={o.id} />
                         </div>
+                        <SeguimientoForm ordenId={o.id} numeroActual={o.numero_seguimiento} />
                       </div>
                     ) : (
                       <div className="space-y-3">
@@ -243,7 +272,9 @@ export default function OrdenesClient({ ordenes }: { ordenes: Orden[] }) {
 
         {ordenesFiltradas.length === 0 && (
           <div className="text-center py-16 bg-white rounded shadow-sm">
-            <p className="font-montserrat text-sm text-gray-400">No hay órdenes</p>
+            <p className="font-montserrat text-sm text-gray-400">
+              {busqueda ? 'No se encontraron órdenes' : 'No hay órdenes'}
+            </p>
           </div>
         )}
       </div>
