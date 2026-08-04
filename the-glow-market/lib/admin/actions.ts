@@ -204,17 +204,19 @@ export async function resendOrderEmail(id: string) {
   const { data: orden } = await db.from('ordenes').select('*').eq('id', id).single()
   if (!orden) throw new Error('Orden no encontrada')
 
-  const { data: usuario } = await db.auth.admin.getUserById(orden.user_id || '')
-  const email =
-    usuario?.user?.email ||
-    orden.datos_envio?.email
+  let usuarioEmail: string | undefined
+  let usuarioNombre: string | undefined
 
+  if (orden.user_id) {
+    const { data: usuario } = await db.auth.admin.getUserById(orden.user_id)
+    usuarioEmail = usuario?.user?.email
+    usuarioNombre = usuario?.user?.user_metadata?.nombre
+  }
+
+  const email = usuarioEmail || orden.datos_envio?.email
   if (!email) throw new Error('No se encontró email para esta orden')
 
-  const nombreCliente =
-    usuario?.user?.user_metadata?.nombre ||
-    orden.datos_envio?.nombre ||
-    email.split('@')[0]
+  const nombreCliente = usuarioNombre || orden.datos_envio?.nombre || email.split('@')[0]
 
   const cursosIds = new Set(
     (await db.from('cursos').select('id')).data?.map((c: any) => c.id) || []
