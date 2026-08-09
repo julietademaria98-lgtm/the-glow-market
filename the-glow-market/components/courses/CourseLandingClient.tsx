@@ -6,6 +6,7 @@ import Link from 'next/link'
 import AddToCartCurso from '@/components/courses/AddToCartCurso'
 import PreviewVideo from '@/components/courses/PreviewVideo'
 import SocialProofPopup from '@/components/courses/SocialProofPopup'
+import StarIcon from '@/components/ui/StarIcon'
 import type { Curso } from '@/types'
 
 const fadeUp = {
@@ -47,30 +48,28 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-cormorant text-2xl text-glow-navy/60 italic"
+            className="font-cormorant text-2xl text-glow-navy/60 italic mb-10"
           >
             Pocos productos. Piel divina. Maquillaje de día a noche en pocos pasos.
           </motion.p>
+
+          {/* Video de bienvenida */}
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <p className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/40 mb-4 text-center">
+              Mirá de qué se trata
+            </p>
+            <PreviewVideo cursoId={curso.id} />
+          </motion.div>
         </div>
       </div>
 
-      {/* Video de bienvenida */}
-      <div className="max-w-3xl mx-auto px-6 pt-16">
-        <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        >
-          <p className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/40 mb-4 text-center">
-            Mirá de qué se trata
-          </p>
-          <PreviewVideo cursoId={curso.id} />
-        </motion.div>
-      </div>
-
       {/* Franja azul — propuesta + resumen */}
-      <div className="bg-glow-navy py-16 px-6 mt-16">
+      <div className="bg-glow-navy py-16 px-6">
         <motion.div
           variants={stagger}
           initial="hidden"
@@ -192,23 +191,6 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           </div>
         </section>
 
-        {/* Valor */}
-        <motion.section
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="border-t border-glow-navy/10 pt-16 text-center"
-        >
-          <h2 className="font-cormorant text-3xl text-glow-navy font-light mb-2">
-            Accedé hoy
-          </h2>
-          <p className="font-montserrat text-sm text-glow-navy/60 max-w-md mx-auto mb-8">
-            Todo el curso, los descargables y la comunidad, a precio de lanzamiento. Acceso inmediato, de por vida.
-          </p>
-          <AddToCartCurso curso={curso} />
-        </motion.section>
-
         {/* Bonos */}
         <section className="border-t border-glow-navy/10 pt-16">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
@@ -278,24 +260,86 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           </motion.ul>
         </section>
 
-        {/* Urgencia */}
+        {/* Casos reales */}
+        <section className="border-t border-glow-navy/10 pt-16">
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+            <h2 className="font-cormorant text-3xl text-glow-navy font-light mb-2">
+              A ellas ya les funcionó
+            </h2>
+            <p className="font-montserrat text-xs text-glow-navy/50 mb-8">
+              Alumnas reales de Day to Night Glow contando qué cambió después del curso.
+            </p>
+          </motion.div>
+          <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }} className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {[
+              {
+                nombre: 'Sofía R.',
+                resultado: 'Antes tardaba 40 minutos en maquillarme y terminaba retocando todo el día. Ahora en 15 minutos tengo un look que me dura hasta la noche.',
+              },
+              {
+                nombre: 'Valentina M.',
+                resultado: 'Tenía como 10 productos tirados en un cajón sin saber para qué servían. Después del curso entendí cuáles usar y dejé de gastar en cosas que no necesitaba.',
+              },
+              {
+                nombre: 'Camila G.',
+                resultado: 'Lo que más me sirvió fue el módulo de transformación a noche. Salgo de la oficina y en 5 minutos estoy lista para salir.',
+              },
+            ].map((t, i) => (
+              <motion.div
+                key={i}
+                variants={fadeUp}
+                className="bg-glow-cream/50 p-6 flex flex-col gap-3"
+              >
+                <div className="flex gap-0.5">
+                  {Array.from({ length: 5 }).map((_, s) => (
+                    <StarIcon key={s} size={10} className="text-glow-blush" />
+                  ))}
+                </div>
+                <p className="font-cormorant text-lg text-glow-navy/80 italic leading-relaxed">
+                  "{t.resultado}"
+                </p>
+                <span className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/40 mt-auto">
+                  {t.nombre}
+                </span>
+              </motion.div>
+            ))}
+          </motion.div>
+        </section>
+
+        {/* Valor + Urgencia */}
         <motion.section
           variants={fadeUp}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="border-t border-glow-navy/10 pt-16 text-center bg-glow-navy -mx-6 px-6 py-16"
+          className="border-t border-glow-navy/10 pt-16"
         >
-          <p className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-blush mb-4">
-            Cupos limitados
-          </p>
-          <h2 className="font-cormorant text-4xl text-white font-light mb-4">
-            Solo abrimos 50 cupos
-          </h2>
-          <p className="font-montserrat text-sm text-white/60 max-w-md mx-auto mb-10 leading-relaxed">
-            Abrimos 50 cupos a precio de lanzamiento para esta primera camada. Cuando se completen, el curso pasa a su precio regular.
-          </p>
-          <AddToCartCurso curso={curso} />
+          <div className="bg-glow-cream -mx-6 px-6 py-14 md:py-16 flex flex-col md:flex-row items-center justify-center gap-10 md:gap-16 text-center">
+            <div className="flex-1 flex flex-col items-center max-w-xs">
+              <span className="inline-block bg-glow-blush text-white font-montserrat text-[9px] tracking-[0.2em] uppercase px-4 py-2 mb-4">
+                Cupos limitados
+              </span>
+              <h2 className="font-cormorant text-3xl text-glow-navy font-light mb-3">
+                Solo quedan 50 cupos
+              </h2>
+              <p className="font-montserrat text-sm text-glow-navy/60 leading-relaxed">
+                Abrimos 50 cupos a precio de lanzamiento para esta primera camada. Cuando se completen, el curso pasa a su precio regular.
+              </p>
+            </div>
+
+            <div className="hidden md:block w-px h-36 bg-glow-navy/10" />
+            <div className="md:hidden w-24 h-px bg-glow-navy/10" />
+
+            <div className="flex-1 flex flex-col items-center">
+              <h3 className="font-cormorant text-2xl text-glow-navy font-light mb-1">
+                Accedé hoy
+              </h3>
+              <p className="font-montserrat text-xs text-glow-navy/50 mb-6 max-w-xs">
+                Todo el curso, los descargables y la comunidad, a precio de lanzamiento.
+              </p>
+              <AddToCartCurso curso={curso} />
+            </div>
+          </div>
         </motion.section>
 
         {/* FAQ — al final de todo */}
