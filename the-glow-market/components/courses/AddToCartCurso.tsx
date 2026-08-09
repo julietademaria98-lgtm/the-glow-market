@@ -1,15 +1,18 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/store/cartStore'
 import { formatPrice } from '@/lib/utils'
 import type { Curso } from '@/types'
 
 export default function AddToCartCurso({ curso }: { curso: Curso }) {
-  const [added, setAdded] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
   const addItem = useCartStore((state) => state.addItem)
 
-  const handleAdd = () => {
+  const handleComprar = () => {
+    setLoading(true)
     addItem({
       id: curso.id,
       slug: curso.slug,
@@ -18,8 +21,7 @@ export default function AddToCartCurso({ curso }: { curso: Curso }) {
       imagen_url: curso.imagen_url || '',
       tipo: 'curso',
     })
-    setAdded(true)
-    setTimeout(() => setAdded(false), 2000)
+    router.push('/checkout')
   }
 
   return (
@@ -44,12 +46,11 @@ export default function AddToCartCurso({ curso }: { curso: Curso }) {
         Precio de lanzamiento
       </p>
       <button
-        onClick={handleAdd}
-        className={`w-full max-w-sm py-4 font-montserrat text-[11px] tracking-[0.25em] uppercase transition-colors duration-300 ${
-          added ? 'bg-green-700 text-white' : 'bg-glow-navy text-white hover:bg-glow-blue'
-        }`}
+        onClick={handleComprar}
+        disabled={loading}
+        className="w-full max-w-sm py-4 font-montserrat text-[11px] tracking-[0.25em] uppercase bg-glow-navy text-white hover:bg-glow-blue transition-colors duration-300 disabled:opacity-60"
       >
-        {added ? '✓ Agregado al carrito' : 'Agregar al carrito'}
+        {loading ? 'Redirigiendo...' : 'Comprar'}
       </button>
     </div>
   )
