@@ -119,7 +119,7 @@ export default async function LeccionPage({ params }: Props) {
               <div className="flex items-center gap-2 mb-5">
                 <StarIcon size={9} className="text-glow-royal" />
                 <span className="font-montserrat text-[10px] font-semibold tracking-[0.25em] uppercase text-glow-navy/80">
-                  Descargables de este módulo
+                  Recursos de este módulo
                 </span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
