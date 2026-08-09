@@ -12,6 +12,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import StarIcon from '@/components/ui/StarIcon'
 import Button from '@/components/ui/Button'
+import CrossSellProducts from '@/components/checkout/CrossSellProducts'
 
 const baseSchema = {
   nombre: z.string().min(2, 'Requerido'),
@@ -306,6 +307,8 @@ export default function CheckoutPage() {
             <p className="font-montserrat text-[9px] text-center text-glow-navy/30 leading-relaxed">
               Serás redirigida a MercadoPago para completar el pago de forma segura.
             </p>
+
+            <CrossSellProducts />
           </div>
         </form>
       </div>
