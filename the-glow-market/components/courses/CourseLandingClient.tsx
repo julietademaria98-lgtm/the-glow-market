@@ -274,43 +274,43 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           </motion.p>
         </section>
 
-        {/* Valor + Urgencia */}
+        {/* Urgencia — cupos */}
         <motion.section
           variants={fadeUp}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="border-t border-glow-navy/10 pt-16"
+          className="border-t border-glow-navy/10 pt-16 text-center"
         >
-          <div className="bg-glow-cream -mx-6 px-6 py-14 md:py-16 border-2 border-glow-navy shadow-[6px_6px_0_0_rgba(233,180,184,0.6)] flex flex-col md:flex-row items-center justify-center gap-10 md:gap-16 text-center">
-            <div className="flex-1 flex flex-col items-center max-w-xs">
-              <span className="inline-block bg-glow-blush text-white font-montserrat text-[10px] tracking-[0.2em] uppercase px-4 py-2 mb-4 font-medium">
-                Cupos limitados
-              </span>
-              <h2 className="font-cormorant text-3xl text-glow-navy font-light mb-3">
-                Abrimos solo 30 cupos
-              </h2>
-              <p className="font-montserrat text-sm text-glow-navy/60 leading-relaxed">
-                Abrimos 30 cupos a precio de lanzamiento para esta primera camada. Cuando se completen, el curso pasa a su precio regular.
-              </p>
-            </div>
+          <span className="inline-block bg-glow-blush text-white font-montserrat text-[10px] tracking-[0.2em] uppercase px-4 py-2 mb-4 font-medium">
+            Cupos limitados
+          </span>
+          <h2 className="font-cormorant text-3xl text-glow-navy font-light mb-3">
+            Abrimos solo 30 cupos
+          </h2>
+          <p className="font-montserrat text-sm text-glow-navy/60 leading-relaxed max-w-md mx-auto">
+            Abrimos 30 cupos a precio de lanzamiento para esta primera camada. Cuando se completen, el curso pasa a su precio regular.
+          </p>
+        </motion.section>
 
-            <div className="hidden md:block w-px h-36 bg-glow-navy/10" />
-            <div className="md:hidden w-24 h-px bg-glow-navy/10" />
-
-            <div className="flex-1 flex flex-col items-center">
-              <span className="inline-block bg-glow-navy text-white font-montserrat text-[10px] tracking-[0.2em] uppercase px-4 py-2 mb-4 font-medium">
-                Precio de lanzamiento
-              </span>
-              <h3 className="font-cormorant text-2xl text-glow-navy font-light mb-1">
-                Accedé hoy
-              </h3>
-              <p className="font-montserrat text-xs text-glow-navy/50 mb-6 max-w-xs">
-                Todo el curso, los bonos y la comunidad, antes de que suba el precio.
-              </p>
-              <AddToCartCurso curso={curso} />
-            </div>
-          </div>
+        {/* Valor — compra */}
+        <motion.section
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="pt-4 text-center"
+        >
+          <span className="inline-block bg-glow-navy text-white font-montserrat text-[10px] tracking-[0.2em] uppercase px-4 py-2 mb-4 font-medium">
+            Precio de lanzamiento
+          </span>
+          <h3 className="font-cormorant text-2xl text-glow-navy font-light mb-1">
+            Accedé hoy
+          </h3>
+          <p className="font-montserrat text-xs text-glow-navy/50 mb-6 max-w-xs mx-auto">
+            Todo el curso, los bonos y la comunidad, antes de que suba el precio.
+          </p>
+          <AddToCartCurso curso={curso} />
         </motion.section>
 
         {/* FAQ — al final de todo */}
