@@ -10,6 +10,7 @@ export default function AddToCartCurso({ curso }: { curso: Curso }) {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const addItem = useCartStore((state) => state.addItem)
+  const closeCart = useCartStore((state) => state.closeCart)
 
   const handleComprar = () => {
     setLoading(true)
@@ -21,6 +22,7 @@ export default function AddToCartCurso({ curso }: { curso: Curso }) {
       imagen_url: curso.imagen_url || '',
       tipo: 'curso',
     })
+    closeCart()
     router.push('/checkout')
   }
 
