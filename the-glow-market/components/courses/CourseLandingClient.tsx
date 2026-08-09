@@ -86,7 +86,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
             variants={fadeUp}
             className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-white/50"
           >
-            Acceso de por vida · 5 descargables · Comunidad exclusiva · Links Clarins con regalos por compra
+            Acceso de por vida · 5 recursos bonus · Comunidad exclusiva · Links Clarins con regalos por compra
           </motion.p>
         </motion.div>
       </div>
@@ -196,18 +196,16 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
             <h2 className="font-cormorant text-3xl text-glow-navy font-light uppercase mb-2">
               Comprando hoy, además te llevás
             </h2>
-            <p className="font-montserrat text-base text-glow-navy/60 mb-8">
-              5 descargables complementarios de bonus, para aplicar el método sin tener que volver a mirar la clase.
-            </p>
           </motion.div>
 
           <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }} className="space-y-4">
             {[
-              { titulo: 'Nunca más comprar de más', desc: 'Sabés exactamente qué producto usar y para qué, así dejás de gastar en cosas que después no tocás.' },
-              { titulo: 'Tu piel, decodificada', desc: 'En 6 preguntas descubrís tu tipo de piel exacto y qué priorizar en cada paso, sin ensayo y error.' },
-              { titulo: 'La base correcta a la primera', desc: 'Encontrás tu subtono real y elegís la base perfecta desde el día uno, sin devolver productos que no te quedan.' },
-              { titulo: 'Un SOS para cualquier día', desc: 'Sabés qué primer usar según cómo esté tu piel ese día, para que el maquillaje aguante sin importar el cansancio.' },
-              { titulo: 'Contorno a tu medida', desc: 'Aplicás el bronzer exactamente donde tu cara lo necesita, con resultado de contorno profesional.' },
+              { titulo: 'Guía de Compra Inteligente', desc: 'Sabés exactamente qué producto usar y para qué, así dejás de gastar en cosas que después no tocás.' },
+              { titulo: 'El Método del Diagnóstico de Piel', desc: 'En 6 preguntas descubrís tu tipo de piel exacto y qué priorizar en cada paso, sin ensayo y error.' },
+              { titulo: 'Guía del Subtono Perfecto', desc: 'Encontrás tu subtono real y elegís la base perfecta desde el día uno, sin devolver productos que no te quedan.' },
+              { titulo: 'Guía SOS del Primer', desc: 'Sabés qué primer usar según cómo esté tu piel ese día, para que el maquillaje aguante sin importar el cansancio.' },
+              { titulo: 'El Método del Contorno Perfecto', desc: 'Aplicás el bronzer exactamente donde tu cara lo necesita, con resultado de contorno profesional.' },
+              { titulo: 'La Comunidad Glow', desc: 'Un espacio privado para mostrar tus looks, resolver dudas al instante y compartir con otras alumnas que están en el mismo camino que vos.' },
             ].map((d, i) => (
               <motion.div
                 key={i}
@@ -217,30 +215,11 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
               >
                 <Check size={14} className="text-glow-blush flex-shrink-0 mt-0.5" />
                 <div>
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <p className="font-montserrat text-xs font-medium text-glow-navy">{d.titulo}</p>
-                    <span className="font-montserrat text-[8px] tracking-widest uppercase text-glow-blush border border-glow-blush/40 px-1.5 py-0.5 flex-shrink-0">
-                      Descargable
-                    </span>
-                  </div>
+                  <p className="font-montserrat text-xs font-medium text-glow-navy mb-0.5">{d.titulo}</p>
                   <p className="font-montserrat text-[11px] text-glow-navy/50 leading-relaxed">{d.desc}</p>
                 </div>
               </motion.div>
             ))}
-
-            <motion.div
-              variants={fadeUp}
-              whileHover={{ scale: 1.01, transition: { duration: 0.2 } }}
-              className="flex gap-4 items-start p-4 border border-glow-blush/40 bg-glow-cream/40 hover:border-glow-blush hover:shadow-sm transition-shadow duration-300"
-            >
-              <span className="font-montserrat text-[10px] tracking-widest text-glow-blush flex-shrink-0 mt-0.5">BONUS</span>
-              <div>
-                <p className="font-montserrat text-xs font-medium text-glow-navy mb-0.5">Nunca más sola frente al espejo</p>
-                <p className="font-montserrat text-[11px] text-glow-navy/50 leading-relaxed">
-                  Acceso a la Comunidad Glow: un espacio privado para mostrar tus looks, resolver dudas al instante y compartir con otras alumnas que están en el mismo camino que vos.
-                </p>
-              </div>
-            </motion.div>
           </motion.div>
 
           <motion.ul
@@ -262,6 +241,37 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
               </motion.li>
             ))}
           </motion.ul>
+        </section>
+
+        {/* Sponsored by Clarins */}
+        <section className="border-t border-glow-navy/10 pt-16 text-center">
+          <motion.p
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-navy/40 mb-4"
+          >
+            Con el respaldo de
+          </motion.p>
+          <motion.p
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="font-cormorant text-4xl md:text-5xl text-glow-navy font-light tracking-[0.15em] mb-5"
+          >
+            CLARINS
+          </motion.p>
+          <motion.p
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="font-montserrat text-sm text-glow-navy/60 max-w-md mx-auto leading-relaxed"
+          >
+            Este curso está armado con productos y el respaldo de Clarins, marca líder mundial en cuidado de la piel. Aprendés un método pensado para funcionar con productos de calidad probada.
+          </motion.p>
         </section>
 
         {/* Valor + Urgencia */}
@@ -296,7 +306,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
                 Accedé hoy
               </h3>
               <p className="font-montserrat text-xs text-glow-navy/50 mb-6 max-w-xs">
-                Todo el curso, los descargables y la comunidad, antes de que suba el precio.
+                Todo el curso, los bonos y la comunidad, antes de que suba el precio.
               </p>
               <AddToCartCurso curso={curso} />
             </div>
