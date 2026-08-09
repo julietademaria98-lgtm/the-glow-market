@@ -4,13 +4,22 @@ import NavbarWrapper, { FooterWrapper } from '@/components/layout/NavbarWrapper'
 import Script from 'next/script'
 
 export const metadata: Metadata = {
-  title: 'The Glow Market — Accesorios & Cursos Online',
+  title: 'The Glow Market — Neceseres & Cursos de Maquillaje Online',
   description:
-    'Accesorios y cursos de automaquillaje. Envíos a todo Argentina.',
-  keywords: ['joyería', 'accesorios', 'argentina', 'cursos online', 'maquillaje', 'glow'],
+    'Neceseres y pouches de diseño, más cursos online de automaquillaje con el respaldo de Clarins. Envíos a todo Argentina.',
+  keywords: [
+    'neceseres',
+    'pouches',
+    'neceser de maquillaje',
+    'cursos online',
+    'curso de maquillaje',
+    'automaquillaje',
+    'argentina',
+    'glow',
+  ],
   openGraph: {
     title: 'The Glow Market',
-    description: 'Accesorios y cursos de automaquillaje.',
+    description: 'Neceseres y pouches de diseño, más cursos online de automaquillaje.',
     siteName: 'The Glow Market',
     locale: 'es_AR',
     type: 'website',
