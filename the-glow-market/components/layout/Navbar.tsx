@@ -56,14 +56,14 @@ export default function Navbar() {
 
           {/* RIGHT ACTIONS — desktop */}
           <div className="hidden md:flex gap-6 items-center">
-            <Link href="/carrito" className="relative nav-link">
-              Carrito
-              {itemCount > 0 && (
+            {itemCount > 0 && (
+              <Link href="/carrito" className="relative nav-link">
+                Carrito
                 <span className="absolute -top-2 -right-4 bg-glow-navy text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-montserrat">
                   {itemCount}
                 </span>
-              )}
-            </Link>
+              </Link>
+            )}
 
             <div className="relative group">
               <Link
@@ -104,14 +104,14 @@ export default function Navbar() {
 
           {/* MOBILE: carrito + hamburger */}
           <div className="flex md:hidden items-center gap-4 ml-auto">
-            <Link href="/carrito" className="relative nav-link">
-              Carrito
-              {itemCount > 0 && (
+            {itemCount > 0 && (
+              <Link href="/carrito" className="relative nav-link">
+                Carrito
                 <span className="absolute -top-2 -right-4 bg-glow-navy text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-montserrat">
                   {itemCount}
                 </span>
-              )}
-            </Link>
+              </Link>
+            )}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="text-glow-navy p-1"
@@ -146,7 +146,7 @@ export default function Navbar() {
               { href: '/', label: 'Inicio' },
               { href: '/productos', label: 'Market' },
               { href: '/cursos', label: 'Cursos Online' },
-              { href: '/carrito', label: 'Carrito' },
+              ...(itemCount > 0 ? [{ href: '/carrito', label: 'Carrito' }] : []),
               { href: '/mi-curso', label: 'Mi Curso' },
             ].map((link) => (
               <Link
