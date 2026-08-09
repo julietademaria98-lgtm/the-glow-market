@@ -45,7 +45,16 @@ function LoginForm() {
       return
     }
 
-    router.push(redirectTo)
+    let destino = redirectTo
+    try {
+      const res = await fetch('/api/auth/link-cursos', { method: 'POST' })
+      const linkData = await res.json()
+      if (linkData.activados > 0 && redirectTo === '/') destino = '/mi-curso'
+    } catch {
+      // Si falla el enganche automático, la revisión de respaldo en "Mi Curso" lo resuelve.
+    }
+
+    router.push(destino)
     router.refresh()
   }
 
