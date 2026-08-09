@@ -16,6 +16,7 @@ interface SendOrderConfirmationParams {
   total: number
   hasCurso?: boolean
   hasProductoFisico?: boolean
+  requiereCuenta?: boolean
 }
 
 export async function sendOrderConfirmation({
@@ -26,9 +27,12 @@ export async function sendOrderConfirmation({
   total,
   hasCurso = false,
   hasProductoFisico = true,
+  requiereCuenta = false,
 }: SendOrderConfirmationParams) {
   const subject = hasCurso && !hasProductoFisico
-    ? '¡Tu curso está listo! ✦ The Glow Market'
+    ? requiereCuenta
+      ? 'Un paso más para acceder a tu curso ✦ The Glow Market'
+      : '¡Tu curso está listo! ✦ The Glow Market'
     : 'Tu pedido está en camino ✦ The Glow Market'
 
   const itemsHtml = items
@@ -43,112 +47,28 @@ export async function sendOrderConfirmation({
       </tr>`)
     .join('')
 
-  const cursoSection = hasCurso ? `
+  const cursoSection = hasCurso
+    ? requiereCuenta
+      ? `
+    <div style="background: #192149; padding: 24px 32px; margin-bottom: 32px; border-radius: 2px; text-align: center;">
+      <p style="font-family: 'Georgia', serif; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #e8b4b8; margin: 0 0 8px 0;">
+        Un paso más para entrar
+      </p>
+      <p style="font-family: 'Georgia', serif; font-size: 20px; font-weight: 300; color: #ffffff; margin: 0 0 12px 0;">
+        Creá tu cuenta gratis con este mismo email
+      </p>
+      <p style="font-family: 'Georgia', serif; font-size: 13px; color: rgba(255,255,255,0.7); margin: 0 0 20px 0; line-height: 1.6;">
+        Usá <strong>${to}</strong> al crear tu cuenta y, apenas inicies sesión, tu curso se activa solo.
+      </p>
+      <a href="https://theglowmarket.com.ar/registro"
+        style="display: inline-block; background: #e9e2da; color: #192149; font-family: 'Georgia', serif; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; padding: 14px 32px; text-decoration: none;">
+        Crear mi cuenta →
+      </a>
+    </div>
+  `
+      : `
     <div style="background: #192149; padding: 24px 32px; margin-bottom: 32px; border-radius: 2px; text-align: center;">
       <p style="font-family: 'Georgia', serif; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #e8b4b8; margin: 0 0 8px 0;">
         Tu curso está disponible ahora
       </p>
-      <p style="font-family: 'Georgia', serif; font-size: 20px; font-weight: 300; color: #ffffff; margin: 0 0 20px 0;">
-        Accedé cuando quieras, de por vida.
-      </p>
-      <a href="https://theglowmarket.com.ar/mi-curso"
-        style="display: inline-block; background: #e9e2da; color: #192149; font-family: 'Georgia', serif; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; padding: 14px 32px; text-decoration: none;">
-        Ir a mi curso →
-      </a>
-    </div>
-  ` : ''
-
-  const productosSection = hasProductoFisico ? `
-    <table style="width: 100%; border-collapse: collapse;">
-      ${itemsHtml}
-      <tr>
-        <td style="padding: 16px 0 0 0; font-family: 'Georgia', serif; color: #1a2340; font-size: 14px; font-weight: bold;">Total</td>
-        <td style="padding: 16px 0 0 0; text-align: right; font-family: 'Georgia', serif; color: #1a2340; font-size: 16px; font-weight: bold;">$${total.toLocaleString('es-AR')}</td>
-      </tr>
-    </table>
-    <div style="border-top: 1px solid #e8e0d8; margin: 32px 0;"></div>
-    <p style="font-size: 14px; color: #1a2340; line-height: 1.7; margin: 0 0 24px 0;">Pronto va a estar en tus manos.</p>
-    <p style="font-size: 13px; color: #1a2340; opacity: 0.6; line-height: 1.7; margin: 0 0 32px 0;">Si tenés alguna pregunta, respondé este mail o escribinos por Instagram.</p>
-    <p style="font-size: 13px; color: #1a2340; line-height: 1.6; margin: 0;">Own Your Glow,<br/><span style="font-style: italic;">Nina - The Glow Market Team</span></p>
-  ` : `
-    <p style="font-size: 13px; color: #1a2340; opacity: 0.6; line-height: 1.7; margin: 0 0 32px 0;">Si tenés alguna pregunta, respondé este mail o escribinos por Instagram.</p>
-    <p style="font-size: 13px; color: #1a2340; line-height: 1.6; margin: 0;">Own Your Glow,<br/><span style="font-style: italic;">Nina - The Glow Market Team</span></p>
-  `
-
-  const introText = hasCurso && !hasProductoFisico
-    ? `
-      <p style="font-size: 14px; color: #1a2340; opacity: 0.7; margin: 0 0 16px 0; line-height: 1.6;">Tu compra fue confirmada. Ya podés acceder a tu curso.</p>
-      <p style="font-size: 14px; color: #1a2340; opacity: 0.7; margin: 0 0 32px 0; line-height: 1.6;">Acordate que tenés que iniciar sesión con el mismo mail y contraseña que te creaste, ¡y listo! Ya podés comenzar a disfrutar el curso.</p>
-    `
-    : `<p style="font-size: 14px; color: #1a2340; opacity: 0.7; margin: 0 0 32px 0; line-height: 1.6;">Recibimos tu pedido y ya está siendo preparado. Gracias por ser parte del glow team.</p>`
-
-  await resend.emails.send({
-    from: 'The Glow Market <hola@theglowmarket.com.ar>',
-    to,
-    subject,
-    html: `<!DOCTYPE html><html><head><meta charset="utf-8"></head>
-<body style="margin: 0; padding: 0; background-color: #f5f0eb; font-family: 'Georgia', serif;">
-  <div style="max-width: 580px; margin: 0 auto; padding: 40px 20px;">
-    <div style="text-align: center; margin-bottom: 40px;">
-      <p style="font-family: 'Georgia', serif; font-size: 11px; letter-spacing: 0.3em; color: #1a2340; text-transform: uppercase; margin: 0;">THE <span style="font-size: 22px; font-weight: 300;">GLOW</span> MARKET</p>
-    </div>
-    <div style="background: #ffffff; padding: 48px 40px; border-radius: 2px;">
-      <p style="font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #1a2340; opacity: 0.5; margin: 0 0 16px 0;">Pedido #${ordenId.slice(0, 8).toUpperCase()}</p>
-      <h1 style="font-size: 28px; font-weight: 300; color: #1a2340; margin: 0 0 16px 0; letter-spacing: 0.05em;">Hola, ${nombreCliente}</h1>
-      ${introText}
-      <div style="border-top: 1px solid #e8e0d8; margin-bottom: 24px;"></div>
-      ${cursoSection}
-      ${productosSection}
-    </div>
-    <div style="text-align: center; margin-top: 32px;">
-      <p style="font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #1a2340; opacity: 0.4; margin: 0;">The Glow Market · theglowmarket.com.ar</p>
-    </div>
-  </div>
-</body></html>`,
-  })
-}
-
-export async function sendSeguimientoEmail({
-  to,
-  nombreCliente,
-  ordenId,
-  numeroSeguimiento,
-}: {
-  to: string
-  nombreCliente: string
-  ordenId: string
-  numeroSeguimiento: string
-}) {
-  await resend.emails.send({
-    from: 'The Glow Market <hola@theglowmarket.com.ar>',
-    to,
-    subject: 'Tu pedido está en camino ✦ The Glow Market',
-    html: `<!DOCTYPE html><html><head><meta charset="utf-8"></head>
-<body style="margin: 0; padding: 0; background-color: #f5f0eb; font-family: 'Georgia', serif;">
-  <div style="max-width: 580px; margin: 0 auto; padding: 40px 20px;">
-    <div style="text-align: center; margin-bottom: 40px;">
-      <p style="font-family: 'Georgia', serif; font-size: 11px; letter-spacing: 0.3em; color: #1a2340; text-transform: uppercase; margin: 0;">THE <span style="font-size: 22px; font-weight: 300;">GLOW</span> MARKET</p>
-    </div>
-    <div style="background: #ffffff; padding: 48px 40px; border-radius: 2px;">
-      <p style="font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #1a2340; opacity: 0.5; margin: 0 0 16px 0;">Pedido #${ordenId.slice(0, 8).toUpperCase()}</p>
-      <h1 style="font-size: 28px; font-weight: 300; color: #1a2340; margin: 0 0 16px 0; letter-spacing: 0.05em;">Hola, ${nombreCliente}</h1>
-      <p style="font-size: 14px; color: #1a2340; opacity: 0.7; margin: 0 0 32px 0; line-height: 1.6;">Tu pedido ya está en camino. Podés seguirlo con el número de seguimiento de Andreani.</p>
-      <div style="border-top: 1px solid #e8e0d8; margin-bottom: 24px;"></div>
-      <div style="background: #f5f0eb; padding: 24px 32px; margin-bottom: 32px; text-align: center;">
-        <p style="font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #1a2340; opacity: 0.5; margin: 0 0 12px 0;">Número de seguimiento</p>
-        <p style="font-family: 'Georgia', serif; font-size: 22px; font-weight: 300; color: #192149; margin: 0 0 20px 0; letter-spacing: 0.05em;">${numeroSeguimiento}</p>
-        <a href="https://www.andreani.com/personas/seguimiento-de-envios?numero=${numeroSeguimiento}"
-          style="display: inline-block; background: #192149; color: #e9e2da; font-family: 'Georgia', serif; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; padding: 14px 32px; text-decoration: none;">
-          Seguir mi pedido →
-        </a>
-      </div>
-      <p style="font-size: 13px; color: #1a2340; opacity: 0.6; line-height: 1.7; margin: 0 0 32px 0;">Si tenés alguna pregunta, respondé este mail o escribinos por Instagram.</p>
-      <p style="font-size: 13px; color: #1a2340; line-height: 1.6; margin: 0;">Own Your Glow,<br/><span style="font-style: italic;">Nina - The Glow Market Team</span></p>
-    </div>
-    <div style="text-align: center; margin-top: 32px;">
-      <p style="font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #1a2340; opacity: 0.4; margin: 0;">The Glow Market · theglowmarket.com.ar</p>
-    </div>
-  </div>
-</body></html>`,
-  })
-}
+      <p
