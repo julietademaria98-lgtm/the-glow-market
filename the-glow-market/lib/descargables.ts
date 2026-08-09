@@ -44,7 +44,7 @@ const DESCARGABLES_POR_ORDEN: Record<number, Descargable[]> = {
       titulo: 'Bronzer por Tipo de Cara',
       subtitulo: 'Aplicación personalizada según tu forma de rostro',
       filename: 'bronzer-tipo-cara.pdf',
-      notaExtra: 'El mismo descargable del Módulo 2 — lo usás también acá',
+      notaExtra: 'El mismo recurso del Módulo 2 — lo usás también acá',
     },
   ],
 }
