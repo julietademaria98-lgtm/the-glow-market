@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { revalidatePath } from 'next/cache'
 import { getPayment } from '@/lib/mercadopago'
 import { sendOrderConfirmation } from '@/lib/email'
 import type { MPWebhookData } from '@/types'
@@ -70,10 +71,12 @@ export async function POST(request: Request) {
 
     // Descontar stock de productos
     if (orden.items) {
+      let stockCambiado = false
+
       for (const item of orden.items) {
         const { data: producto } = await adminClient
           .from('productos')
-          .select('id, stock')
+          .select('id, slug, stock')
           .eq('id', item.id)
           .single()
 
@@ -83,7 +86,16 @@ export async function POST(request: Request) {
             .from('productos')
             .update({ stock: nuevoStock })
             .eq('id', producto.id)
+          stockCambiado = true
+          revalidatePath(`/productos/${producto.slug}`)
         }
+      }
+
+      // El stock se muestra tanto en la home como en /productos: sin esto, una de las
+      // dos páginas puede quedar mostrando disponibilidad vieja hasta que venza el caché.
+      if (stockCambiado) {
+        revalidatePath('/')
+        revalidatePath('/productos')
       }
     }
 
