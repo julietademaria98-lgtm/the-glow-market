@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import StarIcon from '@/components/ui/StarIcon'
+import { linkPendingCourseOrders } from '@/lib/cursoAccess'
 import type { Curso } from '@/types'
 
 async function getMisCursos(userId: string): Promise<Curso[]> {
@@ -33,6 +34,9 @@ export default async function MiCursoPage() {
   } = await supabase.auth.getUser()
 
   if (!user) redirect('/login?redirect=/mi-curso')
+
+  // Red de respaldo: si compró como invitada y todavía no se enganchó su orden con esta cuenta.
+  await linkPendingCourseOrders(user.email, user.id)
 
   const cursos = await getMisCursos(user.id)
   const nombre = user.user_metadata?.nombre || user.email?.split('@')[0] || 'bienvenida'
