@@ -3,8 +3,20 @@ import ProductGrid from '@/components/shop/ProductGrid'
 import StarIcon from '@/components/ui/StarIcon'
 import WaitlistForm from '@/components/shop/WaitlistForm'
 import type { Producto } from '@/types'
+import type { Metadata } from 'next'
 
 export const revalidate = 3600
+
+export const metadata: Metadata = {
+  title: 'Neceseres y Pouches de Diseño — The Glow Market',
+  description:
+    'Descubrí The Flower Pouch Capsule: neceseres y pouches de diseño para tu maquillaje, con envíos a todo Argentina.',
+  keywords: ['neceseres', 'pouches', 'neceser de maquillaje', 'organizador de maquillaje', 'argentina'],
+  openGraph: {
+    title: 'Neceseres y Pouches de Diseño — The Glow Market',
+    description: 'Descubrí The Flower Pouch Capsule: neceseres y pouches de diseño para tu maquillaje.',
+  },
+}
 
 interface SearchParams {
   categoria?: string
