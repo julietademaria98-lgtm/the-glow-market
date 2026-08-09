@@ -1,7 +1,6 @@
 'use client'
 
-import { motion, useInView } from 'framer-motion'
-import { useRef, useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
 import Link from 'next/link'
 import AddToCartCurso from '@/components/courses/AddToCartCurso'
@@ -17,26 +16,6 @@ const fadeUp = {
 const stagger = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.12 } },
-}
-
-function Counter({ target, suffix = '' }: { target: number; suffix?: string }) {
-  const [count, setCount] = useState(0)
-  const ref = useRef(null)
-  const inView = useInView(ref, { once: true })
-
-  useEffect(() => {
-    if (!inView) return
-    let current = 0
-    const step = target / (1200 / 16)
-    const timer = setInterval(() => {
-      current += step
-      if (current >= target) { setCount(target); clearInterval(timer) }
-      else setCount(Math.floor(current))
-    }, 16)
-    return () => clearInterval(timer)
-  }, [inView, target])
-
-  return <span ref={ref}>{count}{suffix}</span>
 }
 
 export default function CourseLandingClient({ curso }: { curso: Curso }) {
@@ -62,65 +41,22 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
             transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
             className="font-cormorant text-4xl md:text-6xl text-glow-navy font-light tracking-wide leading-[1.1] mb-4"
           >
-            Te enseño todos mis tips para que aprendas a maquillarte todos los días
+            Aprendé a maquillarte de manera profesional en menos de 30 minutos
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-cormorant text-2xl text-glow-navy/60 italic mb-6"
+            className="font-cormorant text-2xl text-glow-navy/60 italic"
           >
-            Pocos productos. Piel divina. Maquillaje que dura todo el día.
-          </motion.p>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="font-montserrat text-sm text-glow-navy/60 leading-relaxed max-w-xl mb-8"
-          >
-            De cara recién levantada a look de noche, en 4 módulos cortos. Te enseño el método que uso todos los días para tener piel divina y un maquillaje que no se va.
-          </motion.p>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/40"
-          >
-            Acceso de por vida · 5 descargables · Comunidad exclusiva · Links Clarins con regalos por compra
+            Pocos productos. Piel divina. Maquillaje de día a noche en pocos pasos.
           </motion.p>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="bg-glow-navy py-12 px-6">
+      {/* Video de bienvenida */}
+      <div className="max-w-3xl mx-auto px-6 pt-16">
         <motion.div
-          variants={stagger}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="max-w-3xl mx-auto grid grid-cols-3 gap-8 text-center"
-        >
-          {[
-            { value: 4, suffix: '', label: 'Módulos' },
-            { value: 5, suffix: '', label: 'Descargables PDF' },
-            { value: 100, suffix: '%', label: 'Online y a tu ritmo' },
-          ].map((stat) => (
-            <motion.div key={stat.label} variants={fadeUp}>
-              <p className="font-cormorant text-5xl text-glow-blush font-light mb-1">
-                <Counter target={stat.value} suffix={stat.suffix} />
-              </p>
-              <p className="font-montserrat text-[9px] tracking-[0.2em] uppercase text-white/50">
-                {stat.label}
-              </p>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-
-      <div className="max-w-3xl mx-auto px-6 py-16 space-y-16">
-
-        {/* Video de bienvenida + cita — cierre de la Promesa */}
-        <motion.section
           variants={fadeUp}
           initial="hidden"
           whileInView="visible"
@@ -130,7 +66,43 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
             Mirá de qué se trata
           </p>
           <PreviewVideo cursoId={curso.id} />
-          <p className="font-cormorant text-2xl md:text-3xl text-glow-navy/80 italic leading-relaxed mt-10 text-center">
+        </motion.div>
+      </div>
+
+      {/* Franja azul — propuesta + resumen */}
+      <div className="bg-glow-navy py-16 px-6 mt-16">
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="max-w-3xl mx-auto text-center"
+        >
+          <motion.p
+            variants={fadeUp}
+            className="font-cormorant text-2xl md:text-3xl text-white font-light leading-relaxed mb-6"
+          >
+            Te enseño el método que uso todos los días para tener piel divina y un maquillaje que no se va.
+          </motion.p>
+          <motion.p
+            variants={fadeUp}
+            className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-white/50"
+          >
+            Acceso de por vida · 5 descargables · Comunidad exclusiva · Links Clarins con regalos por compra
+          </motion.p>
+        </motion.div>
+      </div>
+
+      <div className="max-w-3xl mx-auto px-6 py-16 space-y-16">
+
+        {/* Cita — cierre de la Promesa */}
+        <motion.section
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          <p className="font-cormorant text-2xl md:text-3xl text-glow-navy/80 italic leading-relaxed text-center">
             "Este curso lo armé para vos, mujeres reales que quieren salir prolijas y se cansaron de probar productos que no usan."
           </p>
           <span className="block mt-4 text-center font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-navy/40">
