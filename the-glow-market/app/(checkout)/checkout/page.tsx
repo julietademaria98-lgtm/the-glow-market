@@ -187,7 +187,7 @@ export default function CheckoutPage() {
             </div>
 
             {hasCurso && !user && (
-              <p className="font-montserrat text-xs text-glow-navy/70 bg-glow-cream px-4 py-3 leading-relaxed">
+              <p className="font-montserrat text-base uppercase text-glow-navy bg-glow-cream border-2 border-glow-navy shadow-[6px_6px_0_0_rgba(233,180,184,0.6)] px-5 py-4 leading-relaxed">
                 Estás comprando un curso online. No hace falta crear una cuenta ahora: después de tu compra
                 te enviamos un mail para que crees tu cuenta gratis con este mismo email, y tu curso se activa solo.
               </p>
