@@ -53,6 +53,7 @@ export async function createProducto(formData: FormData) {
   }
   revalidatePath('/admin/productos')
   revalidatePath('/productos')
+  revalidatePath('/')
   redirect('/admin/productos')
 }
 
@@ -78,6 +79,7 @@ export async function updateProducto(id: string, formData: FormData) {
   }
   revalidatePath('/admin/productos')
   revalidatePath('/productos')
+  revalidatePath('/')
   redirect('/admin/productos')
 }
 
@@ -88,6 +90,7 @@ export async function deleteProductoFromForm(formData: FormData) {
   await db.from('productos').delete().eq('id', id)
   revalidatePath('/admin/productos')
   revalidatePath('/productos')
+  revalidatePath('/')
 }
 
 export async function toggleActivoFromForm(formData: FormData) {
@@ -97,6 +100,7 @@ export async function toggleActivoFromForm(formData: FormData) {
   await db.from('productos').update({ activo }).eq('id', id)
   revalidatePath('/admin/productos')
   revalidatePath('/productos')
+  revalidatePath('/')
 }
 
 export async function updateCurso(id: string, formData: FormData) {
