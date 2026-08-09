@@ -99,4 +99,26 @@ export default function SocialProofPopup({ cursoNombre }: { cursoNombre: string 
                 <span className="text-glow-navy/50">de {toast.ciudad}</span>
                 {toast.tipo === 'compra' ? (
                   <>
-                    {
+                    {' '}compró <span className="font-medium">{cursoNombre}</span>
+                  </>
+                ) : (
+                  ' está viendo esta página'
+                )}
+              </p>
+              <p className="font-montserrat text-[10px] text-glow-navy/40 mt-1">
+                {toast.tipo === 'compra' ? toast.hace : 'ahora mismo'}
+              </p>
+            </div>
+            <button
+              onClick={() => setDismissed(true)}
+              aria-label="Cerrar"
+              className="text-glow-navy/30 hover:text-glow-navy transition-colors flex-shrink-0"
+            >
+              <X size={13} />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
