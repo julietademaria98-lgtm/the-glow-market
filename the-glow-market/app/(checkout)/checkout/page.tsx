@@ -304,7 +304,7 @@ export default function CheckoutPage() {
             >
               Pagar con MercadoPago
             </Button>
-            <p className="font-montserrat text-[9px] text-center text-glow-navy/30 leading-relaxed">
+             <p className="font-montserrat text-[9px] text-center text-glow-navy leading-relaxed">
               Serás redirigida a MercadoPago para completar el pago de forma segura.
             </p>
 
