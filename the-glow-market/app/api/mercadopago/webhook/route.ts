@@ -110,7 +110,9 @@ export async function POST(request: Request) {
 
     // Enviar email de confirmación
     try {
-      const { data: usuario } = await adminClient.auth.admin.getUserById(orden.user_id || '')
+      const { data: usuario } = orden.user_id
+        ? await adminClient.auth.admin.getUserById(orden.user_id)
+        : { data: null }
       const email =
         usuario?.user?.email ||
         payment.payer?.email ||
@@ -127,6 +129,7 @@ export async function POST(request: Request) {
         )
         const hasCurso = (orden.items || []).some((item: any) => cursosIds.has(item.id))
         const hasProductoFisico = (orden.items || []).some((item: any) => !cursosIds.has(item.id))
+        const requiereCuenta = hasCurso && !orden.user_id
 
         await sendOrderConfirmation({
           to: email,
@@ -136,6 +139,7 @@ export async function POST(request: Request) {
           total: orden.total || 0,
           hasCurso,
           hasProductoFisico,
+          requiereCuenta,
         })
       }
     } catch (emailError) {
