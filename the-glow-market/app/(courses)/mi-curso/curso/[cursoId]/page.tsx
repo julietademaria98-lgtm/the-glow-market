@@ -188,12 +188,12 @@ export default async function CourseOverviewPage({ params }: Props) {
           </div>
         </div>
 
-        {/* Descargables */}
+        {/* Recursos del curso */}
         <div className="py-12 border-b border-glow-navy/10">
           <div className="flex items-center gap-3 mb-8">
             <StarIcon size={9} className="text-glow-blush" />
             <span className="font-montserrat text-[13px] tracking-[0.25em] uppercase text-glow-navy">
-              Material descargable
+              Recursos del curso
             </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -226,7 +226,7 @@ export default async function CourseOverviewPage({ params }: Props) {
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {[
               '6 videos accesibles desde web y celular',
-              '5 descargables exclusivos en PDF',
+              '5 recursos exclusivos en PDF',
               'Acceso de por vida + actualizaciones futuras',
               'Links directos a productos Clarins con regalos por compra',
               'Acceso ilimitado, volvé a verlos cuando quieras',
