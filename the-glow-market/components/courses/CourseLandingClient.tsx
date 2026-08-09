@@ -190,14 +190,14 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           </div>
         </section>
 
-        {/* Bonos */}
+         {/* Bonos */}
         <section className="border-t border-glow-navy/10 pt-16">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <h2 className="font-cormorant text-3xl text-glow-navy font-light mb-2">
+            <h2 className="font-cormorant text-3xl text-glow-navy font-light uppercase mb-2">
               Comprando hoy, además te llevás
             </h2>
-            <p className="font-montserrat text-xs text-glow-navy/50 mb-8">
-              Todo esto sin costo extra, para que el resultado no dependa solo del video.
+            <p className="font-montserrat text-base text-glow-navy/60 mb-8">
+              5 descargables complementarios de bonus, para aplicar el método sin tener que volver a mirar la clase.
             </p>
           </motion.div>
 
@@ -217,10 +217,31 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
               >
                 <Check size={14} className="text-glow-blush flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-montserrat text-xs font-medium text-glow-navy mb-0.5">{d.titulo}</p>
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <p className="font-montserrat text-xs font-medium text-glow-navy">{d.titulo}</p>
+                    <span className="font-montserrat text-[8px] tracking-widest uppercase text-glow-blush border border-glow-blush/40 px-1.5 py-0.5 flex-shrink-0">
+                      Descargable
+                    </span>
+                  </div>
                   <p className="font-montserrat text-[11px] text-glow-navy/50 leading-relaxed">{d.desc}</p>
                 </div>
               </motion.div>
+            ))}
+
+            <motion.div
+              variants={fadeUp}
+              whileHover={{ scale: 1.01, transition: { duration: 0.2 } }}
+              className="flex gap-4 items-start p-4 border border-glow-blush/40 bg-glow-cream/40 hover:border-glow-blush hover:shadow-sm transition-shadow duration-300"
+            >
+              <span className="font-montserrat text-[10px] tracking-widest text-glow-blush flex-shrink-0 mt-0.5">BONUS</span>
+              <div>
+                <p className="font-montserrat text-xs font-medium text-glow-navy mb-0.5">Nunca más sola frente al espejo</p>
+                <p className="font-montserrat text-[11px] text-glow-navy/50 leading-relaxed">
+                  Acceso a la Comunidad Glow: un espacio privado para mostrar tus looks, resolver dudas al instante y compartir con otras alumnas que están en el mismo camino que vos.
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
             ))}
 
             <motion.div
