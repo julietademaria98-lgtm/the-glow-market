@@ -335,8 +335,8 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
               </motion.details>
             ))}
           </motion.div>
-          <Link href="/cursos" className="block mt-10 text-center font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/40 hover:text-glow-navy transition-colors">
-            ← Volver a cursos
+          <Link href="/" className="block mt-10 text-center font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/40 hover:text-glow-navy transition-colors">
+            ← Volver al inicio
           </Link>
         </section>
 
