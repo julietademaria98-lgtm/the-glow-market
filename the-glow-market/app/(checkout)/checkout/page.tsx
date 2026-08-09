@@ -102,47 +102,6 @@ export default function CheckoutPage() {
     )
   }
 
-  if (hasCurso && !user) {
-    return (
-      <main className="min-h-screen bg-glow-cream pt-24 flex items-center justify-center px-6">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-10">
-            <div className="flex items-center justify-center gap-2 mb-6">
-              <StarIcon size={10} className="text-glow-navy" />
-              <StarIcon size={16} className="text-glow-navy" />
-              <StarIcon size={10} className="text-glow-navy" />
-            </div>
-            <h1 className="font-cormorant text-4xl text-glow-navy font-light tracking-wide mb-4">
-              Antes de continuar
-            </h1>
-            <p className="font-montserrat text-sm text-glow-navy/60 leading-relaxed max-w-sm mx-auto">
-              Estás comprando un curso online. Para poder acceder a él una vez acreditado el pago,
-              necesitás una cuenta en The Glow Market con el mismo email que uses para la compra.
-            </p>
-          </div>
-          <div className="bg-white p-8 flex flex-col gap-4">
-            <p className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/40 text-center">
-              ¿Cómo querés continuar?
-            </p>
-            <Link href="/registro?redirect=/checkout">
-              <Button variant="primary" className="w-full" size="md">
-                Crear cuenta nueva
-              </Button>
-            </Link>
-            <Link href="/login?redirect=/checkout">
-              <Button variant="outline" className="w-full" size="md">
-                Ya tengo cuenta — Iniciar sesión
-              </Button>
-            </Link>
-            <p className="font-montserrat text-xs text-glow-navy/70 text-center leading-relaxed pt-2">
-              Solo toma un minuto. Con ese usuario y contraseña vas a poder ver el curso desde cualquier dispositivo.
-            </p>
-          </div>
-        </div>
-      </main>
-    )
-  }
-
   const onSubmit = async (datosEnvio: CheckoutForm) => {
     setLoading(true)
     setError(null)
@@ -225,6 +184,13 @@ export default function CheckoutPage() {
                 </div>
               </div>
             </div>
+
+            {hasCurso && !user && (
+              <p className="font-montserrat text-xs text-glow-navy/70 bg-glow-cream px-4 py-3 leading-relaxed">
+                Estás comprando un curso online. No hace falta crear una cuenta ahora: después de tu compra
+                te enviamos un mail para que crees tu cuenta gratis con este mismo email, y tu curso se activa solo.
+              </p>
+            )}
 
             {!soloDigital && (
               <div>
