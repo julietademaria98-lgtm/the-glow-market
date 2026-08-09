@@ -6,6 +6,7 @@ import Link from 'next/link'
 import AddToCartCurso from '@/components/courses/AddToCartCurso'
 import PreviewVideo from '@/components/courses/PreviewVideo'
 import SocialProofPopup from '@/components/courses/SocialProofPopup'
+import StarIcon from '@/components/ui/StarIcon'
 import type { Curso } from '@/types'
 
 const fadeUp = {
@@ -192,13 +193,14 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
 
         {/* Bonos */}
         <section className="border-t border-glow-navy/10 pt-16">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <h2 className="font-cormorant text-3xl text-glow-navy font-light uppercase mb-2">
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-10">
+            <span className="inline-block w-10 h-px bg-glow-blush mb-4" />
+            <h2 className="font-cormorant text-4xl text-glow-navy font-light uppercase tracking-wide">
               Comprando hoy, además te llevás
             </h2>
           </motion.div>
 
-          <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }} className="space-y-4">
+          <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
               { titulo: 'Guía de Compra Inteligente', desc: 'Sabés exactamente qué producto usar y para qué, así dejás de gastar en cosas que después no tocás.' },
               { titulo: 'El Método del Diagnóstico de Piel', desc: 'En 6 preguntas descubrís tu tipo de piel exacto y qué priorizar en cada paso, sin ensayo y error.' },
@@ -210,13 +212,18 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
               <motion.div
                 key={i}
                 variants={fadeUp}
-                whileHover={{ scale: 1.01, transition: { duration: 0.2 } }}
-                className="flex gap-4 items-start p-4 border border-glow-navy/10 hover:border-glow-blush/50 hover:shadow-sm transition-shadow duration-300"
+                whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                className="group relative overflow-hidden bg-white border border-glow-navy/10 hover:border-glow-blush p-5 flex gap-4 items-start transition-colors duration-300 hover:shadow-lg"
               >
-                <Check size={14} className="text-glow-blush flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-montserrat text-xs font-medium text-glow-navy mb-0.5">{d.titulo}</p>
-                  <p className="font-montserrat text-[11px] text-glow-navy/50 leading-relaxed">{d.desc}</p>
+                <span className="pointer-events-none select-none absolute -top-2 -right-1 font-cormorant text-6xl text-glow-blush/10 group-hover:text-glow-blush/20 transition-colors duration-300">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span className="relative flex-shrink-0 w-9 h-9 rounded-full bg-glow-blush/15 group-hover:bg-glow-blush flex items-center justify-center transition-colors duration-300">
+                  <Check size={15} className="text-glow-blush group-hover:text-white transition-colors duration-300" />
+                </span>
+                <div className="relative">
+                  <p className="font-montserrat text-sm font-bold text-glow-navy mb-1">{d.titulo}</p>
+                  <p className="font-montserrat text-xs text-glow-navy/60 leading-relaxed">{d.desc}</p>
                 </div>
               </motion.div>
             ))}
@@ -243,36 +250,49 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           </motion.ul>
         </section>
 
+        {/* Bloque Clarins + Cupos + Valor, con olas propias (fuera del space-y del resto) */}
+        <div>
+
+        {/* Ola de entrada — blanco a navy */}
+        <div className="-mt-4 -mb-px">
+          <svg viewBox="0 0 1440 80" className="w-full h-14 md:h-20 block" preserveAspectRatio="none">
+            <path d="M0,40 C240,80 480,0 720,24 C960,48 1200,80 1440,40 L1440,80 L0,80 Z" fill="#192149" />
+          </svg>
+        </div>
+
         {/* Sponsored by Clarins */}
-        <section className="border-t border-glow-navy/10 pt-16 text-center">
-          <motion.p
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
+        <section className="relative overflow-hidden bg-glow-navy -mx-6 px-6 pb-16 text-center">
+          <div className="pointer-events-none absolute left-1/2 top-8 -translate-x-1/2 w-64 h-64 rounded-full bg-glow-blush/20 blur-3xl" />
+          <motion.div
+            className="relative"
+            initial={{ opacity: 0, scale: 0.92 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-navy/40 mb-4"
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
-            Con el respaldo de
-          </motion.p>
-          <motion.p
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="font-cormorant text-4xl md:text-5xl text-glow-navy font-light tracking-[0.15em] mb-5"
-          >
-            CLARINS
-          </motion.p>
-          <motion.p
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="font-montserrat text-sm text-glow-navy/60 max-w-md mx-auto leading-relaxed"
-          >
-            Este curso está armado con productos y el respaldo de Clarins, marca líder mundial en cuidado de la piel. Aprendés un método pensado para funcionar con productos de calidad probada.
-          </motion.p>
+            <p className="font-montserrat text-[10px] tracking-[0.35em] uppercase text-glow-blush mb-4">
+              Con el respaldo de
+            </p>
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <StarIcon size={12} className="text-glow-blush" />
+              <p className="font-cormorant text-5xl md:text-6xl text-white font-light tracking-[0.2em]">
+                CLARINS
+              </p>
+              <StarIcon size={12} className="text-glow-blush" />
+            </div>
+            <div className="w-16 h-px bg-glow-blush mx-auto mb-6" />
+            <p className="font-montserrat text-sm text-white/70 max-w-md mx-auto leading-relaxed">
+              Este curso está armado con productos y el respaldo de <strong className="text-white font-semibold">Clarins</strong>, marca líder mundial en cuidado de la piel. Aprendés un método pensado para funcionar con productos de calidad probada.
+            </p>
+          </motion.div>
         </section>
+
+        {/* Ola — navy a rosa */}
+        <div className="-mb-px">
+          <svg viewBox="0 0 1440 80" className="w-full h-10 md:h-14 block" preserveAspectRatio="none">
+            <path d="M0,20 C240,50 480,60 720,35 C960,10 1200,45 1440,25 L1440,80 L0,80 Z" fill="#E1C8CB" />
+          </svg>
+        </div>
 
         {/* Urgencia — cupos */}
         <motion.section
@@ -280,18 +300,30 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="border-t border-glow-navy/10 pt-16 text-center"
+          className="bg-glow-blush -mx-6 px-6 pb-16 text-center"
         >
-          <span className="inline-block bg-glow-blush text-white font-montserrat text-[10px] tracking-[0.2em] uppercase px-4 py-2 mb-4 font-medium">
+          <motion.span
+            animate={{ scale: [1, 1.06, 1] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+            className="inline-flex items-center gap-2 bg-white text-glow-blush font-montserrat text-[10px] tracking-[0.2em] uppercase px-4 py-2 mb-5 font-bold shadow-sm"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-glow-blush animate-pulse" />
             Cupos limitados
-          </span>
-          <h2 className="font-cormorant text-3xl text-glow-navy font-light mb-3">
-            Abrimos solo 30 cupos
+          </motion.span>
+          <h2 className="font-cormorant text-4xl md:text-5xl text-white font-light mb-3 drop-shadow-sm">
+            Abrimos solo <span className="underline decoration-white/40 decoration-2 underline-offset-4">30 cupos</span>
           </h2>
-          <p className="font-montserrat text-sm text-glow-navy/60 leading-relaxed max-w-md mx-auto">
-            Abrimos 30 cupos a precio de lanzamiento para esta primera camada. Cuando se completen, el curso pasa a su precio regular.
+          <p className="font-montserrat text-sm text-white leading-relaxed max-w-md mx-auto">
+            Abrimos 30 cupos a precio de lanzamiento para esta primera camada. <strong className="font-bold">Cuando se completen, el curso pasa a su precio regular.</strong>
           </p>
         </motion.section>
+
+        {/* Ola de salida — rosa a blanco */}
+        <div className="-mt-px">
+          <svg viewBox="0 0 1440 80" className="w-full h-10 md:h-14 block" preserveAspectRatio="none">
+            <path d="M0,60 C240,20 480,10 720,45 C960,80 1200,30 1440,55 L1440,0 L0,0 Z" fill="#FFFFFF" />
+          </svg>
+        </div>
 
         {/* Valor — compra */}
         <motion.section
@@ -299,19 +331,25 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="pt-4 text-center"
+          className="text-center"
         >
-          <span className="inline-block bg-glow-navy text-white font-montserrat text-[10px] tracking-[0.2em] uppercase px-4 py-2 mb-4 font-medium">
+          <span className="inline-block bg-glow-navy text-white font-montserrat text-[10px] tracking-[0.2em] uppercase px-4 py-2 mb-4 font-bold">
             Precio de lanzamiento
           </span>
-          <h3 className="font-cormorant text-2xl text-glow-navy font-light mb-1">
-            Accedé hoy
-          </h3>
-          <p className="font-montserrat text-xs text-glow-navy/50 mb-6 max-w-xs mx-auto">
-            Todo el curso, los bonos y la comunidad, antes de que suba el precio.
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <StarIcon size={9} className="text-glow-blush" />
+            <h3 className="font-cormorant text-3xl text-glow-navy font-light">
+              Accedé <span className="font-semibold text-glow-blush">hoy</span>
+            </h3>
+            <StarIcon size={9} className="text-glow-blush" />
+          </div>
+          <p className="font-montserrat text-sm text-glow-navy/70 mb-8 max-w-xs mx-auto">
+            Todo el curso, los bonos y la comunidad, <strong className="text-glow-navy">antes de que suba el precio</strong>.
           </p>
           <AddToCartCurso curso={curso} />
         </motion.section>
+
+        </div>
 
         {/* FAQ — al final de todo */}
         <section className="border-t border-glow-navy/10 pt-16">
