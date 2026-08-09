@@ -31,7 +31,6 @@ interface Toast {
   id: number
   nombre: string
   ciudad: string
-  tipo: 'compra' | 'viendo'
   hace: string
 }
 
@@ -49,19 +48,17 @@ export default function SocialProofPopup({ cursoNombre }: { cursoNombre: string 
       showTimer = setTimeout(() => {
         if (cancelled) return
         const persona = PERSONAS[Math.floor(Math.random() * PERSONAS.length)]
-        const tipo: Toast['tipo'] = Math.random() > 0.5 ? 'compra' : 'viendo'
         setToast({
           id: Date.now(),
           nombre: persona.nombre,
           ciudad: persona.ciudad,
-          tipo,
           hace: minutosAleatorios(),
         })
         hideTimer = setTimeout(() => {
           if (cancelled) return
           setToast(null)
           cycle(6000 + Math.random() * 6000)
-        }, 4500)
+        }, 7500)
       }, delay)
     }
 
@@ -88,25 +85,15 @@ export default function SocialProofPopup({ cursoNombre }: { cursoNombre: string 
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             className="bg-white shadow-lg border border-glow-navy/10 px-4 py-3 flex items-start gap-3 pointer-events-auto"
           >
-            <span
-              className={`mt-1 w-2 h-2 rounded-full flex-shrink-0 ${
-                toast.tipo === 'compra' ? 'bg-glow-blush' : 'bg-green-500 animate-pulse'
-              }`}
-            />
+            <span className="mt-1 w-2 h-2 rounded-full flex-shrink-0 bg-glow-blush" />
             <div className="flex-1">
               <p className="font-montserrat text-xs text-glow-navy leading-snug">
                 <span className="font-medium">{toast.nombre}</span>{' '}
                 <span className="text-glow-navy/50">de {toast.ciudad}</span>
-                {toast.tipo === 'compra' ? (
-                  <>
-                    {' '}compró <span className="font-medium">{cursoNombre}</span>
-                  </>
-                ) : (
-                  ' está viendo esta página'
-                )}
+                {' '}compró <span className="font-medium">{cursoNombre}</span>
               </p>
               <p className="font-montserrat text-[10px] text-glow-navy/40 mt-1">
-                {toast.tipo === 'compra' ? toast.hace : 'ahora mismo'}
+                {toast.hace}
               </p>
             </div>
             <button
