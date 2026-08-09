@@ -190,7 +190,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           </div>
         </section>
 
-         {/* Bonos */}
+        {/* Bonos */}
         <section className="border-t border-glow-navy/10 pt-16">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <h2 className="font-cormorant text-3xl text-glow-navy font-light uppercase mb-2">
@@ -226,22 +226,6 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
                   <p className="font-montserrat text-[11px] text-glow-navy/50 leading-relaxed">{d.desc}</p>
                 </div>
               </motion.div>
-            ))}
-
-            <motion.div
-              variants={fadeUp}
-              whileHover={{ scale: 1.01, transition: { duration: 0.2 } }}
-              className="flex gap-4 items-start p-4 border border-glow-blush/40 bg-glow-cream/40 hover:border-glow-blush hover:shadow-sm transition-shadow duration-300"
-            >
-              <span className="font-montserrat text-[10px] tracking-widest text-glow-blush flex-shrink-0 mt-0.5">BONUS</span>
-              <div>
-                <p className="font-montserrat text-xs font-medium text-glow-navy mb-0.5">Nunca más sola frente al espejo</p>
-                <p className="font-montserrat text-[11px] text-glow-navy/50 leading-relaxed">
-                  Acceso a la Comunidad Glow: un espacio privado para mostrar tus looks, resolver dudas al instante y compartir con otras alumnas que están en el mismo camino que vos.
-                </p>
-              </div>
-            </motion.div>
-          </motion.div>
             ))}
 
             <motion.div
