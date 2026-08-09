@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 import CourseCard from '@/components/courses/CourseCard'
 import StarIcon from '@/components/ui/StarIcon'
 import type { Curso } from '@/types'
@@ -35,6 +36,11 @@ async function getCursosConAcceso() {
 
 export default async function CursosPage() {
   const cursos = await getCursosConAcceso()
+
+  // Con un solo curso activo, el catálogo no aporta nada: se va directo a la landing del curso.
+  if (cursos.length === 1) {
+    redirect(`/cursos/${cursos[0].slug}`)
+  }
 
   return (
     <main className="min-h-screen bg-glow-navy pt-24">
