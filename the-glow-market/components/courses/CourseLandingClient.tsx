@@ -111,42 +111,51 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
 
         {/* Dolores */}
         <section className="border-t border-glow-navy/10 pt-16">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <h2 className="font-cormorant text-3xl text-glow-navy font-light mb-2">
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-10">
+            <span className="inline-block w-10 h-px bg-glow-blush mb-4" />
+            <h2 className="font-cormorant text-4xl text-glow-navy font-light">
               ¿Este curso es para vos?
             </h2>
-            <p className="font-montserrat text-xs text-glow-navy/50 mb-6">
+            <p className="font-montserrat text-xs text-glow-navy/50 mt-2">
               Si te sentís identificada con alguna de estas, sí:
             </p>
           </motion.div>
-          <motion.ul variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }} className="space-y-4">
+          <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
-              'Comprás productos de maquillaje y la mitad no los usás.',
-              'Te cuesta hacerte la cara en menos de 30 minutos a la mañana.',
-              'Querés llevar tu look del día a la noche sin desarmar todo.',
-              'Tenés ganas de aprender un método simple que funcione siempre.',
+              { pre: 'Comprás productos de maquillaje y ', bold: 'la mitad no los usás', post: '.' },
+              { pre: '', bold: 'Te cuesta hacerte la cara en menos de 30 minutos', post: ' a la mañana.' },
+              { pre: 'Querés llevar tu look del día a la noche ', bold: 'sin desarmar todo', post: '.' },
+              { pre: 'Tenés ganas de aprender ', bold: 'un método simple que funcione siempre', post: '.' },
             ].map((item, i) => (
-              <motion.li key={i} variants={fadeUp} className="flex items-start gap-3">
-                <span className="mt-0.5 w-5 h-5 rounded-full bg-glow-blush flex items-center justify-center flex-shrink-0">
-                  <Check size={11} className="text-white" />
+              <motion.div
+                key={i}
+                variants={fadeUp}
+                whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                className="bg-glow-blush/10 border border-glow-blush/30 hover:border-glow-blush hover:shadow-lg p-5 flex items-start gap-3 transition-all duration-300"
+              >
+                <span className="mt-0.5 w-6 h-6 rounded-full bg-glow-blush flex items-center justify-center flex-shrink-0">
+                  <Check size={12} className="text-white" />
                 </span>
-                <span className="font-montserrat text-sm text-glow-navy/70">{item}</span>
-              </motion.li>
+                <span className="font-montserrat text-sm text-glow-navy/80 leading-relaxed">
+                  {item.pre}<strong className="font-bold text-glow-navy">{item.bold}</strong>{item.post}
+                </span>
+              </motion.div>
             ))}
-          </motion.ul>
+          </motion.div>
         </section>
 
         {/* Qué vas a lograr */}
         <section className="border-t border-glow-navy/10 pt-16">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <h2 className="font-cormorant text-3xl text-glow-navy font-light mb-2 uppercase">
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-10">
+            <span className="inline-block w-10 h-px bg-glow-blush mb-4" />
+            <h2 className="font-cormorant text-4xl text-glow-navy font-light uppercase">
               Qué vas a lograr en cada módulo
             </h2>
-            <p className="font-montserrat text-sm text-glow-navy/50 mb-8">
+            <p className="font-montserrat text-sm text-glow-navy/50 mt-2">
               4 módulos cortos, pensados para un resultado concreto — volvé a verlos cuantas veces necesites.
             </p>
           </motion.div>
-          <div className="space-y-6">
+          <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
               {
                 num: '01',
@@ -171,24 +180,25 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
             ].map((mod, i) => (
               <motion.div
                 key={mod.num}
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
-                className="flex gap-6 items-start border-b border-glow-navy/10 pb-6 last:border-0"
+                variants={fadeUp}
+                whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                className="group relative overflow-hidden bg-white border border-glow-navy/10 hover:border-glow-blush p-5 transition-colors duration-300 hover:shadow-lg"
               >
-                <span className="font-cormorant text-5xl text-glow-blush font-light leading-none flex-shrink-0 w-12">
+                <span className="pointer-events-none select-none absolute -top-3 -right-2 font-cormorant text-7xl text-glow-blush/10 group-hover:text-glow-blush/20 transition-colors duration-300">
                   {mod.num}
                 </span>
-                <div className="pt-2">
-                  <h3 className="font-montserrat text-sm font-medium tracking-wide text-glow-navy uppercase mb-2">
+                <div className="relative">
+                  <span className="inline-block bg-glow-navy text-white font-montserrat text-[9px] tracking-widest uppercase px-2 py-1 mb-3">
+                    Módulo {mod.num}
+                  </span>
+                  <h3 className="font-montserrat text-sm font-bold tracking-wide text-glow-navy uppercase mb-2">
                     {mod.titulo}
                   </h3>
                   <p className="font-montserrat text-sm text-glow-navy/60 leading-relaxed">{mod.resultado}</p>
                 </div>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </section>
 
         {/* Bonos */}
@@ -250,19 +260,12 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           </motion.ul>
         </section>
 
-        {/* Bloque Clarins + Cupos + Valor, con olas propias (fuera del space-y del resto) */}
+        {/* Bloque Clarins + Cupos + Valor, franjas de color pegadas entre sí */}
         <div>
 
-        {/* Ola de entrada — blanco a navy */}
-        <div className="-mt-4 -mb-px">
-          <svg viewBox="0 0 1440 80" className="w-full h-14 md:h-20 block" preserveAspectRatio="none">
-            <path d="M0,40 C240,80 480,0 720,24 C960,48 1200,80 1440,40 L1440,80 L0,80 Z" fill="#192149" />
-          </svg>
-        </div>
-
         {/* Sponsored by Clarins */}
-        <section className="relative overflow-hidden bg-glow-navy -mx-6 px-6 pb-16 text-center">
-          <div className="pointer-events-none absolute left-1/2 top-8 -translate-x-1/2 w-64 h-64 rounded-full bg-glow-blush/20 blur-3xl" />
+        <section className="relative overflow-hidden bg-glow-navy -mx-6 px-6 py-16 text-center">
+          <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-glow-blush/15 blur-3xl" />
           <motion.div
             className="relative"
             initial={{ opacity: 0, scale: 0.92 }}
@@ -287,20 +290,13 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           </motion.div>
         </section>
 
-        {/* Ola — navy a rosa */}
-        <div className="-mb-px">
-          <svg viewBox="0 0 1440 80" className="w-full h-10 md:h-14 block" preserveAspectRatio="none">
-            <path d="M0,20 C240,50 480,60 720,35 C960,10 1200,45 1440,25 L1440,80 L0,80 Z" fill="#E1C8CB" />
-          </svg>
-        </div>
-
         {/* Urgencia — cupos */}
         <motion.section
           variants={fadeUp}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="bg-glow-blush -mx-6 px-6 pb-16 text-center"
+          className="bg-glow-blush -mx-6 px-6 py-16 text-center"
         >
           <motion.span
             animate={{ scale: [1, 1.06, 1] }}
@@ -318,20 +314,13 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           </p>
         </motion.section>
 
-        {/* Ola de salida — rosa a blanco */}
-        <div className="-mt-px">
-          <svg viewBox="0 0 1440 80" className="w-full h-10 md:h-14 block" preserveAspectRatio="none">
-            <path d="M0,60 C240,20 480,10 720,45 C960,80 1200,30 1440,55 L1440,0 L0,0 Z" fill="#FFFFFF" />
-          </svg>
-        </div>
-
         {/* Valor — compra */}
         <motion.section
           variants={fadeUp}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="text-center"
+          className="bg-glow-cream -mx-6 px-6 py-16 text-center"
         >
           <span className="inline-block bg-glow-navy text-white font-montserrat text-[10px] tracking-[0.2em] uppercase px-4 py-2 mb-4 font-bold">
             Precio de lanzamiento
