@@ -6,6 +6,7 @@ import { Check } from 'lucide-react'
 import Link from 'next/link'
 import AddToCartCurso from '@/components/courses/AddToCartCurso'
 import PreviewVideo from '@/components/courses/PreviewVideo'
+import SocialProofPopup from '@/components/courses/SocialProofPopup'
 import type { Curso } from '@/types'
 
 const fadeUp = {
@@ -42,7 +43,9 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
   return (
     <main className="min-h-screen bg-white">
 
-      {/* Hero */}
+      <SocialProofPopup cursoNombre={curso.titulo} />
+
+      {/* Hero — Promesa */}
       <div className="bg-glow-cream pt-24 pb-16 px-6">
         <div className="max-w-3xl mx-auto">
           <motion.p
@@ -57,9 +60,9 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="font-cormorant text-5xl md:text-7xl text-glow-navy font-light tracking-wide leading-none mb-4"
+            className="font-cormorant text-4xl md:text-6xl text-glow-navy font-light tracking-wide leading-[1.1] mb-4"
           >
-            Curso de Maquillaje: {curso.titulo}
+            Te enseño todos mis tips para que aprendas a maquillarte todos los días
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -83,7 +86,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/40"
           >
-            Acceso de por vida · 5 descargables · Links Clarins con regalos por compra
+            Acceso de por vida · 5 descargables · Comunidad exclusiva · Links Clarins con regalos por compra
           </motion.p>
         </div>
       </div>
@@ -114,44 +117,28 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
         </motion.div>
       </div>
 
-            <div className="max-w-3xl mx-auto px-6 py-16 space-y-16">
+      <div className="max-w-3xl mx-auto px-6 py-16 space-y-16">
 
-        {/* Cita creadora */}
+        {/* Video de bienvenida + cita — cierre de la Promesa */}
         <motion.section
           variants={fadeUp}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="text-center py-8"
         >
-          <p className="font-cormorant text-2xl md:text-3xl text-glow-navy/80 italic leading-relaxed mb-4">
+          <p className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/40 mb-4 text-center">
+            Mirá de qué se trata
+          </p>
+          <PreviewVideo cursoId={curso.id} />
+          <p className="font-cormorant text-2xl md:text-3xl text-glow-navy/80 italic leading-relaxed mt-10 text-center">
             "Este curso lo armé para vos, mujeres reales que quieren salir prolijas y se cansaron de probar productos que no usan."
           </p>
-          <span className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-navy/40">
+          <span className="block mt-4 text-center font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-navy/40">
             — Nina Amateis
           </span>
         </motion.section>
 
-        {/* Qué es */}
-        <motion.section
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        >
-          <h2 className="font-cormorant text-3xl text-glow-navy font-light mb-4">
-            Qué es Day to Night Glow
-          </h2>
-          <p className="font-montserrat text-sm text-glow-navy/60 leading-relaxed mb-8">
-            Un curso de automaquillaje en 4 módulos cortos, pensado para vos que querés salir prolija sin gastar 30 minutos cada mañana. Aprendés una rutina de piel que cambia todo, un maquillaje de día completo con pocos productos, un retoque express que te salva a las 4 de la tarde, y una transformación a noche que no te obliga a desarmar nada. Con productos buenos, buena técnica, y todo el respaldo de Clarins.
-          </p>
-          <p className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/40 mb-4">
-            Video de bienvenida
-          </p>
-          <PreviewVideo cursoId={curso.id} />
-        </motion.section>
-
-        {/* Para quién */}
+        {/* Dolores */}
         <section className="border-t border-glow-navy/10 pt-16">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <h2 className="font-cormorant text-3xl text-glow-navy font-light mb-2">
@@ -178,22 +165,38 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           </motion.ul>
         </section>
 
-        {/* Módulos */}
+        {/* Qué vas a lograr */}
         <section className="border-t border-glow-navy/10 pt-16">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <h2 className="font-cormorant text-3xl text-glow-navy font-light mb-2 uppercase">
-              Qué vas a aprender en cada módulo
+              Qué vas a lograr en cada módulo
             </h2>
             <p className="font-montserrat text-sm text-glow-navy/50 mb-8">
-              4 módulos cortos — volvé a verlos cuantas veces necesites.
+              4 módulos cortos, pensados para un resultado concreto — volvé a verlos cuantas veces necesites.
             </p>
           </motion.div>
           <div className="space-y-6">
             {[
-              { num: '01', titulo: 'Piel limpia e hidratada', duracion: '5–7 min' },
-              { num: '02', titulo: 'Makeup básico de día', duracion: '7–9 min' },
-              { num: '03', titulo: 'Retoque', duracion: '3–4 min' },
-              { num: '04', titulo: 'Transformación a noche', duracion: '6–8 min' },
+              {
+                num: '01',
+                titulo: 'Piel que se ve sana, no maquillada',
+                resultado: 'Vas a lograr una piel luminosa, pareja e hidratada en minutos: la base perfecta para cualquier look.',
+              },
+              {
+                num: '02',
+                titulo: 'Un makeup de día que no se nota que te maquillaste',
+                resultado: 'Vas a poder armar tu cara todos los días con pocos productos y en la mitad de tiempo que ahora.',
+              },
+              {
+                num: '03',
+                titulo: 'Un retoque que te salva a cualquier hora',
+                resultado: 'Vas a saber exactamente qué tocar para verte fresca a las 4 de la tarde, sin rehacer todo de cero.',
+              },
+              {
+                num: '04',
+                titulo: 'Pasar de día a noche sin desarmar nada',
+                resultado: 'Vas a transformar tu look de oficina en un look de noche en minutos, sumando solo un par de pasos.',
+              },
             ].map((mod, i) => (
               <motion.div
                 key={mod.num}
@@ -207,33 +210,51 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
                   {mod.num}
                 </span>
                 <div className="pt-2">
-                  <h3 className="font-montserrat text-sm font-medium tracking-wide text-glow-navy uppercase mb-1">
+                  <h3 className="font-montserrat text-sm font-medium tracking-wide text-glow-navy uppercase mb-2">
                     {mod.titulo}
                   </h3>
-                  <span className="font-montserrat text-[10px] text-glow-navy/40">{mod.duracion}</span>
+                  <p className="font-montserrat text-sm text-glow-navy/60 leading-relaxed">{mod.resultado}</p>
                 </div>
               </motion.div>
             ))}
           </div>
         </section>
 
-        {/* Descargables */}
+        {/* Valor */}
+        <motion.section
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="border-t border-glow-navy/10 pt-16 text-center"
+        >
+          <h2 className="font-cormorant text-3xl text-glow-navy font-light mb-2">
+            Accedé hoy
+          </h2>
+          <p className="font-montserrat text-sm text-glow-navy/60 max-w-md mx-auto mb-8">
+            Todo el curso, los descargables y la comunidad, a precio de lanzamiento. Acceso inmediato, de por vida.
+          </p>
+          <AddToCartCurso curso={curso} />
+        </motion.section>
+
+        {/* Bonos */}
         <section className="border-t border-glow-navy/10 pt-16">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <h2 className="font-cormorant text-3xl text-glow-navy font-light mb-2">
-              5 descargables exclusivos
+              Todo lo que te llevás
             </h2>
             <p className="font-montserrat text-xs text-glow-navy/50 mb-8">
-              Material adicional para que apliques sin volver al video — para siempre.
+              Más allá de los videos, esto es lo que te ayuda a aplicar el método para siempre.
             </p>
           </motion.div>
+
           <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }} className="space-y-4">
             {[
-              { titulo: 'Kit Esencial', desc: 'Lista completa de productos Clarins con qué hace cada uno y en qué módulos aparece.' },
-              { titulo: 'Diagnóstico de Piel', desc: 'Test de 6 preguntas para identificar tu tipo de piel y saber qué priorizar en cada módulo.' },
-              { titulo: 'Guía de Subtono', desc: '3 tests caseros para identificar tu subtono y elegir la base correcta sin perder plata.' },
-              { titulo: 'SOS Primer por Color', desc: 'Los 5 colores del SOS Primer Clarins y para qué sirve cada uno.' },
-              { titulo: 'Bronzer por Tipo de Cara', desc: 'Diagramas visuales del paso a paso según tu forma de rostro (6 tipos).' },
+              { titulo: 'Kit Esencial', desc: 'Sabés exactamente qué producto Clarins usar y para qué, sin comprar de más ni adivinar.' },
+              { titulo: 'Diagnóstico de Piel', desc: 'Identificás tu tipo de piel en 6 preguntas y sabés qué priorizar en cada módulo.' },
+              { titulo: 'Guía de Subtono', desc: 'Elegís la base correcta a la primera, sin gastar plata en productos que no te sirven.' },
+              { titulo: 'SOS Primer por Color', desc: 'Sabés qué primer usar según lo que tu piel necesita ese día.' },
+              { titulo: 'Bronzer por Tipo de Cara', desc: 'Aplicás el bronzer en el lugar justo para tu forma de cara, con diagramas paso a paso.' },
             ].map((d, i) => (
               <motion.div
                 key={i}
@@ -248,18 +269,31 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
                 </div>
               </motion.div>
             ))}
-          </motion.div>
-        </section>
 
-        {/* Lo que incluye */}
-        <section className="border-t border-glow-navy/10 pt-16">
-          <motion.h2 variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="font-cormorant text-3xl text-glow-navy font-light mb-6">
-            Lo que llevás al comprar el curso
-          </motion.h2>
-          <motion.ul variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }} className="space-y-3">
+            <motion.div
+              variants={fadeUp}
+              whileHover={{ scale: 1.01, transition: { duration: 0.2 } }}
+              className="flex gap-4 items-start p-4 border border-glow-blush/40 bg-glow-cream/40 hover:border-glow-blush hover:shadow-sm transition-shadow duration-300"
+            >
+              <span className="font-montserrat text-[10px] tracking-widest text-glow-blush flex-shrink-0 mt-0.5">BONUS</span>
+              <div>
+                <p className="font-montserrat text-xs font-medium text-glow-navy mb-0.5">Comunidad Glow</p>
+                <p className="font-montserrat text-[11px] text-glow-navy/50 leading-relaxed">
+                  Un espacio privado para compartir dudas, mostrar tus looks y hablar con otras alumnas que están aprendiendo lo mismo que vos.
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+
+          <motion.ul
+            variants={stagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="space-y-3 mt-10 pt-10 border-t border-glow-navy/10"
+          >
             {[
               '4 módulos en video, accesibles desde web y celular.',
-              '5 descargables exclusivos en PDF.',
               'Acceso de por vida + todas las actualizaciones futuras.',
               'Links directos a cada producto Clarins con regalos exclusivos por compra.',
               'Acceso ilimitado para verlo cuantas veces necesites.',
@@ -272,7 +306,27 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           </motion.ul>
         </section>
 
-        {/* FAQ */}
+        {/* Urgencia */}
+        <motion.section
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="border-t border-glow-navy/10 pt-16 text-center bg-glow-navy -mx-6 px-6 py-16"
+        >
+          <p className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-blush mb-4">
+            Cupos limitados
+          </p>
+          <h2 className="font-cormorant text-4xl text-white font-light mb-4">
+            Solo abrimos 50 cupos
+          </h2>
+          <p className="font-montserrat text-sm text-white/60 max-w-md mx-auto mb-10 leading-relaxed">
+            Abrimos 50 cupos a precio de lanzamiento para esta primera camada. Cuando se completen, el curso pasa a su precio regular.
+          </p>
+          <AddToCartCurso curso={curso} />
+        </motion.section>
+
+        {/* FAQ — al final de todo */}
         <section className="border-t border-glow-navy/10 pt-16">
           <motion.h2 variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="font-cormorant text-3xl text-glow-navy font-light mb-6">
             Lo que más nos preguntan
@@ -281,6 +335,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
             {[
               { q: '¿Cuánto dura el curso?', a: 'Los 4 módulos suman alrededor de 25 minutos de video. Está pensado para que lo puedas hacer en una mañana o repartido en varios días.' },
               { q: '¿Cuándo lo puedo ver?', a: 'Apenas confirmás tu compra, te llega un mail con tu acceso. Podés empezar al minuto, desde la compu o el celular.' },
+              { q: '¿Necesito crear una cuenta antes de comprar?', a: 'No. Comprás primero y creás tu cuenta gratis después, con el mismo email que usaste en la compra. En cuanto inicies sesión, el curso se activa solo.' },
               { q: '¿Necesito comprar todos los productos Clarins?', a: 'No. El curso te sirve aunque uses productos que ya tenés. Recomendamos Clarins porque son los que funcionan con este método, y las alumnas tienen un beneficio exclusivo.' },
               { q: '¿Tengo acceso para siempre?', a: 'Sí. Una vez que comprás el curso, lo tenés disponible para siempre, con todas las actualizaciones que vayamos sumando.' },
             ].map((item, i) => (
@@ -293,27 +348,10 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
               </motion.details>
             ))}
           </motion.div>
-        </section>
-
-        {/* CTA final */}
-        <motion.section
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="border-t border-glow-navy/10 pt-16 text-center"
-        >
-          <h2 className="font-cormorant text-4xl text-glow-navy font-light mb-4">
-            ¿Lista para empezar?
-          </h2>
-          <p className="font-montserrat text-sm text-glow-navy/60 mb-10">
-            Acceso inmediato. De por vida. Desde cualquier dispositivo.
-          </p>
-          <AddToCartCurso curso={curso} />
-          <Link href="/cursos" className="block mt-6 font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/40 hover:text-glow-navy transition-colors">
+          <Link href="/cursos" className="block mt-10 text-center font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/40 hover:text-glow-navy transition-colors">
             ← Volver a cursos
           </Link>
-        </motion.section>
+        </section>
 
       </div>
     </main>
