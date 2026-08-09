@@ -58,20 +58,22 @@ export default function CrossSellProducts() {
   }
 
   return (
-    <div className="border-t border-glow-navy/10 pt-6 mt-2">
-      <div className="flex items-center gap-2 mb-1">
-        <p className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
-          Sumá antes de pagar
+    <div className="bg-glow-cream mt-12 px-6 py-10 md:px-10 md:py-12">
+      <div className="flex flex-col items-center text-center mb-8">
+        <div className="flex items-center gap-3 mb-2 flex-wrap justify-center">
+          <h2 className="font-cormorant text-3xl md:text-4xl text-glow-navy font-light">
+            Sumá antes de pagar
+          </h2>
+          <span className="bg-glow-blush text-white font-montserrat text-xs font-bold tracking-wide px-3 py-1.5">
+            -10% OFF
+          </span>
+        </div>
+        <p className="font-montserrat text-sm text-glow-navy/80">
+          Descuento exclusivo por agregarlo ahora, antes de pagar.
         </p>
-        <span className="bg-glow-blush text-white font-montserrat text-[9px] font-bold tracking-wide px-2 py-0.5">
-          -10%
-        </span>
       </div>
-      <p className="font-montserrat text-[10px] text-glow-navy/40 mb-4">
-        Descuento exclusivo por agregarlo acá, antes de pagar.
-      </p>
 
-      <div className="flex flex-col gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
         {disponibles.map((producto) => {
           const precioBase = Number(producto.precio_oferta ?? producto.precio)
           const precioConDescuento = Math.round(precioBase * (1 - DESCUENTO_CHECKOUT))
@@ -82,32 +84,43 @@ export default function CrossSellProducts() {
           const yaAgregado = agregados.has(producto.id)
 
           return (
-            <div key={producto.id} className="flex gap-3 items-center">
-              <div className="relative w-12 h-14 flex-shrink-0 overflow-hidden bg-glow-cream">
-                <Image src={imagen} alt={producto.nombre} fill className="object-cover" sizes="48px" />
+            <div key={producto.id} className="bg-white flex flex-col overflow-hidden shadow-sm">
+              <div className="relative aspect-square w-full overflow-hidden bg-glow-cream">
+                <Image
+                  src={imagen}
+                  alt={producto.nombre}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                />
+                <span className="absolute top-2 left-2 bg-glow-blush text-white font-montserrat text-[10px] font-bold px-2 py-1">
+                  -10%
+                </span>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-montserrat text-xs text-glow-navy truncate">{producto.nombre}</p>
-                <div className="flex items-baseline gap-2">
-                  <span className="font-montserrat text-xs font-medium text-glow-navy">
+              <div className="p-4 flex flex-col flex-1">
+                <p className="font-montserrat text-sm text-glow-navy font-medium mb-1 leading-snug">
+                  {producto.nombre}
+                </p>
+                <div className="flex items-baseline gap-2 mb-3">
+                  <span className="font-montserrat text-base font-semibold text-glow-navy">
                     {formatPrice(precioConDescuento)}
                   </span>
-                  <span className="font-montserrat text-[10px] text-glow-navy/40 line-through">
+                  <span className="font-montserrat text-xs text-glow-navy/50 line-through">
                     {formatPrice(precioBase)}
                   </span>
                 </div>
+                <button
+                  onClick={() => handleAgregar(producto)}
+                  disabled={yaAgregado}
+                  className={`mt-auto w-full py-2.5 font-montserrat text-[10px] tracking-[0.15em] uppercase transition-colors duration-300 ${
+                    yaAgregado
+                      ? 'bg-green-700 text-white'
+                      : 'bg-glow-navy text-white hover:bg-glow-blue'
+                  }`}
+                >
+                  {yaAgregado ? '✓ Agregado' : 'Agregar'}
+                </button>
               </div>
-              <button
-                onClick={() => handleAgregar(producto)}
-                disabled={yaAgregado}
-                className={`flex-shrink-0 font-montserrat text-[9px] tracking-[0.15em] uppercase px-3 py-2 transition-colors duration-300 ${
-                  yaAgregado
-                    ? 'bg-green-700 text-white'
-                    : 'border border-glow-navy text-glow-navy hover:bg-glow-navy hover:text-white'
-                }`}
-              >
-                {yaAgregado ? '✓' : 'Agregar'}
-              </button>
             </div>
           )
         })}
