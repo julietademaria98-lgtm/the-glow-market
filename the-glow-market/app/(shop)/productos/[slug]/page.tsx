@@ -40,9 +40,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const producto = await getProducto(params.slug)
   if (!producto) return { title: 'Producto no encontrado' }
 
+  const descripcion =
+    producto.descripcion || `${producto.nombre}: neceser de diseño de The Glow Market.`
+  const imagen =
+    producto.imagenes?.find((img) => img.es_principal)?.url || producto.imagenes?.[0]?.url
+
   return {
     title: `${producto.nombre} — The Glow Market`,
-    description: producto.descripcion || undefined,
+    description: descripcion,
+    keywords: ['neceser', 'pouch', producto.nombre, producto.categoria, 'argentina'],
+    openGraph: {
+      title: `${producto.nombre} — The Glow Market`,
+      description: descripcion,
+      images: imagen ? [imagen] : undefined,
+    },
   }
 }
 
