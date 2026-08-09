@@ -80,7 +80,7 @@ export default function CourseInfoDrawer({ curso, isOpen, onClose }: CourseInfoD
               De cara recién levantada a look de noche, en 4 módulos cortos. Te enseño el método que uso todos los días para tener piel divina y un maquillaje que no se va.
             </p>
             <p className="font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/40 mt-4">
-              Acceso de por vida · 5 descargables · Links Clarins con regalos por compra
+              Acceso de por vida · 5 recursos bonus · Links Clarins con regalos por compra
             </p>
           </div>
 
@@ -151,10 +151,10 @@ export default function CourseInfoDrawer({ curso, isOpen, onClose }: CourseInfoD
             </div>
           </div>
 
-          {/* 5 descargables */}
+          {/* 5 recursos bonus */}
           <div className="px-6 py-6 border-b border-glow-navy/10">
             <h3 className="font-cormorant text-2xl text-glow-navy font-light mb-1">
-              5 descargables exclusivos
+              5 recursos exclusivos
             </h3>
             <p className="font-montserrat text-xs text-glow-navy/50 mb-5">
               Material adicional para que apliques sin volver al video — para siempre.
@@ -186,7 +186,7 @@ export default function CourseInfoDrawer({ curso, isOpen, onClose }: CourseInfoD
             <ul className="space-y-2">
               {[
                 '4 módulos en video, accesibles desde web y celular.',
-                '5 descargables exclusivos en PDF.',
+                '5 recursos exclusivos en PDF.',
                 'Acceso de por vida + todas las actualizaciones futuras.',
                 'Links directos a cada producto Clarins con regalos exclusivos por compra.',
                 'Acceso ilimitado para verlo cuantas veces necesites.',
