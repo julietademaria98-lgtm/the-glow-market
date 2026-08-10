@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
@@ -10,6 +11,7 @@ import StarIcon from '@/components/ui/StarIcon'
 import AddToCartButton from './AddToCartButton'
 import Button from '@/components/ui/Button'
 import Link from 'next/link'
+import { useCartStore } from '@/store/cartStore'
 
 interface ProductDetailProps {
   producto: Producto
@@ -60,6 +62,22 @@ export default function ProductDetail({ producto }: ProductDetailProps) {
 
   const [activeImage, setActiveImage] = useState(mainImage?.url || '/placeholder-product.jpg')
   const [openAccordion, setOpenAccordion] = useState<string | null>(null)
+
+  const router = useRouter()
+  const addItem = useCartStore((state) => state.addItem)
+  const closeCart = useCartStore((state) => state.closeCart)
+
+  const handleComprarAhora = () => {
+    addItem({
+      id: producto.id,
+      slug: producto.slug,
+      nombre: producto.nombre,
+      precio: Number(producto.precio_oferta ?? producto.precio),
+      imagen_url: activeImage,
+    })
+    closeCart()
+    router.push('/checkout')
+  }
 
   return (
     <div className="max-w-[1400px] mx-auto px-6 py-12 md:py-20">
@@ -195,11 +213,15 @@ export default function ProductDetail({ producto }: ProductDetailProps) {
               producto={producto}
               mainImageUrl={activeImage}
             />
-            <Link href="/checkout">
-              <Button variant="outline" className="w-full" size="md">
-                Comprar Ahora
-              </Button>
-            </Link>
+            <Button
+              variant="outline"
+              className="w-full"
+              size="md"
+              onClick={handleComprarAhora}
+              disabled={producto.stock === 0}
+            >
+              Comprar Ahora
+            </Button>
           </div>
 
           {producto.stock <= 5 && producto.stock > 0 && (
