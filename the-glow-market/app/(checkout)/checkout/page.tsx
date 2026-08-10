@@ -186,6 +186,8 @@ export default function CheckoutPage() {
               </div>
             </div>
 
+            <CrossSellProducts />
+
             {hasCurso && !user && (
               <p className="font-montserrat text-sm text-glow-navy bg-glow-cream border-2 border-glow-navy shadow-[6px_6px_0_0_rgba(233,180,184,0.6)] px-5 py-4 leading-relaxed">
                 Estás comprando un curso online. No hace falta crear una cuenta ahora: después de tu compra
@@ -309,8 +311,6 @@ export default function CheckoutPage() {
             </p>
           </div>
         </form>
-
-        <CrossSellProducts />
       </div>
     </main>
   )
