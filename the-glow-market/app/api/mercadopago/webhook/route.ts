@@ -91,11 +91,13 @@ export async function POST(request: Request) {
         }
       }
 
-      // El stock se muestra tanto en la home como en /productos: sin esto, una de las
-      // dos páginas puede quedar mostrando disponibilidad vieja hasta que venza el caché.
+      // El stock y precio se muestran en la home, /productos, la ficha propia y como
+      // "también te puede gustar" en OTRAS fichas: sin la revalidación de layout, esas
+      // páginas relacionadas pueden quedar mostrando datos viejos hasta que venza el caché.
       if (stockCambiado) {
         revalidatePath('/')
         revalidatePath('/productos')
+        revalidatePath('/productos/[slug]', 'layout')
       }
     }
 
