@@ -58,11 +58,11 @@ export default function CrossSellProducts() {
   }
 
   return (
-    <div className="bg-glow-cream mt-12 px-6 py-10 md:px-10 md:py-12">
+    <div className="bg-white px-6 py-8 md:px-8">
       <div className="flex flex-col items-center text-center mb-8">
         <div className="flex items-center gap-3 mb-2 flex-wrap justify-center">
           <h2 className="font-cormorant text-3xl md:text-4xl text-glow-navy font-light">
-            Sumá antes de pagar
+            Sumá a tu carrito
           </h2>
           <span className="bg-glow-blush text-white font-montserrat text-xs font-bold tracking-wide px-3 py-1.5">
             -10% OFF
@@ -73,7 +73,7 @@ export default function CrossSellProducts() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-2 gap-5">
         {disponibles.map((producto) => {
           const precioBase = Number(producto.precio_oferta ?? producto.precio)
           const precioConDescuento = Math.round(precioBase * (1 - DESCUENTO_CHECKOUT))
