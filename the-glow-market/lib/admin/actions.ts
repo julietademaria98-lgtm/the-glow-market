@@ -191,7 +191,8 @@ export async function resendOrderEmail(id: string) {
   const cursosIds = new Set((await db.from('cursos').select('id')).data?.map((c: any) => c.id) || [])
   const hasCurso = (orden.items || []).some((item: any) => cursosIds.has(item.id))
   const hasProductoFisico = (orden.items || []).some((item: any) => !cursosIds.has(item.id))
-  await sendOrderConfirmation({ to: email, nombreCliente, ordenId: orden.id, items: orden.items || [], total: orden.total || 0, hasCurso, hasProductoFisico })
+  const requiereCuenta = hasCurso && !orden.user_id
+  await sendOrderConfirmation({ to: email, nombreCliente, ordenId: orden.id, items: orden.items || [], total: orden.total || 0, hasCurso, hasProductoFisico, requiereCuenta })
 }
 
 export async function guardarSeguimiento(id: string, formData: FormData) {
