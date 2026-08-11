@@ -6,6 +6,12 @@ import StarIcon from '@/components/ui/StarIcon'
 import Button from '@/components/ui/Button'
 import Link from 'next/link'
 
+declare global {
+  interface Window {
+    fbq?: (...args: any[]) => void
+  }
+}
+
 function SuccessContent() {
   const searchParams = useSearchParams()
   const isPending = searchParams.get('pending') === 'true'
@@ -24,6 +30,19 @@ function SuccessContent() {
       .then((data) => {
         setHasCurso(Boolean(data.hasCurso))
         setHasProductoFisico(Boolean(data.hasProductoFisico))
+
+        // Evento de compra para Meta: solo una vez por orden aprobada, aunque se
+        // recargue esta página (el pixel no tiene forma propia de deduplicar).
+        if (data.aprobado && window.fbq) {
+          const yaEnviado = sessionStorage.getItem(`fbq_purchase_${orderId}`)
+          if (!yaEnviado) {
+            window.fbq('track', 'Purchase', {
+              value: data.total || 0,
+              currency: 'ARS',
+            })
+            sessionStorage.setItem(`fbq_purchase_${orderId}`, '1')
+          }
+        }
       })
       .finally(() => setLoadingResumen(false))
   }, [orderId])
