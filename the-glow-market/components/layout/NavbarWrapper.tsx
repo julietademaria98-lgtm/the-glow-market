@@ -4,11 +4,17 @@ import Navbar from './Navbar'
 import Footer from './Footer'
 import CartDrawer from './CartDrawer'
 
+function ocultarChrome(pathname: string) {
+  if (pathname.startsWith('/admin')) return true
+  if (pathname.startsWith('/mi-curso/curso/')) return true
+  if (pathname.match(/^\/mi-curso\/[^/]+$/)) return true
+  if (pathname.startsWith('/success')) return true
+  return false
+}
+
 export default function NavbarWrapper() {
   const pathname = usePathname()
-  if (pathname.startsWith('/admin')) return null
-  if (pathname.startsWith('/mi-curso/curso/')) return null
-  if (pathname.match(/^\/mi-curso\/[^/]+$/)) return null
+  if (ocultarChrome(pathname)) return null
   return (
     <>
       <Navbar />
@@ -19,8 +25,6 @@ export default function NavbarWrapper() {
 
 export function FooterWrapper() {
   const pathname = usePathname()
-  if (pathname.startsWith('/admin')) return null
-  if (pathname.startsWith('/mi-curso/curso/')) return null
-  if (pathname.match(/^\/mi-curso\/[^/]+$/)) return null
+  if (ocultarChrome(pathname)) return null
   return <Footer />
 }
