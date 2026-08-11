@@ -14,7 +14,7 @@ export async function GET(request: Request) {
 
   const { data: orden } = await adminClient
     .from('ordenes')
-    .select('items')
+    .select('items, total, estado')
     .eq('id', orderId)
     .single()
 
@@ -29,5 +29,10 @@ export async function GET(request: Request) {
   const hasCurso = items.some((item) => cursosIds.has(item.id))
   const hasProductoFisico = items.some((item) => !cursosIds.has(item.id))
 
-  return NextResponse.json({ hasCurso, hasProductoFisico })
+  return NextResponse.json({
+    hasCurso,
+    hasProductoFisico,
+    total: orden.total || 0,
+    aprobado: orden.estado === 'aprobado',
+  })
 }
