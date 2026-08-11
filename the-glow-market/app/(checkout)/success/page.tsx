@@ -1,33 +1,33 @@
 'use client'
 
 import { useEffect, useState, Suspense } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import StarIcon from '@/components/ui/StarIcon'
 import Button from '@/components/ui/Button'
 import Link from 'next/link'
 
 function SuccessContent() {
   const searchParams = useSearchParams()
-  const router = useRouter()
   const isPending = searchParams.get('pending') === 'true'
   const orderId = searchParams.get('order')
-  const [countdown, setCountdown] = useState(8)
   const [copied, setCopied] = useState(false)
+  const [loadingResumen, setLoadingResumen] = useState(true)
+  const [hasCurso, setHasCurso] = useState(false)
+  const [hasProductoFisico, setHasProductoFisico] = useState(false)
 
   useEffect(() => {
-    if (isPending) return
-    const interval = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval)
-          router.push('/mi-curso')
-          return 0
-        }
-        return prev - 1
+    if (!orderId) {
+      setLoadingResumen(false)
+      return
+    }
+    fetch(`/api/ordenes/resumen?order=${orderId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setHasCurso(Boolean(data.hasCurso))
+        setHasProductoFisico(Boolean(data.hasProductoFisico))
       })
-    }, 1000)
-    return () => clearInterval(interval)
-  }, [isPending, router])
+      .finally(() => setLoadingResumen(false))
+  }, [orderId])
 
   function handleShare() {
     const url = 'https://theglowmarket.com.ar/cursos/day-to-night-glow'
@@ -39,6 +39,22 @@ function SuccessContent() {
       setTimeout(() => setCopied(false), 2000)
     }
   }
+
+  const subtitulo = isPending
+    ? 'Tu pago está siendo procesado.'
+    : hasCurso && hasProductoFisico
+      ? 'Bienvenida a la comunidad Glow.'
+      : hasCurso
+        ? 'Bienvenida a la comunidad Glow.'
+        : 'Bienvenida a The Glow Market.'
+
+  const mensaje = isPending
+    ? 'Te avisaremos por email cuando se confirme el pago. Ya podés cerrar esta ventana.'
+    : hasCurso && hasProductoFisico
+      ? 'En unos minutos vas a recibir un mail con los pasos para ingresar a tu curso, y novedades sobre el envío de tu pedido.'
+      : hasCurso
+        ? 'En unos minutos vas a recibir un mail con los pasos a seguir para que puedas ingresar ya a tu curso.'
+        : 'En unos minutos vas a recibir un mail con la confirmación de tu pedido.'
 
   return (
     <main className="min-h-screen bg-glow-cream flex items-center justify-center px-6">
@@ -55,16 +71,16 @@ function SuccessContent() {
         </h1>
 
         <p className="font-cormorant text-2xl text-glow-navy/70 font-light italic">
-          {isPending
-            ? 'Tu pago está siendo procesado.'
-            : 'Bienvenida a la comunidad Glow.'}
+          {subtitulo}
         </p>
 
-        <p className="font-montserrat text-sm text-glow-navy/60 leading-relaxed max-w-sm">
-          {isPending
-            ? 'Te avisaremos por email cuando se confirme el pago. Ya podés cerrar esta ventana.'
-            : 'Tu curso ya está disponible. Ingresá con tu usuario y contraseña para empezar cuando quieras, de por vida.'}
-        </p>
+        {loadingResumen && !isPending ? (
+          <div className="w-5 h-5 border-2 border-glow-navy/30 border-t-glow-navy rounded-full animate-spin" />
+        ) : (
+          <p className="font-montserrat text-sm text-glow-navy/60 leading-relaxed max-w-sm">
+            {mensaje}
+          </p>
+        )}
 
         {orderId && (
           <p className="font-montserrat text-xs text-glow-navy/30 tracking-widest uppercase">
@@ -72,35 +88,40 @@ function SuccessContent() {
           </p>
         )}
 
-        {!isPending && (
+        {!isPending && !loadingResumen && (
           <>
             <div className="flex flex-col sm:flex-row gap-3 mt-2 w-full max-w-xs">
-              <Link href="/mi-curso" className="w-full">
-                <Button variant="primary" size="md" className="w-full">
-                  Ir a mi curso
-                </Button>
-              </Link>
+              {hasCurso ? (
+                <Link href="/mi-curso" className="w-full">
+                  <Button variant="primary" size="md" className="w-full">
+                    Ir a mi curso
+                  </Button>
+                </Link>
+              ) : (
+                <Link href="/productos" className="w-full">
+                  <Button variant="primary" size="md" className="w-full">
+                    Seguir viendo la tienda
+                  </Button>
+                </Link>
+              )}
             </div>
 
-            {/* CTA compartir */}
-            <div className="mt-4 pt-6 border-t border-glow-navy/10 w-full max-w-sm flex flex-col items-center gap-3">
-              <p className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/40">
-                ¿Querés compartirlo?
-              </p>
-              <p className="font-cormorant text-lg text-glow-navy/60 font-light">
-                Contale a alguien que también lo necesita
-              </p>
-              <button
-                onClick={handleShare}
-                className="font-montserrat text-[10px] tracking-[0.2em] uppercase border border-glow-navy/30 text-glow-navy px-6 py-3 hover:bg-glow-navy hover:text-white transition-all duration-300"
-              >
-                {copied ? '¡Link copiado!' : 'Compartir el curso →'}
-              </button>
-            </div>
-
-            <p className="font-montserrat text-[10px] text-glow-navy/30">
-              Redirigiendo a tu curso en {countdown}s...
-            </p>
+            {hasCurso && (
+              <div className="mt-4 pt-6 border-t border-glow-navy/10 w-full max-w-sm flex flex-col items-center gap-3">
+                <p className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/40">
+                  ¿Querés compartirlo?
+                </p>
+                <p className="font-cormorant text-lg text-glow-navy/60 font-light">
+                  Contale a alguien que también lo necesita
+                </p>
+                <button
+                  onClick={handleShare}
+                  className="font-montserrat text-[10px] tracking-[0.2em] uppercase border border-glow-navy/30 text-glow-navy px-6 py-3 hover:bg-glow-navy hover:text-white transition-all duration-300"
+                >
+                  {copied ? '¡Link copiado!' : 'Compartir el curso →'}
+                </button>
+              </div>
+            )}
           </>
         )}
 
