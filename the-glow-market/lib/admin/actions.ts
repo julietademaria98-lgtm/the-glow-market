@@ -154,6 +154,20 @@ export async function grantAccesoFromForm(formData: FormData) {
   revalidatePath('/admin/cursos')
 }
 
+export async function resetPasswordFromForm(formData: FormData) {
+  const db = await checkAdmin()
+  const email = (formData.get('email') as string).trim()
+  const nuevaPassword = formData.get('nueva_password') as string
+  if (nuevaPassword.length < 6) throw new Error('La contraseña debe tener al menos 6 caracteres')
+
+  const { data: users } = await db.auth.admin.listUsers()
+  const user = users?.users?.find(u => u.email === email)
+  if (!user) throw new Error(`No existe una cuenta con el email ${email}`)
+
+  const { error } = await db.auth.admin.updateUserById(user.id, { password: nuevaPassword })
+  if (error) throw new Error(error.message)
+}
+
 export async function revokeAcceso(id: string) {
   const db = await checkAdmin()
   await db.from('accesos_curso').update({ activo: false }).eq('id', id)
