@@ -1,5 +1,6 @@
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { updateCurso, updateLeccion, grantAccesoFromForm, revokeAcceso } from '@/lib/admin/actions'
+import ResetPasswordForm from './ResetPasswordForm'
 import type { Curso, Leccion } from '@/types'
 
 async function getData() {
@@ -32,6 +33,8 @@ export default async function AdminCursosPage() {
   return (
     <div className="p-8 space-y-10">
       <h1 className="font-cormorant text-3xl text-glow-navy font-light">Cursos</h1>
+
+      <ResetPasswordForm />
 
       {cursos.map((curso) => {
         const lecciones = (curso.lecciones || []).sort((a, b) => a.orden - b.orden)
