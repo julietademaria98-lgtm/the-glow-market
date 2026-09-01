@@ -1,18 +1,52 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import StarIcon from '@/components/ui/StarIcon'
 import Button from '@/components/ui/Button'
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const [verificando, setVerificando] = useState(true)
+  const [linkValido, setLinkValido] = useState(false)
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const supabase = createClient()
+
+    async function verificarLink() {
+      // Si el link ya generó sesión automáticamente (formato antiguo con #access_token),
+      // no hace falta hacer nada más.
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        setLinkValido(true)
+        setVerificando(false)
+        return
+      }
+
+      // Formato actual: el link trae ?code=... y hay que canjearlo por una sesión.
+      const code = searchParams.get('code')
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code)
+        if (!error) {
+          setLinkValido(true)
+          setVerificando(false)
+          return
+        }
+      }
+
+      setLinkValido(false)
+      setVerificando(false)
+    }
+
+    verificarLink()
+  }, [searchParams])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -55,48 +89,78 @@ export default function ResetPasswordPage() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white p-8 md:p-10 flex flex-col gap-5">
-          <h1 className="font-cormorant text-3xl text-glow-navy font-light tracking-wide">
-            Crear nueva contraseña
-          </h1>
-
-          {error && (
-            <p className="font-montserrat text-xs text-red-500 bg-red-50 px-4 py-3">{error}</p>
-          )}
-
-          <div className="flex flex-col gap-1.5">
-            <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
-              Nueva contraseña
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="border border-glow-navy/20 focus:border-glow-navy outline-none px-4 py-3 font-montserrat text-sm text-glow-navy bg-transparent transition-colors duration-300 placeholder:text-glow-navy/30"
-              placeholder="••••••••"
-            />
+        {verificando ? (
+          <div className="bg-white p-8 md:p-10 flex justify-center">
+            <div className="w-6 h-6 border-2 border-glow-navy/30 border-t-glow-navy rounded-full animate-spin" />
           </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
-              Repetir contraseña
-            </label>
-            <input
-              type="password"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              required
-              className="border border-glow-navy/20 focus:border-glow-navy outline-none px-4 py-3 font-montserrat text-sm text-glow-navy bg-transparent transition-colors duration-300 placeholder:text-glow-navy/30"
-              placeholder="••••••••"
-            />
+        ) : !linkValido ? (
+          <div className="bg-white p-8 md:p-10 flex flex-col gap-4">
+            <h1 className="font-cormorant text-2xl text-glow-navy font-light tracking-wide">
+              Este link ya no es válido
+            </h1>
+            <p className="font-montserrat text-sm text-glow-navy/60 leading-relaxed">
+              Puede haber expirado o ya haberse usado. Además, tiene que abrirse desde el mismo
+              navegador donde pediste el cambio de contraseña — si lo abriste desde el mail en el
+              celular y pediste el cambio desde la computadora (o viceversa), no va a funcionar.
+            </p>
+            <Link href="/forgot-password">
+              <Button variant="primary" className="w-full mt-1">
+                Pedir un link nuevo
+              </Button>
+            </Link>
           </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="bg-white p-8 md:p-10 flex flex-col gap-5">
+            <h1 className="font-cormorant text-3xl text-glow-navy font-light tracking-wide">
+              Crear nueva contraseña
+            </h1>
 
-          <Button type="submit" variant="primary" className="w-full mt-1" loading={loading}>
-            Guardar contraseña
-          </Button>
-        </form>
+            {error && (
+              <p className="font-montserrat text-xs text-red-500 bg-red-50 px-4 py-3">{error}</p>
+            )}
+
+            <div className="flex flex-col gap-1.5">
+              <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
+                Nueva contraseña
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="border border-glow-navy/20 focus:border-glow-navy outline-none px-4 py-3 font-montserrat text-sm text-glow-navy bg-transparent transition-colors duration-300 placeholder:text-glow-navy/30"
+                placeholder="••••••••"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
+                Repetir contraseña
+              </label>
+              <input
+                type="password"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                required
+                className="border border-glow-navy/20 focus:border-glow-navy outline-none px-4 py-3 font-montserrat text-sm text-glow-navy bg-transparent transition-colors duration-300 placeholder:text-glow-navy/30"
+                placeholder="••••••••"
+              />
+            </div>
+
+            <Button type="submit" variant="primary" className="w-full mt-1" loading={loading}>
+              Guardar contraseña
+            </Button>
+          </form>
+        )}
       </div>
     </main>
+  )
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense>
+      <ResetPasswordContent />
+    </Suspense>
   )
 }
