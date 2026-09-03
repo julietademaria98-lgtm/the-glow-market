@@ -35,7 +35,7 @@ export default function Navbar() {
     window.location.href = '/'
   }
 
-  const navLinkClass = `nav-link transition-colors duration-300 ${!scrolled ? 'text-white/90 hover:text-white' : ''}`
+  const navLinkClass = `nav-link transition-colors duration-300`
 
   const marqueeText = '✦ 3 CUOTAS SIN INTERÉS  '
 
@@ -55,11 +55,7 @@ export default function Navbar() {
           ))}
         </div>
       </div>
-      <nav
-        className={`fixed top-8 w-full z-50 transition-all duration-500 ${
-          scrolled ? 'bg-glow-cream shadow-sm' : 'bg-transparent'
-        }`}
-      >
+      <nav className="fixed top-8 w-full z-50 bg-glow-cream shadow-sm">
         <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
           {/* LEFT LINKS — desktop */}
           <div className="hidden md:flex gap-8">
@@ -74,9 +70,7 @@ export default function Navbar() {
           {/* CENTER LOGO */}
                     <Link
             href="/"
-            className={`hidden md:block absolute left-1/2 -translate-x-1/2 whitespace-nowrap transition-all duration-500 ${
-              scrolled ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
-            }`}
+            className="hidden md:block absolute left-1/2 -translate-x-1/2 whitespace-nowrap"
           >
             <span className="font-cormorant text-xl md:text-2xl tracking-widest text-glow-navy font-light select-none">
               THE{' '}
