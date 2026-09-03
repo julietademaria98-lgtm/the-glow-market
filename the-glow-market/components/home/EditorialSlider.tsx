@@ -2,12 +2,9 @@
 
 import { useRef, useEffect, useState } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
 
 interface SliderImage {
   url: string
-  slug: string
-  nombre: string
 }
 
 export default function EditorialSlider({ images }: { images: SliderImage[] }) {
@@ -35,6 +32,8 @@ export default function EditorialSlider({ images }: { images: SliderImage[] }) {
     return () => cancelAnimationFrame(rafRef.current)
   }, [isPaused])
 
+  if (images.length === 0) return null
+
   return (
     <section className="bg-glow-cream py-16 overflow-hidden">
       <div
@@ -48,20 +47,19 @@ export default function EditorialSlider({ images }: { images: SliderImage[] }) {
           style={{ width: 'max-content', willChange: 'transform' }}
         >
           {items.map((img, i) => (
-            <Link
+            <div
               key={i}
-              href={`/productos/${img.slug}`}
-              className="relative flex-shrink-0 overflow-hidden block group"
+              className="relative flex-shrink-0 overflow-hidden"
               style={{ width: '320px', height: '420px' }}
             >
               <Image
                 src={img.url}
-                alt={img.nombre}
+                alt=""
                 fill
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                className="object-cover"
                 sizes="320px"
               />
-            </Link>
+            </div>
           ))}
         </div>
       </div>
