@@ -53,8 +53,6 @@ export async function createProducto(formData: FormData) {
   }
   revalidatePath('/admin/productos')
   revalidatePath('/productos')
-  revalidatePath('/productos/[slug]', 'layout')
-  revalidatePath('/')
   redirect('/admin/productos')
 }
 
@@ -80,8 +78,6 @@ export async function updateProducto(id: string, formData: FormData) {
   }
   revalidatePath('/admin/productos')
   revalidatePath('/productos')
-  revalidatePath('/productos/[slug]', 'layout')
-  revalidatePath('/')
   redirect('/admin/productos')
 }
 
@@ -92,8 +88,6 @@ export async function deleteProductoFromForm(formData: FormData) {
   await db.from('productos').delete().eq('id', id)
   revalidatePath('/admin/productos')
   revalidatePath('/productos')
-  revalidatePath('/productos/[slug]', 'layout')
-  revalidatePath('/')
 }
 
 export async function toggleActivoFromForm(formData: FormData) {
@@ -103,8 +97,6 @@ export async function toggleActivoFromForm(formData: FormData) {
   await db.from('productos').update({ activo }).eq('id', id)
   revalidatePath('/admin/productos')
   revalidatePath('/productos')
-  revalidatePath('/productos/[slug]', 'layout')
-  revalidatePath('/')
 }
 
 export async function updateCurso(id: string, formData: FormData) {
@@ -154,20 +146,6 @@ export async function grantAccesoFromForm(formData: FormData) {
   revalidatePath('/admin/cursos')
 }
 
-export async function resetPasswordFromForm(formData: FormData) {
-  const db = await checkAdmin()
-  const email = (formData.get('email') as string).trim()
-  const nuevaPassword = formData.get('nueva_password') as string
-  if (nuevaPassword.length < 6) throw new Error('La contraseña debe tener al menos 6 caracteres')
-
-  const { data: users } = await db.auth.admin.listUsers()
-  const user = users?.users?.find(u => u.email === email)
-  if (!user) throw new Error(`No existe una cuenta con el email ${email}`)
-
-  const { error } = await db.auth.admin.updateUserById(user.id, { password: nuevaPassword })
-  if (error) throw new Error(error.message)
-}
-
 export async function revokeAcceso(id: string) {
   const db = await checkAdmin()
   await db.from('accesos_curso').update({ activo: false }).eq('id', id)
@@ -205,8 +183,7 @@ export async function resendOrderEmail(id: string) {
   const cursosIds = new Set((await db.from('cursos').select('id')).data?.map((c: any) => c.id) || [])
   const hasCurso = (orden.items || []).some((item: any) => cursosIds.has(item.id))
   const hasProductoFisico = (orden.items || []).some((item: any) => !cursosIds.has(item.id))
-  const requiereCuenta = hasCurso && !orden.user_id
-  await sendOrderConfirmation({ to: email, nombreCliente, ordenId: orden.id, items: orden.items || [], total: orden.total || 0, hasCurso, hasProductoFisico, requiereCuenta })
+  await sendOrderConfirmation({ to: email, nombreCliente, ordenId: orden.id, items: orden.items || [], total: orden.total || 0, hasCurso, hasProductoFisico })
 }
 
 export async function guardarSeguimiento(id: string, formData: FormData) {
@@ -233,7 +210,9 @@ export async function guardarSeguimiento(id: string, formData: FormData) {
     await sendSeguimientoEmail({ to: email, nombreCliente, ordenId: orden.id, numeroSeguimiento })
   }
   revalidatePath('/admin/ordenes')
-  export async function addSliderImagen(formData: FormData) {
+}
+
+export async function addSliderImagen(formData: FormData) {
   const db = await checkAdmin()
   const url = formData.get('url') as string
   const orden = Number(formData.get('orden')) || 0
@@ -248,5 +227,4 @@ export async function deleteSliderImagen(id: string) {
   await db.from('slider_imagenes').delete().eq('id', id)
   revalidatePath('/admin/slider')
   revalidatePath('/')
-}
 }
