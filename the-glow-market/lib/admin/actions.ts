@@ -152,6 +152,19 @@ export async function revokeAcceso(id: string) {
   revalidatePath('/admin/cursos')
 }
 
+export async function resetPasswordFromForm(formData: FormData) {
+  const db = await checkAdmin()
+  const email = formData.get('email') as string
+  if (!email) throw new Error('Email requerido')
+  const { error } = await db.auth.admin.generateLink({
+    type: 'recovery',
+    email,
+    options: { redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/reset-password` },
+  })
+  if (error) throw new Error(error.message)
+  revalidatePath('/admin/cursos')
+}
+
 export async function updateEstadoOrden(id: string, formData: FormData) {
   const db = await checkAdmin()
   const estado = formData.get('estado') as string
