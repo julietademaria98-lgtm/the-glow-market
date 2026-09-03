@@ -233,4 +233,20 @@ export async function guardarSeguimiento(id: string, formData: FormData) {
     await sendSeguimientoEmail({ to: email, nombreCliente, ordenId: orden.id, numeroSeguimiento })
   }
   revalidatePath('/admin/ordenes')
+  export async function addSliderImagen(formData: FormData) {
+  const db = await checkAdmin()
+  const url = formData.get('url') as string
+  const orden = Number(formData.get('orden')) || 0
+  if (!url) return
+  await db.from('slider_imagenes').insert({ url, orden })
+  revalidatePath('/admin/slider')
+  revalidatePath('/')
+}
+
+export async function deleteSliderImagen(id: string) {
+  const db = await checkAdmin()
+  await db.from('slider_imagenes').delete().eq('id', id)
+  revalidatePath('/admin/slider')
+  revalidatePath('/')
+}
 }
