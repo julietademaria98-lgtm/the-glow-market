@@ -9,16 +9,9 @@ import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [user, setUser] = useState<User | null>(null)
   const itemCount = useCartStore((state) => state.itemCount())
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50)
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
 
   useEffect(() => {
     const supabase = createClient()
@@ -57,29 +50,17 @@ export default function Navbar() {
       </div>
       <nav className="fixed top-8 w-full z-50 bg-glow-cream shadow-sm">
         <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
-          {/* LEFT LINKS — desktop */}
           <div className="hidden md:flex gap-8">
-            <Link href="/productos" className={navLinkClass}>
-              Market
-            </Link>
-            <Link href="/cursos" className={navLinkClass}>
-              Cursos Online
-            </Link>
+            <Link href="/productos" className={navLinkClass}>Market</Link>
+            <Link href="/cursos" className={navLinkClass}>Cursos Online</Link>
           </div>
 
-          {/* CENTER LOGO */}
-                    <Link
-            href="/"
-            className="hidden md:block absolute left-1/2 -translate-x-1/2 whitespace-nowrap"
-          >
+          <Link href="/" className="hidden md:block absolute left-1/2 -translate-x-1/2 whitespace-nowrap">
             <span className="font-cormorant text-xl md:text-2xl tracking-widest text-glow-navy font-light select-none">
-              THE{' '}
-              <span className="text-2xl md:text-4xl font-normal">GLOW</span>{' '}
-              MARKET
+              THE <span className="text-2xl md:text-4xl font-normal">GLOW</span> MARKET
             </span>
           </Link>
 
-          {/* RIGHT ACTIONS — desktop */}
           <div className="hidden md:flex gap-6 items-center">
             <Link href="/carrito" className={`relative ${navLinkClass}`}>
               Carrito
@@ -89,35 +70,22 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
-
             <div className="relative group">
-              <Link
-                href={user ? '/mi-curso' : '/login?redirect=%2Fmi-curso'}
-                className={navLinkClass}
-              >
+              <Link href={user ? '/mi-curso' : '/login?redirect=%2Fmi-curso'} className={navLinkClass}>
                 {user ? 'Mi Curso' : 'Mi Cuenta'}
               </Link>
               <div className="absolute right-0 top-full pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                 <div className="bg-white shadow-md min-w-[160px] py-2">
                   {user ? (
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-2.5 font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/60 hover:text-glow-navy hover:bg-glow-cream transition-colors"
-                    >
+                    <button onClick={handleLogout} className="w-full text-left px-4 py-2.5 font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/60 hover:text-glow-navy hover:bg-glow-cream transition-colors">
                       Cerrar sesión
                     </button>
                   ) : (
                     <>
-                      <Link
-                        href="/login"
-                        className="block px-4 py-2.5 font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/60 hover:text-glow-navy hover:bg-glow-cream transition-colors"
-                      >
+                      <Link href="/login" className="block px-4 py-2.5 font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/60 hover:text-glow-navy hover:bg-glow-cream transition-colors">
                         Iniciar sesión
                       </Link>
-                      <Link
-                        href="/registro"
-                        className="block px-4 py-2.5 font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/60 hover:text-glow-navy hover:bg-glow-cream transition-colors"
-                      >
+                      <Link href="/registro" className="block px-4 py-2.5 font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/60 hover:text-glow-navy hover:bg-glow-cream transition-colors">
                         Crear cuenta
                       </Link>
                     </>
@@ -127,7 +95,6 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* MOBILE: carrito + hamburger */}
           <div className="flex md:hidden items-center gap-4 ml-auto">
             <Link href="/carrito" className="relative nav-link">
               Carrito
@@ -137,34 +104,16 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="text-glow-navy p-1"
-              aria-label="Menú"
-            >
+            <button onClick={() => setMenuOpen(!menuOpen)} className="text-glow-navy p-1" aria-label="Menú">
               {menuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
         </div>
       </nav>
 
-      {/* MOBILE DRAWER */}
-      <div
-        className={`fixed inset-0 z-40 transition-all duration-500 md:hidden ${
-          menuOpen ? 'visible' : 'invisible'
-        }`}
-      >
-        <div
-          className={`absolute inset-0 bg-glow-dark/40 transition-opacity duration-500 ${
-            menuOpen ? 'opacity-100' : 'opacity-0'
-          }`}
-          onClick={() => setMenuOpen(false)}
-        />
-        <div
-          className={`absolute top-0 left-0 h-full w-72 bg-glow-cream flex flex-col pt-20 px-8 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-            menuOpen ? 'translate-x-0' : '-translate-x-full'
-          }`}
-        >
+      <div className={`fixed inset-0 z-40 transition-all duration-500 md:hidden ${menuOpen ? 'visible' : 'invisible'}`}>
+        <div className={`absolute inset-0 bg-glow-dark/40 transition-opacity duration-500 ${menuOpen ? 'opacity-100' : 'opacity-0'}`} onClick={() => setMenuOpen(false)} />
+        <div className={`absolute top-0 left-0 h-full w-72 bg-glow-cream flex flex-col pt-20 px-8 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${menuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
           <div className="flex flex-col gap-8">
             <StarIcon size={16} className="text-glow-navy mb-4" />
             {[
@@ -174,28 +123,16 @@ export default function Navbar() {
               { href: '/carrito', label: 'Carrito' },
               { href: '/mi-curso', label: 'Mi Curso' },
             ].map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMenuOpen(false)}
-                className="font-cormorant text-2xl text-glow-navy tracking-wide hover:opacity-60 transition-opacity"
-              >
+              <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)} className="font-cormorant text-2xl text-glow-navy tracking-wide hover:opacity-60 transition-opacity">
                 {link.label}
               </Link>
             ))}
             {user ? (
-              <button
-                onClick={handleLogout}
-                className="font-cormorant text-2xl text-glow-navy/40 tracking-wide hover:opacity-60 transition-opacity text-left"
-              >
+              <button onClick={handleLogout} className="font-cormorant text-2xl text-glow-navy/40 tracking-wide hover:opacity-60 transition-opacity text-left">
                 Cerrar sesión
               </button>
             ) : (
-              <Link
-                href="/login"
-                onClick={() => setMenuOpen(false)}
-                className="font-cormorant text-2xl text-glow-navy/40 tracking-wide hover:opacity-60 transition-opacity"
-              >
+              <Link href="/login" onClick={() => setMenuOpen(false)} className="font-cormorant text-2xl text-glow-navy/40 tracking-wide hover:opacity-60 transition-opacity">
                 Iniciar sesión
               </Link>
             )}
