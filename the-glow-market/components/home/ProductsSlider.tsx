@@ -130,6 +130,7 @@ function MejuriCard({ producto, index }: { producto: Producto; index: number }) 
             />
           )}
 
+          {/* Badge izquierda */}
           {sinStock ? (
             <div className="absolute top-3 left-3 bg-glow-navy/50 text-white font-montserrat text-[9px] tracking-widest uppercase px-2 py-1">
               Sin stock
@@ -139,6 +140,11 @@ function MejuriCard({ producto, index }: { producto: Producto; index: number }) 
               Oferta
             </div>
           ) : null}
+
+          {/* Badge derecha: Regalos CLARINS */}
+          <div className="absolute top-3 right-3 font-montserrat text-[9px] tracking-widest uppercase px-2 py-1" style={{ backgroundColor: '#e8b4b8', color: '#192149' }}>
+            Regalos CLARINS
+          </div>
 
           {!sinStock && (
             <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-[350ms] ease-[cubic-bezier(0.22,1,0.36,1)]">
