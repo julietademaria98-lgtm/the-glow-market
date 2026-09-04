@@ -27,7 +27,7 @@ async function getHomeData() {
       .limit(3),
     supabase
       .from('slider_imagenes')
-      .select('id, url')
+      .select('url')
       .eq('activo', true)
       .order('orden', { ascending: true }),
   ])
@@ -35,7 +35,7 @@ async function getHomeData() {
   return {
     productos: (productosRes.data || []) as Producto[],
     cursos: (cursosRes.data || []) as Curso[],
-    sliderImagenes: (sliderRes.data || []) as { id: string; url: string }[],
+    sliderImagenes: (sliderRes.data || []) as { url: string }[],
   }
 }
 
