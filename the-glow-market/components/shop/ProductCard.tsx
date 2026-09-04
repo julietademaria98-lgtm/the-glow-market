@@ -48,7 +48,6 @@ export default function ProductCard({ producto, index = 0 }: ProductCardProps) {
       className="group product-card-container"
     >
       <Link href={`/productos/${producto.slug}`} className="block">
-        {/* Image container */}
         <div className="relative aspect-square overflow-hidden bg-white">
           <Image
             src={mainImage}
@@ -67,7 +66,7 @@ export default function ProductCard({ producto, index = 0 }: ProductCardProps) {
             />
           )}
 
-          {/* Badges */}
+          {/* Badge izquierda: stock / oferta */}
           {producto.stock === 0 ? (
             <div className="absolute top-3 left-3 bg-glow-navy/50 text-white font-montserrat text-[9px] tracking-widest uppercase px-2 py-1">
               Sin stock
@@ -78,7 +77,11 @@ export default function ProductCard({ producto, index = 0 }: ProductCardProps) {
             </div>
           ) : null}
 
-          {/* Add to cart — slide from bottom */}
+          {/* Badge derecha: Regalos CLARINS */}
+          <div className="absolute top-3 right-3 font-montserrat text-[9px] tracking-widest uppercase px-2 py-1" style={{ backgroundColor: '#e8b4b8', color: '#192149' }}>
+            Regalos CLARINS
+          </div>
+
           {producto.stock !== 0 && (
             <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]">
               <button
@@ -95,7 +98,6 @@ export default function ProductCard({ producto, index = 0 }: ProductCardProps) {
           )}
         </div>
 
-        {/* Product info */}
         <div className="mt-3 space-y-1">
           <h3 className="font-cormorant text-base md:text-lg text-glow-navy tracking-wide leading-tight">
             {producto.nombre}
