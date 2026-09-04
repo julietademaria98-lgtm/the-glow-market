@@ -4,7 +4,6 @@ import { useRef, useEffect, useState } from 'react'
 import Image from 'next/image'
 
 interface SliderImage {
-  id: string
   url: string
 }
 
