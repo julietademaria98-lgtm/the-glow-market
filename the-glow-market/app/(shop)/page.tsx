@@ -10,20 +10,38 @@ export const revalidate = 3600
 
 async function getHomeData() {
   const supabase = await createClient()
-  const [productosRes, sliderRes, cursosRes] = await Promise.all([
-    supabase.from('productos').select('*, imagenes:producto_imagenes(*)').eq('activo', true).eq('destacado', true).order('created_at', { ascending: false }).limit(4),
-    supabase.from('slider_imagenes').select('*').eq('activo', true).order('orden'),
-    supabase.from('cursos').select('*, lecciones(*)').eq('activo', true).order('created_at', { ascending: false }).limit(3),
+
+  const [productosRes, cursosRes, sliderRes] = await Promise.all([
+    supabase
+      .from('productos')
+      .select('*, imagenes:producto_imagenes(*)')
+      .eq('activo', true)
+      .eq('destacado', true)
+      .order('created_at', { ascending: false })
+      .limit(4),
+    supabase
+      .from('cursos')
+      .select('*, lecciones(*)')
+      .eq('activo', true)
+      .order('created_at', { ascending: false })
+      .limit(3),
+    supabase
+      .from('slider_imagenes')
+      .select('id, url')
+      .eq('activo', true)
+      .order('orden', { ascending: true }),
   ])
+
   return {
     productos: (productosRes.data || []) as Producto[],
-    sliderImagenes: (sliderRes.data || []) as { url: string }[],
     cursos: (cursosRes.data || []) as Curso[],
+    sliderImagenes: (sliderRes.data || []) as { id: string; url: string }[],
   }
 }
 
 export default async function HomePage() {
-  const { productos, sliderImagenes, cursos } = await getHomeData()
+  const { productos, cursos, sliderImagenes } = await getHomeData()
+
   return (
     <main>
       <HeroSection />
