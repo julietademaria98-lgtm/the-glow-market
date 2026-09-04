@@ -4,6 +4,7 @@ import { useRef, useEffect, useState } from 'react'
 import Image from 'next/image'
 
 interface SliderImage {
+  id: string
   url: string
 }
 
@@ -18,21 +19,24 @@ export default function EditorialSlider({ images }: { images: SliderImage[] }) {
   useEffect(() => {
     const track = trackRef.current
     if (!track) return
+
     const speed = 0.5
     const totalWidth = track.scrollWidth / 3
+
     const animate = () => {
       if (!isPaused) {
         posRef.current += speed
-        if (posRef.current >= totalWidth) posRef.current = 0
+        if (posRef.current >= totalWidth) {
+          posRef.current = 0
+        }
         track.style.transform = `translateX(-${posRef.current}px)`
       }
       rafRef.current = requestAnimationFrame(animate)
     }
+
     rafRef.current = requestAnimationFrame(animate)
     return () => cancelAnimationFrame(rafRef.current)
   }, [isPaused])
-
-  if (images.length === 0) return null
 
   return (
     <section className="bg-glow-cream py-16 overflow-hidden">
