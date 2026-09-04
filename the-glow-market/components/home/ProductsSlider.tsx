@@ -44,7 +44,7 @@ export default function ProductsSlider({ productos }: ProductsSliderProps) {
         ))}
       </div>
 
-      <div className="flex justify-center" style={{ marginTop: '48px', paddingBottom: '64px' }}>
+      <div className="flex justify-center items-center" style={{ paddingTop: '56px', paddingBottom: '56px' }}>
         <Link
           href="/productos"
           className="font-montserrat uppercase"
