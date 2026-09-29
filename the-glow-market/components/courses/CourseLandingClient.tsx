@@ -10,6 +10,9 @@ import type { Curso } from '@/types'
 const bodyFont = DM_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--course-body-font', display: 'swap' })
 const titleFont = Playfair_Display({ subsets: ['latin'], weight: ['500', '600', '700'], style: ['normal', 'italic'], variable: '--course-title-font', display: 'swap' })
 
+// Video de Nina alojado en Supabase.
+const TRANSFORMATION_VIDEO_URL = 'https://daevvoumyxwgwqfbafvn.supabase.co/storage/v1/object/public/product-images/antes-despues.MOV'
+
 const MODULES = [
   { num: '01', eyebrow: 'Prepará', title: 'Piel que se ve sana, no maquillada', desc: 'Vas a lograr una piel luminosa, pareja e hidratada en minutos: la base perfecta para cualquier look.' },
   { num: '02', eyebrow: 'Iluminá', title: 'Un makeup de día que no se nota que te maquillaste', desc: 'Vas a poder armar tu cara todos los días con pocos productos y en la mitad de tiempo que ahora.' },
@@ -132,6 +135,24 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           {'ACCESO DE POR VIDA  ✦  5 RECURSOS BONUS  ✦  COMUNIDAD EXCLUSIVA  ✦  REGALOS POR COMPRA CLARINS  ✦  ACCESO DE POR VIDA  ✦  5 RECURSOS BONUS  ✦  COMUNIDAD EXCLUSIVA  ✦  REGALOS POR COMPRA CLARINS  ✦  '}
         </span>
       </div>
+
+      {/* Antes y después de Nina. */}
+      <section className="course-section course-transformation" aria-labelledby="course-transformation-title">
+        <div className="course-transformation-media">
+          {TRANSFORMATION_VIDEO_URL ? (
+            <video controls playsInline preload="metadata" src={TRANSFORMATION_VIDEO_URL}
+              aria-label="Nina antes del curso y con el maquillaje llevado a noche" />
+          ) : (
+            <div className="course-video-pending"><span>✦</span><p>El glow, paso a paso.</p></div>
+          )}
+        </div>
+        <div className="course-transformation-copy">
+          <p className="course-eyebrow">Day to night glow</p>
+          <h2 className="course-h2" id="course-transformation-title">Así empezás.<br /><em>Así quedás llevándolo a noche.</em></h2>
+          <p className="course-transformation-description">De tu piel al natural a un makeup de noche, paso a paso y con pocos productos.</p>
+          <a className="course-cta" href="#inscripcion">Quiero aprender</a>
+        </div>
+      </section>
 
       {/* Intro quote */}
       <section className="course-section course-intro">
@@ -940,6 +961,17 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           .course-benefits-group[aria-hidden=true] { display:none; } .course-benefit-item { white-space:normal; }
           .course-ticker { white-space:normal; }
         }
+
+.course-transformation{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:clamp(35px,6vw,90px);max-width:1240px;margin:auto}
+.course-transformation-media{width:100%;max-width:440px;justify-self:center;background:#192149;border-radius:100px 100px 12px 12px;overflow:hidden;aspect-ratio:9/16}
+.course-transformation-media video{display:block;width:100%;height:100%;object-fit:contain}
+.course-transformation-copy h2{font-size:clamp(36px,3.7vw,56px);line-height:1.14;text-wrap:balance}
+.course-transformation-copy .course-transformation-description{font-size:20px;line-height:1.6;max-width:440px;margin:25px 0}
+.course-transformation-copy .course-cta{margin-top:8px}
+@media(max-width:600px){.course-transformation{grid-template-columns:1fr;gap:30px}.course-transformation-media{max-width:350px;border-radius:70px 70px 12px 12px}.course-transformation-copy .course-transformation-description{font-size:18px}}
+
+.course-video-pending{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#E9E2DA;text-align:center;padding:30px}
+.course-video-pending span{font-size:40px;color:#E1C8CB}.course-video-pending p{font-family:var(--course-title-font),serif;font-size:32px}
       `}</style>
     </main>
   )
