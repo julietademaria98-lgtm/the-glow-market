@@ -58,7 +58,7 @@ export default function AddToCartCurso({ curso }: { curso: Curso }) {
           added ? 'bg-green-700 text-white' : 'bg-glow-navy text-white hover:bg-glow-blue'
         }`}
       >
-        {added ? '✓ Agregado al carrito' : 'Agregar al carrito'}
+        {added ? '✓ Agregado al carrito' : 'Comprar'}
       </button>
 
       <div className="flex items-center gap-2 mt-1">
