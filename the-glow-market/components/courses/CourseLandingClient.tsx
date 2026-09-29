@@ -42,7 +42,7 @@ const FAQ = [
 export default function CourseLandingClient({ curso }: { curso: Curso }) {
   const [isNight, setIsNight] = useState(false)
 
-  const imgUrl = curso.imagen_url || ''
+  const imgUrl = curso.imagen_url || 'https://daevvoumyxwgwqfbafvn.supabase.co/storage/v1/object/public/product-images/nina-glow-fondo-claro.png'
   const accentBlue = '#1A4C81'
   const pink = '#E1C8CB'
 
