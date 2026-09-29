@@ -2,11 +2,13 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
+import { DM_Sans, Playfair_Display } from 'next/font/google'
 import AddToCartCurso from '@/components/courses/AddToCartCurso'
-import PreviewVideo from '@/components/courses/PreviewVideo'
 import SocialProofPopup from '@/components/courses/SocialProofPopup'
 import type { Curso } from '@/types'
+
+const bodyFont = DM_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--course-body-font', display: 'swap' })
+const titleFont = Playfair_Display({ subsets: ['latin'], weight: ['500', '600', '700'], style: ['normal', 'italic'], variable: '--course-title-font', display: 'swap' })
 
 const MODULES = [
   { num: '01', eyebrow: 'Prepará', title: 'Piel que se ve sana, no maquillada', desc: 'Vas a lograr una piel luminosa, pareja e hidratada en minutos: la base perfecta para cualquier look.' },
@@ -43,19 +45,11 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
   const [isNight, setIsNight] = useState(false)
 
   const imgUrl = 'https://daevvoumyxwgwqfbafvn.supabase.co/storage/v1/object/public/product-images/nina-glow-fondo-claro.png'
-  const accentBlue = '#1A4C81'
   const pink = '#E1C8CB'
 
   return (
-    <main className={`course-landing${isNight ? ' night' : ''}`}>
+    <main className={`course-landing ${bodyFont.variable} ${titleFont.variable}${isNight ? ' night' : ''}`}>
       <SocialProofPopup cursoNombre={curso.titulo} />
-
-      {/* Announcement */}
-      <div className="course-announcement">
-        <div className="course-announcement-track">
-          {'✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   '}
-        </div>
-      </div>
 
       {/* Hero */}
       <div className="course-hero">
@@ -87,7 +81,6 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
               alt="Nina Amateis con los productos del curso Day to Night Glow"
               fill
               className="course-hero-img"
-              style={{ objectPosition: 'center 60%', filter: isNight ? 'brightness(0.72) saturate(0.8)' : undefined, transition: 'filter 0.7s' }}
               priority
               sizes="(max-width: 600px) 88vw, 50vw"
             />
@@ -103,6 +96,8 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
             {(['day', 'night'] as const).map((m) => (
               <button
                 key={m}
+                type="button"
+                aria-pressed={(m === 'night') === isNight}
                 className={`course-mode-btn${(m === 'night') === isNight ? ' active' : ''}`}
                 onClick={() => setIsNight(m === 'night')}
               >
@@ -142,7 +137,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
       <section className="course-section course-intro">
         <p className="course-eyebrow">Un método simple. Un cambio real.</p>
         <blockquote className="course-quote">
-          "Este curso lo armé para vos, mujeres reales que quieren salir prolijas y se cansaron de probar productos que no usan."
+          “Este curso lo armé para vos, mujeres reales que quieren salir prolijas y se cansaron de probar <span className="course-quote-ending">productos que no usan.”</span>
         </blockquote>
         <p className="course-author">NINA AMATEIS</p>
         <p className="course-method">
@@ -230,7 +225,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
         </div>
 
         {/* Benefits band */}
-        <div className="course-benefits-band">
+        <div className="course-benefits-band" tabIndex={0} aria-label="Beneficios incluidos">
           <div className="course-benefits-track">
             {[0, 1].map((g) => (
               <div key={g} className="course-benefits-group" aria-hidden={g === 1}>
@@ -291,30 +286,6 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="course-footer">
-        <Link href="/" className="course-footer-logo">
-          THE <span className="course-footer-logo-glow">GLOW</span> MARKET
-        </Link>
-        <div className="course-footer-tagline">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M12 0 L13.5 10.5 L24 12 L13.5 13.5 L12 24 L10.5 13.5 L0 12 L10.5 10.5 Z" />
-          </svg>
-          <span>Own Your Glow</span>
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M12 0 L13.5 10.5 L24 12 L13.5 13.5 L12 24 L10.5 13.5 L0 12 L10.5 10.5 Z" />
-          </svg>
-        </div>
-        <nav className="course-footer-nav">
-          <Link href="/productos">Tienda</Link>
-          <Link href="/cursos">Cursos</Link>
-          <Link href="/mi-curso">Mi Cuenta</Link>
-          <a href="mailto:hola@theglowmarket.com">Contacto</a>
-        </nav>
-        <div className="course-footer-rule" />
-        <p className="course-footer-copy">© 2026 The Glow Market. Todos los derechos reservados.</p>
-      </footer>
-
       <style>{`
         .course-landing {
           --bg: #E9E2DA;
@@ -323,7 +294,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           --pink: #E1C8CB;
           background: var(--bg);
           color: var(--ink);
-          font-family: 'Montserrat', Arial, sans-serif;
+          font-family: var(--course-body-font), Arial, sans-serif;
           transition: background .6s, color .6s;
         }
         .course-landing.night {
@@ -331,30 +302,12 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           --ink: #E9E2DA;
         }
         .night .course-for-you { background: #1A4C81; }
-        .night .course-hero-img { filter: brightness(.72) saturate(.8); }
+        .night .course-hero-img { filter: none; }
         .night .course-clarins-logo { color: #E1C8CB; }
         .night .course-lead-strong { background: linear-gradient(transparent 72%, #20699F 72%); }
         .night .course-highlight { background: linear-gradient(transparent 72%, #20699F 72%); }
         .night .course-cta { background: #E1C8CB; color: #192149; }
         .night .course-module-1 { border-color: rgba(233,226,218,.2); }
-
-        /* Announcement */
-        .course-announcement {
-          background: var(--accent);
-          color: #E9E2DA;
-          height: 32px;
-          overflow: hidden;
-          font-family: 'Montserrat', sans-serif;
-          font-size: 10px;
-          font-weight: 400;
-          letter-spacing: 2.4px;
-          line-height: 32px;
-          white-space: nowrap;
-        }
-        .course-announcement-track {
-          display: inline-block;
-          animation: marquee 65s linear infinite;
-        }
 
         /* Hero */
         .course-hero {
@@ -377,7 +330,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           margin: 0 0 16px;
         }
         .course-h1 {
-          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-family: var(--course-title-font), Georgia, serif;
           font-size: clamp(72px, 7.8vw, 116px);
           line-height: .93;
           font-weight: 500;
@@ -417,7 +370,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           font-size: 15px;
           text-decoration: none;
           transition: transform .2s, background .2s;
-          font-family: 'Montserrat', sans-serif;
+          font-family: var(--course-body-font), Arial, sans-serif;
         }
         .course-cta:hover { transform: translateY(-3px); }
         .course-foot { font-size: 13px; opacity: .6; margin: 0; }
@@ -455,7 +408,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           text-align: center;
         }
         .course-hero-placeholder p {
-          font-family: 'Cormorant Garamond', serif;
+          font-family: var(--course-title-font), Georgia, serif;
           font-size: clamp(34px, 4vw, 56px);
           line-height: 1.15;
           letter-spacing: -1.5px;
@@ -482,7 +435,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           border-radius: 99px;
           font-size: 13px;
           cursor: pointer;
-          font-family: 'Montserrat', sans-serif;
+          font-family: var(--course-body-font), Arial, sans-serif;
           transition: background .2s, color .2s;
         }
         .course-mode-btn.active {
@@ -512,7 +465,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           line-height: 1.4;
         }
         .course-seal-b {
-          font-family: 'Cormorant Garamond', serif;
+          font-family: var(--course-title-font), Georgia, serif;
           font-size: 32px;
           font-weight: 500;
           display: block;
@@ -532,7 +485,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           letter-spacing: 1px;
         }
         .course-caption-title {
-          font-family: 'Cormorant Garamond', serif;
+          font-family: var(--course-title-font), Georgia, serif;
           font-weight: 500;
           font-size: 34px;
           display: block;
@@ -548,7 +501,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
         }
         .course-ticker-track {
           display: inline-block;
-          animation: ticker-scroll 32s linear infinite;
+          animation: course-ticker-scroll 32s linear infinite;
           font-size: 14px;
           letter-spacing: 2px;
         }
@@ -563,7 +516,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           margin-right: auto;
         }
         .course-quote {
-          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-family: var(--course-title-font), Georgia, serif;
           font-size: clamp(28px, 3.5vw, 49px);
           line-height: 1.35;
           margin: 25px auto;
@@ -585,7 +538,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
 
         /* H2 */
         .course-h2 {
-          font-family: 'Cormorant Garamond', serif;
+          font-family: var(--course-title-font), Georgia, serif;
           font-size: clamp(36px, 4.3vw, 64px);
           font-weight: 500;
           line-height: 1.08;
@@ -658,14 +611,14 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
         .course-module-3 { background: #20699F; color: #E9E2DA; }
         .course-module-4 { background: #192149; color: #E9E2DA; }
         .course-module-num {
-          font-family: 'Cormorant Garamond', serif;
+          font-family: var(--course-title-font), Georgia, serif;
           font-size: 54px;
           display: block;
           margin-bottom: 40px;
           font-style: italic;
         }
         .course-module-title {
-          font-family: 'Cormorant Garamond', serif;
+          font-family: var(--course-title-font), Georgia, serif;
           font-size: 25px;
           line-height: 1.2;
           font-weight: 500;
@@ -732,7 +685,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           margin-bottom: 12px;
         }
         .course-bonus-title {
-          font-family: 'Cormorant Garamond', serif;
+          font-family: var(--course-title-font), Georgia, serif;
           font-size: 27px;
           line-height: 1.18;
           font-weight: 500;
@@ -761,7 +714,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
 
         /* Benefits band */
         .course-benefits-band {
-          margin: 55px -7% 0;
+          margin: 55px -8.139535% 0;
           background: #E1C8CB;
           color: #192149;
           overflow: hidden;
@@ -770,7 +723,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
         .course-benefits-track {
           display: flex;
           width: max-content;
-          animation: benefits-scroll 60s linear infinite;
+          animation: course-benefits-scroll 60s linear infinite;
         }
         .course-benefits-group {
           display: flex;
@@ -832,7 +785,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           box-shadow: 8px 12px 0 rgba(25,33,73,.07);
         }
         .course-pricecard-title {
-          font-family: 'Cormorant Garamond', serif;
+          font-family: var(--course-title-font), Georgia, serif;
           font-size: 38px;
           font-weight: 500;
           margin: 20px;
@@ -868,68 +821,9 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           margin-top: 12px;
         }
 
-        /* Footer */
-        .course-footer {
-          background: #192149;
-          color: #E9E2DA;
-          padding: 64px 24px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 32px;
-          text-align: center;
-        }
-        .course-footer-logo {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 30px;
-          font-weight: 300;
-          letter-spacing: 2.4px;
-          line-height: 1;
-          color: #E9E2DA;
-          text-decoration: none;
-          white-space: nowrap;
-        }
-        .course-footer-logo-glow { font-size: 48px; font-weight: 400; }
-        .course-footer-tagline {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          color: #E1C8CB;
-          font-size: 10px;
-          text-transform: uppercase;
-          letter-spacing: 3px;
-        }
-        .course-footer-nav {
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: center;
-          gap: 40px;
-          font-size: 10px;
-          letter-spacing: 2px;
-          text-transform: uppercase;
-          color: rgba(255,255,255,.7);
-        }
-        .course-footer-nav a { color: inherit; text-decoration: none; }
-        .course-footer-nav a:hover { color: #E1C8CB; }
-        .course-footer-rule {
-          width: 100%;
-          max-width: 320px;
-          height: 1px;
-          background: rgba(255,255,255,.1);
-        }
-        .course-footer-copy {
-          font-size: 10px;
-          letter-spacing: 1.6px;
-          text-transform: uppercase;
-          color: rgba(255,255,255,.5);
-          margin: 0;
-          line-height: 1.8;
-        }
-
         /* Animations */
-        @keyframes marquee { to { transform: translateX(-50%); } }
-        @keyframes ticker-scroll { to { transform: translateX(-50%); } }
-        @keyframes benefits-scroll { to { transform: translateX(-50%); } }
+        @keyframes course-ticker-scroll { to { transform: translateX(-50%); } }
+        @keyframes course-benefits-scroll { to { transform: translateX(-50%); } }
 
         /* Responsive: tablet */
         @media (max-width: 900px) {
@@ -979,6 +873,72 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           .course-announcement-track,
           .course-ticker-track,
           .course-benefits-track { animation: none; }
+        }
+
+        /* Approved design, scoped to this course component. */
+        .course-landing { padding-top:96px; font-size:16px; }
+        .course-landing *, .course-landing *::before, .course-landing *::after { box-sizing:border-box; }
+        .course-landing section[id] { scroll-margin-top:112px; }
+        .course-hero { min-height:730px; }
+        .course-hero-copy { container-type:inline-size; min-width:0; }
+        .course-h1 { font-size:clamp(58px,8vw,116px); letter-spacing:-.045em; line-height:1.03; margin:24px 0 32px; }
+        .course-h1-em { font-size:.79em; white-space:nowrap; letter-spacing:-.055em; }
+        @supports(font-size:1cqi) { .course-h1 { font-size:clamp(54px,23cqi,116px); } }
+        .course-lead { font-size:clamp(23px,2.1vw,31px); line-height:1.32; max-width:490px; text-wrap:pretty; margin:0 0 18px; }
+        .course-sub { font-size:18px; line-height:1.6; max-width:460px; margin:0 0 12px; }
+        .course-foot { opacity:1; }
+        .course-hero-img { object-position:center 60%; }
+        .course-caption-title { display:inline; }
+        .course-intro { max-width:1240px; }
+        .course-quote { font-size:clamp(28px,3.3vw,47px); font-style:normal; text-wrap:balance; margin:30px auto; }
+        .course-quote-ending { white-space:nowrap; }
+        .course-method { text-wrap:balance; }
+        .course-for-you-left { justify-self:center; width:100%; max-width:520px; }
+        .course-for-you-left .course-h2 { margin:0; }
+        .night .course-for-you { color:#E9E2DA; }
+        .night .course-check-item { border-color:#E9E2DA40; }
+        .night .course-module-4 { background:#1A4C81; border:1px solid #E9E2DA55; }
+        #programa .course-section-head { justify-content:flex-start; gap:clamp(40px,7vw,110px); align-items:center; }
+        .course-modules-intro { text-wrap:balance; }
+        .course-bonus-grid { grid-auto-rows:1fr; }
+        .course-bonus-card { height:100%; min-width:0; }
+        .course-bonus-card:hover, .course-bonus-card:focus { transform:none; }
+        .course-bonus-small { margin:0; }
+        .course-bonus-title { margin:20px 0; }
+        .course-bonus-action { margin:0 0 18px; }
+        .course-bonus-desc { flex:1; }
+        .course-bonus-highlight svg { flex-shrink:0; }
+        .course-benefits-band:hover .course-benefits-track,
+        .course-benefits-band:focus .course-benefits-track { animation-play-state:paused; }
+        .course-landing a:focus-visible, .course-landing button:focus-visible,
+        .course-landing summary:focus-visible, .course-bonus-card:focus-visible { outline:3px solid #20699F; outline-offset:5px; }
+        /* Presentation only; existing cart component still owns pricing and actions. */
+        .course-pricecard > div > div:first-child { flex-direction:column; align-items:center; gap:0; }
+        .course-pricecard > div > div:first-child > span:not(.line-through) { font-family:var(--course-body-font),sans-serif; font-size:clamp(42px,4vw,62px); line-height:1.2; letter-spacing:-3px; }
+        .course-pricecard > div > div:first-child > span.line-through { order:-1; font-size:21px; margin:14px; }
+        .course-pricecard > div > p:first-of-type { font-family:var(--course-body-font),sans-serif; font-size:16px; line-height:1.7; color:#192149; }
+        .course-pricecard > div > p:nth-of-type(2) { display:none; }
+        .course-pricecard > div > button { font-family:var(--course-body-font),sans-serif; font-size:15px; font-weight:600; text-transform:none; letter-spacing:0; border-radius:99px; max-width:none; margin:18px 0; }
+        @media(min-width:1500px) { .course-landing { max-width:1600px; margin:auto; } }
+        @media(max-width:900px) { .course-hero { min-height:600px; } .course-lead { font-size:23px; } }
+        @media(max-width:600px) {
+          .course-h1 { margin:18px 0 26px; }
+          .course-lead { font-size:25px; } .course-sub { font-size:17px; }
+          .course-hero-visual { min-height:540px; } .course-hero-img { object-position:center 40%; }
+          .course-quote { font-size:29px; } .course-quote-ending { white-space:normal; }
+          .course-bonus { padding-bottom:0; } .course-bonus-title { font-size:25px; }
+        }
+        @media(hover:none),(pointer:coarse) {
+          .course-bonus-card { background:#E9E2DA; color:#192149; }
+          .course-bonus-card .course-bonus-small { color:#1A4C81; }
+          .course-bonus-desc { visibility:visible; opacity:1; transform:none; }
+          .course-bonus-card .course-bonus-action { display:none; }
+        }
+        @media(prefers-reduced-motion:reduce) {
+          .course-landing *, .course-landing *::before, .course-landing *::after { animation:none!important; transition:none!important; }
+          .course-benefits-track { width:auto; } .course-benefits-group { flex-wrap:wrap; gap:20px; }
+          .course-benefits-group[aria-hidden=true] { display:none; } .course-benefit-item { white-space:normal; }
+          .course-ticker { white-space:normal; }
         }
       `}</style>
     </main>
