@@ -53,7 +53,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
       {/* Announcement */}
       <div className="course-announcement">
         <div className="course-announcement-track">
-          {'✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   '}
+          {'✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   '}
         </div>
       </div>
 
@@ -134,7 +134,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
       {/* Ticker */}
       <div className="course-ticker">
         <span className="course-ticker-track">
-          {'ACCESO DE POR VIDA  ✦  5 RECURSOS BONUS  ✦  COMUNIDAD EXCLUSIVA  ✦  REGALOS POR COMPRA CLARINS  ✦  ACCESO DE POR VIDA  ✦  5 RECURSOS BONUS  ✦  COMUNIDAD EXCLUSIVA  ✦  REGALOS POR COMPRA CLARINS  ✦  '}
+          {'ACCESO DE POR VIDA  ✦  5 RECURSOS BONUS  ✦  COMUNIDAD EXCLUSIVA  ✦  REGALOS POR COMPRA CLARINS  ✦  ACCESO DE POR VIDA  ✦  5 RECURSOS BONUS  ✦  COMUNIDAD EXCLUSIVA  ✦  REGALOS POR COMPRA CLARINS  ✦  '}
         </span>
       </div>
 
@@ -465,8 +465,9 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
         /* Mode toggle */
         .course-mode {
           position: absolute;
-          left: 8%;
-          top: 28px;
+          left: 50%;
+          transform: translateX(-50%);
+          top: 32px;
           z-index: 2;
           display: flex;
           background: rgba(233,226,218,.87);
