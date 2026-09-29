@@ -1,29 +1,29 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/store/cartStore'
 import { formatPrice } from '@/lib/utils'
 import type { Curso } from '@/types'
 
 export default function AddToCartCurso({ curso }: { curso: Curso }) {
-  const [loading, setLoading] = useState(false)
-  const router = useRouter()
+  const [added, setAdded] = useState(false)
   const addItem = useCartStore((state) => state.addItem)
-  const closeCart = useCartStore((state) => state.closeCart)
 
-  const handleComprar = () => {
-    setLoading(true)
+  const precio = Number(curso.precio_oferta ?? curso.precio)
+  const precioOriginal = Number(curso.precio)
+  const cuota = Math.ceil(precio / 3)
+
+  const handleAdd = () => {
     addItem({
       id: curso.id,
       slug: curso.slug,
       nombre: curso.titulo,
-      precio: Number(curso.precio_oferta ?? curso.precio),
+      precio,
       imagen_url: curso.imagen_url || '',
       tipo: 'curso',
     })
-    closeCart()
-    router.push('/checkout')
+    setAdded(true)
+    setTimeout(() => setAdded(false), 2000)
   }
 
   return (
@@ -32,28 +32,47 @@ export default function AddToCartCurso({ curso }: { curso: Curso }) {
         {curso.precio_oferta ? (
           <>
             <span className="font-montserrat text-2xl font-medium text-glow-navy">
-              {formatPrice(curso.precio_oferta)}
+              {formatPrice(precio)}
             </span>
             <span className="font-montserrat text-sm text-glow-navy/40 line-through">
-              {formatPrice(curso.precio)}
+              {formatPrice(precioOriginal)}
             </span>
           </>
         ) : (
           <span className="font-montserrat text-2xl font-medium text-glow-navy">
-            {formatPrice(curso.precio)}
+            {formatPrice(precio)}
           </span>
         )}
       </div>
+
+      <p className="font-montserrat text-[11px] text-glow-navy/60">
+        o <strong>3 cuotas sin interés</strong> de {formatPrice(cuota)}
+      </p>
+
       <p className="font-montserrat text-[9px] tracking-[0.2em] uppercase text-glow-navy/40">
         Precio de lanzamiento
       </p>
+
       <button
-        onClick={handleComprar}
-        disabled={loading}
-        className="w-full max-w-sm py-4 font-montserrat text-[11px] tracking-[0.25em] uppercase bg-glow-navy text-white hover:bg-glow-blue transition-colors duration-300 disabled:opacity-60"
+        onClick={handleAdd}
+        className={`w-full max-w-sm py-4 font-montserrat text-[11px] tracking-[0.25em] uppercase transition-colors duration-300 ${
+          added ? 'bg-green-700 text-white' : 'bg-glow-navy text-white hover:bg-glow-blue'
+        }`}
       >
-        {loading ? 'Redirigiendo...' : 'Comprar'}
+        {added ? '✓ Agregado al carrito' : 'Comprar'}
       </button>
+
+      <div className="flex items-center gap-2 mt-1">
+        <span className="font-montserrat text-[9px] tracking-widest uppercase text-glow-navy/30">
+          Pagá con
+        </span>
+        <span
+          className="font-montserrat text-[11px] font-semibold tracking-wide"
+          style={{ color: '#009ee3' }}
+        >
+          MercadoPago
+        </span>
+      </div>
     </div>
   )
 }
