@@ -53,7 +53,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
       {/* Announcement */}
       <div className="course-announcement">
         <div className="course-announcement-track">
-          {'✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   '}
+          {'✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   ✦ 3 CUOTAS SIN INTERÉS   '}
         </div>
       </div>
 
@@ -87,7 +87,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
               alt="Nina Amateis con los productos del curso Day to Night Glow"
               fill
               className="course-hero-img"
-              style={{ objectPosition: 'center 30%', filter: isNight ? 'brightness(0.72) saturate(0.8)' : undefined, transition: 'filter 0.7s' }}
+              style={{ objectPosition: 'center 60%', filter: isNight ? 'brightness(0.72) saturate(0.8)' : undefined, transition: 'filter 0.7s' }}
               priority
               sizes="(max-width: 600px) 88vw, 50vw"
             />
@@ -134,7 +134,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
       {/* Ticker */}
       <div className="course-ticker">
         <span className="course-ticker-track">
-          {'ACCESO DE POR VIDA  ✦  5 RECURSOS BONUS  ✦  COMUNIDAD EXCLUSIVA  ✦  REGALOS POR COMPRA CLARINS  ✦  ACCESO DE POR VIDA  ✦  5 RECURSOS BONUS  ✦  COMUNIDAD EXCLUSIVA  ✦  REGALOS POR COMPRA CLARINS  ✦  '}
+          {'ACCESO DE POR VIDA  ✦  5 RECURSOS BONUS  ✦  COMUNIDAD EXCLUSIVA  ✦  REGALOS POR COMPRA CLARINS  ✦  ACCESO DE POR VIDA  ✦  5 RECURSOS BONUS  ✦  COMUNIDAD EXCLUSIVA  ✦  REGALOS POR COMPRA CLARINS  ✦  '}
         </span>
       </div>
 
@@ -424,13 +424,13 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
 
         .course-hero-visual {
           position: relative;
-          margin: 56px 28px 28px 0;
+          margin: 28px 30px 28px 0;
           background: var(--accent);
-          border-radius: 999px 999px 12px 12px;
+          border-radius: 160px 160px 12px 12px;
           overflow: hidden;
           color: white;
           align-self: stretch;
-          min-height: 560px;
+          min-height: 620px;
         }
         .course-hero-img {
           object-fit: cover;
@@ -465,9 +465,8 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
         /* Mode toggle */
         .course-mode {
           position: absolute;
-          left: 50%;
-          transform: translateX(-50%);
-          top: 32px;
+          left: 8%;
+          top: 36px;
           z-index: 2;
           display: flex;
           background: rgba(233,226,218,.87);
@@ -938,6 +937,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           .course-hero-copy { padding: 45px 8%; }
           .course-h1 { font-size: 80px; }
           .course-hero-visual { min-height: 570px; margin-right: 15px; }
+          .course-mode { left: 22px; top: 44px; padding: 4px; }
           .course-modules { grid-template-columns: 1fr 1fr; }
           .course-for-you, .course-enroll, .course-faq { gap: 35px; }
           .course-bonus-grid { grid-template-columns: 1fr 1fr; }
@@ -951,7 +951,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           .course-hero { display: flex; flex-direction: column; }
           .course-hero-copy { padding: 38px 7% 28px; }
           .course-h1 { font-size: 88px; letter-spacing: -4px; }
-          .course-hero-visual { min-height: 490px; margin: 0 6% 30px; }
+          .course-hero-visual { min-height: 490px; margin: 0 6% 30px; border-radius: 140px 140px 12px 12px; }
           .course-mode { left: 24px; top: 44px; }
           .course-mode-btn { padding: 10px 14px; }
           .course-seal { width: 90px; height: 90px; font-size: 10px; }
