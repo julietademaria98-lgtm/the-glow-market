@@ -87,6 +87,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
               alt="Nina Amateis con los productos del curso Day to Night Glow"
               fill
               className="course-hero-img"
+              style={{ objectPosition: 'center 60%', filter: isNight ? 'brightness(0.72) saturate(0.8)' : undefined, transition: 'filter 0.7s' }}
               priority
               sizes="(max-width: 600px) 88vw, 50vw"
             />
@@ -424,14 +425,15 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           position: relative;
           margin: 28px 30px 28px 0;
           background: var(--accent);
-          border-radius: 160px 160px 12px 12px;
+          border-radius: 180px 180px 12px 12px;
           overflow: hidden;
           color: white;
-          min-height: 620px;
+          min-height: 680px;
+          align-self: stretch;
         }
         .course-hero-img {
           object-fit: cover;
-          object-position: center 35%;
+          object-position: center 60%;
           transition: filter .7s, transform 1s;
         }
         .course-hero-gradient {
