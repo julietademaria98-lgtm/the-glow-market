@@ -972,6 +972,12 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
 
 .course-video-pending{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#E9E2DA;text-align:center;padding:30px}
 .course-video-pending span{font-size:40px;color:#E1C8CB}.course-video-pending p{font-family:var(--course-title-font),serif;font-size:32px}
+
+/* Separación visual entre el video y la voz de Nina. */
+.course-intro{max-width:none;width:100%;background:#1A4C81;color:#E9E2DA;position:relative}
+.course-intro::before{content:'✦';display:block;color:#E1C8CB;font-size:38px;line-height:1;margin:0 auto 24px}
+.course-intro .course-eyebrow,.course-intro .course-author{color:#E1C8CB}
+.course-intro .course-quote,.course-intro .course-method{color:#E9E2DA}
       `}</style>
     </main>
   )
