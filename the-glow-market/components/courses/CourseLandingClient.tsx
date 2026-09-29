@@ -301,16 +301,16 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           <motion.span
             animate={{ scale: [1, 1.06, 1] }}
             transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-            className="inline-flex items-center gap-2 bg-white text-glow-blush font-montserrat text-[10px] tracking-[0.2em] uppercase px-4 py-2 mb-5 font-bold shadow-sm"
+            className="inline-flex items-center gap-2 bg-white text-glow-navy font-montserrat text-[10px] tracking-[0.2em] uppercase px-4 py-2 mb-5 font-bold shadow-sm"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-glow-blush animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-glow-navy animate-pulse" />
             Cupos limitados
           </motion.span>
-          <h2 className="font-cormorant text-4xl md:text-5xl text-white font-light mb-3 drop-shadow-sm">
-            Abrimos solo <span className="underline decoration-white/40 decoration-2 underline-offset-4">30 cupos</span>
+          <h2 className="font-cormorant text-4xl md:text-5xl text-glow-navy font-light mb-3">
+            Abrimos solo <span className="underline decoration-glow-navy/40 decoration-2 underline-offset-4">30 cupos</span>
           </h2>
-          <p className="font-montserrat text-sm text-white leading-relaxed max-w-md mx-auto">
-            Abrimos 30 cupos a precio de lanzamiento para esta primera camada. <strong className="font-bold">Cuando se completen, el curso pasa a su precio regular.</strong>
+          <p className="font-montserrat text-sm text-glow-navy/80 leading-relaxed max-w-md mx-auto">
+            Abrimos 30 cupos a precio de lanzamiento para esta primera camada. <strong className="font-bold text-glow-navy">Cuando se completen, el curso pasa a su precio regular.</strong>
           </p>
         </motion.section>
 
