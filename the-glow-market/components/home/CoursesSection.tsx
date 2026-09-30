@@ -98,7 +98,7 @@ export default function CoursesSection({ cursos }: CoursesSectionProps) {
         .glow-courses-pill-text em { font-style: italic; }
         .glow-courses-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          grid-template-columns: repeat(3, 1fr);
           gap: 24px;
         }
         .glow-course-card {
@@ -206,7 +206,10 @@ export default function CoursesSection({ cursos }: CoursesSectionProps) {
           color: #E9E2DA;
           border-color: rgba(233,226,218,0.55);
         }
-        @media (max-width: 720px) {
+        @media (max-width: 900px) {
+          .glow-courses-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
           .glow-courses-section { padding: 60px 6%; }
           .glow-courses-grid { grid-template-columns: 1fr; }
           .glow-courses-pill { max-width: 100%; }
