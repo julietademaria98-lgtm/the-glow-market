@@ -1,9 +1,9 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import Link from 'next/link'
-import type { Curso } from '@/types'
+import StarIcon from '@/components/ui/StarIcon'
 import { formatPrice } from '@/lib/utils'
+import type { Curso } from '@/types'
 
 interface CoursesSectionProps {
   cursos: Curso[]
@@ -11,109 +11,238 @@ interface CoursesSectionProps {
 
 export default function CoursesSection({ cursos }: CoursesSectionProps) {
   return (
-    <section>
-      {/* Banner navy */}
-      <div className="bg-glow-navy py-16 px-6 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-        >
-          <h2
-            className="font-cormorant text-white font-light tracking-[0.15em] uppercase"
-            style={{ fontSize: 'clamp(44px, 7vw, 80px)' }}
-          >
-            Curso Online
+    <section className="glow-courses-section">
+      {/* Header row */}
+      <div className="glow-courses-head">
+        <div>
+          <p className="glow-courses-eyebrow">Formación exclusiva · Sponsored by Clarins</p>
+          <h2 className="glow-courses-h2">
+            Aprendé a hacer<br />tu propio glow.
           </h2>
-          <p className="font-montserrat text-xs md:text-sm tracking-[0.3em] uppercase text-white/70 mt-4">
-            Formación Exclusiva Sponsored By{' '}
-            <span className="font-bold text-white">Clarins</span>
-          </p>
-        </motion.div>
-      </div>
-
-      {/* Cards sobre fondo cream */}
-      <div className="bg-glow-cream py-16 px-6">
-        <div className="max-w-[520px] mx-auto flex flex-col items-center gap-10">
-          {cursos.map((curso, i) => (
-            <HomeCourseCard key={curso.id} curso={curso} index={i} />
-          ))}
         </div>
-
-        {/* Link alumnas */}
-        <div className="text-center mt-12">
-          <p className="font-cormorant text-2xl md:text-3xl text-glow-navy tracking-[0.1em] uppercase mb-4">
-            ¿Ya sos alumna?
-          </p>
-          <Link
-            href="/login"
-            className="font-montserrat text-xs tracking-[0.25em] uppercase text-glow-navy border border-transparent px-6 py-3 inline-block hover:border-glow-navy transition-all duration-300"
-          >
-            Ingresar aquí →
-          </Link>
+        <div className="glow-courses-pill">
+          <StarIcon size={14} className="glow-courses-pill-star" />
+          <span className="glow-courses-pill-text">
+            Cursos online.<br /><em>A tu ritmo.</em>
+          </span>
         </div>
       </div>
+
+      {/* Course cards */}
+      <div className="glow-courses-grid">
+        {cursos.map((curso) => (
+          <CourseCard key={curso.id} curso={curso} />
+        ))}
+      </div>
+
+      {/* Footer */}
+      <div className="glow-courses-footer">
+        <Link href="/login" className="glow-courses-footer-link">
+          ¿Ya sos alumna? Ingresá a tu curso ↗
+        </Link>
+      </div>
+
+      <style>{`
+        .glow-courses-section {
+          background: #192149;
+          color: #E9E2DA;
+          padding: 90px 7%;
+        }
+        .glow-courses-head {
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-between;
+          gap: 32px;
+          margin-bottom: 56px;
+          flex-wrap: wrap;
+        }
+        .glow-courses-eyebrow {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: rgba(233,226,218,0.45);
+          margin-bottom: 14px;
+        }
+        .glow-courses-h2 {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: clamp(40px, 5vw, 72px);
+          font-weight: 400;
+          color: #E9E2DA;
+          line-height: 1;
+          letter-spacing: -0.04em;
+        }
+        .glow-courses-pill {
+          background: #E1C8CB;
+          border-radius: 64px 16px 16px 16px;
+          padding: 22px 26px;
+          display: flex;
+          align-items: flex-start;
+          gap: 10px;
+          flex-shrink: 0;
+          max-width: 210px;
+        }
+        .glow-courses-pill-star {
+          color: #192149;
+          flex-shrink: 0;
+          margin-top: 3px;
+        }
+        .glow-courses-pill-text {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 22px;
+          font-weight: 400;
+          color: #192149;
+          line-height: 1.25;
+        }
+        .glow-courses-pill-text em { font-style: italic; }
+        .glow-courses-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 24px;
+        }
+        .glow-course-card {
+          background: white;
+          border-radius: 28px;
+          overflow: hidden;
+          text-decoration: none;
+          display: block;
+        }
+        .glow-course-img-wrap {
+          position: relative;
+          aspect-ratio: 16/9;
+          overflow: hidden;
+        }
+        .glow-course-img-wrap img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+          transition: transform 0.6s cubic-bezier(0.22,1,0.36,1);
+        }
+        .glow-course-card:hover .glow-course-img-wrap img {
+          transform: scale(1.04);
+        }
+        .glow-course-img-gradient {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(to top, rgba(25,33,73,0.4) 0%, transparent 55%);
+          z-index: 1;
+          pointer-events: none;
+        }
+        .glow-course-info {
+          padding: 20px 22px 24px;
+        }
+        .glow-course-title {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: clamp(22px, 2.5vw, 30px);
+          font-weight: 400;
+          color: #192149;
+          line-height: 1.1;
+          margin-bottom: 8px;
+        }
+        .glow-course-desc {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 11px;
+          color: rgba(25,33,73,0.5);
+          line-height: 1.6;
+          margin-bottom: 18px;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .glow-course-bottom {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+        }
+        .glow-course-price-main {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 15px;
+          font-weight: 500;
+          color: #192149;
+        }
+        .glow-course-price-old {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 12px;
+          color: #aaa;
+          text-decoration: line-through;
+          margin-left: 6px;
+        }
+        .glow-course-btn {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          background: #192149;
+          color: white;
+          padding: 10px 18px;
+          border-radius: 9999px;
+          text-decoration: none;
+          transition: background 0.3s;
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+        .glow-course-btn:hover { background: #1A4C81; }
+        .glow-courses-footer {
+          text-align: center;
+          margin-top: 52px;
+        }
+        .glow-courses-footer-link {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 12px;
+          font-weight: 500;
+          letter-spacing: 0.1em;
+          color: rgba(233,226,218,0.55);
+          text-decoration: none;
+          border-bottom: 1px solid rgba(233,226,218,0.2);
+          padding-bottom: 2px;
+          transition: color 0.3s, border-color 0.3s;
+        }
+        .glow-courses-footer-link:hover {
+          color: #E9E2DA;
+          border-color: rgba(233,226,218,0.55);
+        }
+        @media (max-width: 720px) {
+          .glow-courses-section { padding: 60px 6%; }
+          .glow-courses-grid { grid-template-columns: 1fr; }
+          .glow-courses-pill { max-width: 100%; }
+        }
+      `}</style>
     </section>
   )
 }
 
-function HomeCourseCard({ curso, index }: { curso: Curso; index: number }) {
+function CourseCard({ curso }: { curso: Curso }) {
+  const precio = Number(curso.precio_oferta ?? curso.precio)
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8, delay: index * 0.15, ease: [0.22, 1, 0.36, 1] }}
-      className="w-full bg-white border border-glow-navy"
-    >
-      {/* Imagen */}
+    <div className="glow-course-card">
       {curso.imagen_url && (
-        <img
-          src={curso.imagen_url}
-          alt={curso.titulo}
-          className="w-full h-auto block"
-        />
+        <div className="glow-course-img-wrap">
+          <img src={curso.imagen_url} alt={curso.titulo} />
+          <div className="glow-course-img-gradient" />
+        </div>
       )}
-
-      {/* Info */}
-      <div className="bg-glow-navy px-6 pt-5 pb-6 flex flex-col gap-3">
-        <h3
-          className="font-cormorant text-white font-light tracking-wide uppercase leading-tight"
-          style={{ fontSize: 'clamp(22px, 4vw, 30px)' }}
-        >
-          {curso.titulo}
-        </h3>
+      <div className="glow-course-info">
+        <h3 className="glow-course-title">{curso.titulo}</h3>
         {curso.descripcion && (
-          <p className="font-montserrat text-[11px] text-white/60 leading-relaxed line-clamp-2">
-            {curso.descripcion}
-          </p>
+          <p className="glow-course-desc">{curso.descripcion}</p>
         )}
-        <div className="flex items-end justify-between mt-1">
-          <div className="flex flex-col gap-0.5">
-            {curso.precio_oferta ? (
-              <>
-                <span className="font-montserrat text-sm font-medium text-white">
-                  {formatPrice(curso.precio_oferta)}
-                </span>
-                <span className="font-montserrat text-xs text-white/40 line-through">
-                  {formatPrice(curso.precio)}
-                </span>
-              </>
-            ) : (
-              <span className="font-montserrat text-sm font-medium text-white">
-                {formatPrice(curso.precio)}
-              </span>
+        <div className="glow-course-bottom">
+          <div>
+            <span className="glow-course-price-main">{formatPrice(precio)}</span>
+            {curso.precio_oferta && (
+              <span className="glow-course-price-old">{formatPrice(Number(curso.precio))}</span>
             )}
           </div>
-          <Link
-            href={`/cursos/${curso.slug}`}
-            className="font-montserrat text-[10px] tracking-[0.2em] uppercase border border-white/60 text-white px-5 py-2 hover:bg-white hover:text-glow-navy transition-colors duration-300"
-          >
-            Más Info
+          <Link href={`/cursos/${curso.slug}`} className="glow-course-btn">
+            Más info
           </Link>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }
