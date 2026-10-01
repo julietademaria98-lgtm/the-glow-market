@@ -1,46 +1,61 @@
 'use client'
 
-import { useCartStore } from '@/store/cartStore'
+import '@/components/ui/glow-spaces.css'
+
+import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Minus, Plus, Trash2 } from 'lucide-react'
-import { formatPrice } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useCartStore } from '@/store/cartStore'
+import { formatPrice } from '@/lib/utils'
+import { useHasMounted } from '@/hooks/useHasMounted'
 import StarIcon from '@/components/ui/StarIcon'
 import Button from '@/components/ui/Button'
-import { useState } from 'react'
-import { useHasMounted } from '@/hooks/useHasMounted'
 
 export default function CarritoPage() {
   const { items, removeItem, updateQuantity, total } = useCartStore()
   const hasMounted = useHasMounted()
+
   const [codigoCupon, setCodigoCupon] = useState('')
-  const [cuponAplicado, setCuponAplicado] = useState<{ codigo: string; descuento: number } | null>(null)
+  const [cuponAplicado, setCuponAplicado] = useState<{
+    codigo: string
+    descuento: number
+  } | null>(null)
   const [cuponError, setCuponError] = useState<string | null>(null)
   const [loadingCupon, setLoadingCupon] = useState(false)
 
   const subtotal = total()
-  // Los cursos no se envían: un carrito solo digital no habla de envío en ningún lado.
-  const soloDigital = items.length > 0 && items.every((i) => i.tipo === 'curso')
-  const descuento = cuponAplicado ? Math.round(subtotal * cuponAplicado.descuento / 100) : 0
+  const soloDigital =
+    items.length > 0 && items.every((item) => item.tipo === 'curso')
+  const descuento = cuponAplicado
+    ? Math.round(subtotal * cuponAplicado.descuento / 100)
+    : 0
   const totalFinal = subtotal - descuento
 
   async function aplicarCupon() {
     if (!codigoCupon.trim()) return
+
     setLoadingCupon(true)
     setCuponError(null)
+
     try {
       const res = await fetch('/api/cupones/validar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ codigo: codigoCupon }),
       })
+
       const data = await res.json()
+
       if (!res.ok) {
         setCuponError(data.error)
         setCuponAplicado(null)
       } else {
-        setCuponAplicado({ codigo: data.codigo, descuento: data.descuento })
+        setCuponAplicado({
+          codigo: data.codigo,
+          descuento: data.descuento,
+        })
         setCuponError(null)
       }
     } finally {
@@ -54,25 +69,30 @@ export default function CarritoPage() {
     setCuponError(null)
   }
 
-  // El carrito vive en localStorage, así que hasta montar en el cliente no sabemos qué tiene.
-  // Sin esto, el server y el primer render dirían "vacío" aunque haya productos.
   if (!hasMounted) {
-    return <main className="min-h-screen bg-glow-cream pt-24" />
+    return (
+      <main className="glow-space glow-cart min-h-screen bg-glow-cream pt-24" />
+    )
   }
 
   if (items.length === 0) {
     return (
-      <main className="min-h-screen bg-glow-cream pt-24 flex items-center justify-center">
+      <main className="glow-space glow-cart min-h-screen bg-glow-cream pt-24 flex items-center justify-center">
         <div className="text-center flex flex-col items-center gap-6 px-6">
           <StarIcon size={48} className="text-glow-navy/20" />
-          <h1 className="font-cormorant text-4xl text-glow-navy font-light">
+
+          <h1 className="font-display text-4xl text-glow-navy font-light">
             Tu carrito está vacío
           </h1>
-          <p className="font-montserrat text-xs text-glow-navy/50 max-w-xs leading-relaxed">
+
+          <p className="font-body text-xs text-glow-navy/50 max-w-xs leading-relaxed">
             Explorá nuestra colección y encontrá piezas que te hagan brillar.
           </p>
+
           <Link href="/productos">
-            <Button variant="primary" size="md">Explorar Tienda</Button>
+            <Button variant="primary" size="md">
+              Explorar Tienda
+            </Button>
           </Link>
         </div>
       </main>
@@ -80,22 +100,25 @@ export default function CarritoPage() {
   }
 
   return (
-    <main className="min-h-screen bg-glow-cream pt-24">
+    <main className="glow-space glow-cart min-h-screen bg-glow-cream pt-24">
       <div className="max-w-[1200px] mx-auto px-6 py-12">
-        <div className="flex items-center gap-3 mb-10">
+        <div className="glow-space-heading flex items-center gap-3 mb-10">
           <StarIcon size={12} className="text-glow-navy" />
-          <h1 className="font-cormorant text-4xl md:text-5xl text-glow-navy font-light tracking-wide">
+
+          <h1 className="font-display text-4xl md:text-5xl text-glow-navy font-light tracking-wide">
             Tu Carrito
           </h1>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-12">
-          {/* Items */}
           <div>
-            <div className="hidden md:grid grid-cols-[1fr_auto_auto_auto] gap-4 pb-3 mb-3 border-b border-glow-navy/10">
-              {['Producto', 'Precio', 'Cantidad', 'Total'].map((h) => (
-                <span key={h} className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/40">
-                  {h}
+            <div className="hidden md:grid grid-cols-[minmax(0,1fr)_90px_110px_90px] gap-4 pb-3 mb-3 border-b border-glow-navy/10">
+              {['Producto', 'Precio', 'Cantidad', 'Total'].map((titulo) => (
+                <span
+                  key={titulo}
+                  className="font-body text-xs tracking-[0.2em] uppercase text-glow-navy/65"
+                >
+                  {titulo}
                 </span>
               ))}
             </div>
@@ -109,7 +132,7 @@ export default function CarritoPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
-                  className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto_auto] gap-4 items-center py-6 border-b border-glow-navy/10"
+                  className="glow-cart-row grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_90px_110px_90px] gap-4 items-center py-6 border-b border-glow-navy/10"
                 >
                   <div className="flex gap-4 items-start">
                     <div className="relative w-20 h-24 flex-shrink-0 overflow-hidden bg-white">
@@ -121,112 +144,169 @@ export default function CarritoPage() {
                         sizes="80px"
                       />
                     </div>
+
                     <div className="flex flex-col gap-1">
-                      <p className="font-cormorant text-lg text-glow-navy leading-tight">{item.nombre}</p>
-                      <p className="font-montserrat text-xs text-glow-navy/50 md:hidden">{formatPrice(item.precio)}</p>
+                      <p className="font-display text-lg text-glow-navy leading-tight">
+                        {item.nombre}
+                      </p>
+
+                      <p className="font-body text-xs text-glow-navy/50 md:hidden">
+                        {formatPrice(item.precio)}
+                      </p>
+
                       <button
                         onClick={() => removeItem(item.id)}
-                        className="flex items-center gap-1 font-montserrat text-[10px] tracking-wide uppercase text-glow-navy/30 hover:text-glow-navy transition-colors w-fit mt-2"
+                        className="flex items-center gap-1 font-body text-xs tracking-wide uppercase text-glow-navy/65 hover:text-glow-navy transition-colors w-fit mt-2"
                       >
                         <Trash2 size={10} />
                         Eliminar
                       </button>
                     </div>
                   </div>
-                  <span className="hidden md:block font-montserrat text-sm text-glow-navy">{formatPrice(item.precio)}</span>
+
+                  <span className="hidden md:block font-body text-sm text-glow-navy">
+                    {formatPrice(item.precio)}
+                  </span>
+
                   <div className="flex items-center gap-2 border border-glow-navy/20 w-fit px-2 py-1">
-                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="text-glow-navy hover:opacity-60 transition-opacity p-1">
+                    <button
+                      aria-label="Reducir cantidad"
+                      onClick={() =>
+                        updateQuantity(item.id, item.quantity - 1)
+                      }
+                      className="text-glow-navy hover:opacity-60 transition-opacity p-1"
+                    >
                       <Minus size={10} />
                     </button>
-                    <span className="font-montserrat text-xs w-6 text-center text-glow-navy">{item.quantity}</span>
-                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="text-glow-navy hover:opacity-60 transition-opacity p-1">
+
+                    <span className="font-body text-xs w-6 text-center text-glow-navy">
+                      {item.quantity}
+                    </span>
+
+                    <button
+                      aria-label="Aumentar cantidad"
+                      onClick={() =>
+                        updateQuantity(item.id, item.quantity + 1)
+                      }
+                      className="text-glow-navy hover:opacity-60 transition-opacity p-1"
+                    >
                       <Plus size={10} />
                     </button>
                   </div>
-                  <span className="font-montserrat text-sm font-medium text-glow-navy">{formatPrice(item.precio * item.quantity)}</span>
+
+                  <span className="font-body text-sm font-medium text-glow-navy">
+                    {formatPrice(item.precio * item.quantity)}
+                  </span>
                 </motion.div>
               ))}
             </AnimatePresence>
           </div>
 
-          {/* Resumen */}
-          <div className="bg-white p-8 flex flex-col gap-6 h-fit sticky top-24">
-            <h2 className="font-cormorant text-2xl text-glow-navy font-light">Resumen</h2>
+          <div className="glow-order-summary bg-white p-8 flex flex-col gap-6 h-fit lg:sticky lg:top-28">
+            <h2 className="font-display text-2xl text-glow-navy font-light">
+              Resumen
+            </h2>
 
             <div className="flex flex-col gap-3">
               {items.map((item) => (
                 <div key={item.id} className="flex justify-between">
-                  <span className="font-montserrat text-xs text-glow-navy/60">{item.nombre} × {item.quantity}</span>
-                  <span className="font-montserrat text-xs text-glow-navy">{formatPrice(item.precio * item.quantity)}</span>
+                  <span className="font-body text-xs text-glow-navy/60">
+                    {item.nombre} × {item.quantity}
+                  </span>
+
+                  <span className="font-body text-xs text-glow-navy">
+                    {formatPrice(item.precio * item.quantity)}
+                  </span>
                 </div>
               ))}
             </div>
 
             <div className="h-px bg-glow-navy/10" />
 
-            {/* Cupón */}
             {cuponAplicado ? (
               <div className="flex items-center justify-between bg-glow-blush/10 border border-glow-blush/40 px-4 py-3">
                 <div>
-                  <p className="font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/60">
+                  <p className="font-body text-xs tracking-[0.15em] uppercase text-glow-navy/60">
                     Cupón aplicado
                   </p>
-                  <p className="font-montserrat text-xs font-medium text-glow-navy">
+
+                  <p className="font-body text-xs font-medium text-glow-navy">
                     {cuponAplicado.codigo} — {cuponAplicado.descuento}% off
                   </p>
                 </div>
-                <button onClick={quitarCupon} className="font-montserrat text-[10px] text-glow-navy/40 hover:text-glow-navy transition-colors underline">
+
+                <button
+                  onClick={quitarCupon}
+                  className="font-body text-xs text-glow-navy/65 hover:text-glow-navy transition-colors underline"
+                >
                   Quitar
                 </button>
               </div>
             ) : (
               <div className="flex flex-col gap-2">
-                <p className="font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/40">
+                <p className="font-body text-xs tracking-[0.15em] uppercase text-glow-navy/65">
                   Código de descuento
                 </p>
+
                 <div className="flex gap-2">
                   <input
                     type="text"
                     value={codigoCupon}
-                    onChange={(e) => setCodigoCupon(e.target.value.toUpperCase())}
-                    onKeyDown={(e) => e.key === 'Enter' && aplicarCupon()}
-                    placeholder=""
-                    className="flex-1 border border-glow-navy/20 px-3 py-2 font-montserrat text-xs text-glow-navy placeholder:text-glow-navy/20 outline-none focus:border-glow-navy transition-colors bg-transparent"
+                    onChange={(event) =>
+                      setCodigoCupon(event.target.value.toUpperCase())
+                    }
+                    onKeyDown={(event) =>
+                      event.key === 'Enter' && aplicarCupon()
+                    }
+                    className="flex-1 border border-glow-navy/20 px-3 py-2 font-body text-xs text-glow-navy outline-none focus:border-glow-navy transition-colors bg-transparent"
                   />
+
                   <button
                     onClick={aplicarCupon}
                     disabled={loadingCupon || !codigoCupon.trim()}
-                    className="font-montserrat text-[10px] tracking-[0.15em] uppercase bg-glow-navy text-white px-4 py-2 hover:bg-glow-navy/80 transition-colors disabled:opacity-40"
+                    className="font-body text-xs tracking-[0.15em] uppercase bg-glow-navy text-white px-4 py-2 hover:bg-glow-navy/80 transition-colors disabled:opacity-40"
                   >
                     {loadingCupon ? '...' : 'Aplicar'}
                   </button>
                 </div>
+
                 {cuponError && (
-                  <p className="font-montserrat text-[10px] text-red-400">{cuponError}</p>
+                  <p className="font-body text-xs text-red-400">
+                    {cuponError}
+                  </p>
                 )}
               </div>
             )}
 
             <div className="h-px bg-glow-navy/10" />
 
-            {/* Totales */}
             <div className="flex flex-col gap-2">
               <div className="flex justify-between">
-                <span className="font-montserrat text-xs text-glow-navy/50">Subtotal</span>
-                <span className="font-montserrat text-xs text-glow-navy">{formatPrice(subtotal)}</span>
+                <span className="font-body text-xs text-glow-navy/50">
+                  Subtotal
+                </span>
+                <span className="font-body text-xs text-glow-navy">
+                  {formatPrice(subtotal)}
+                </span>
               </div>
+
               {cuponAplicado && (
                 <div className="flex justify-between">
-                  <span className="font-montserrat text-xs text-glow-blush">Descuento ({cuponAplicado.descuento}%)</span>
-                  <span className="font-montserrat text-xs text-glow-blush">− {formatPrice(descuento)}</span>
+                  <span className="font-body text-xs text-glow-blue">
+                    Descuento ({cuponAplicado.descuento}%)
+                  </span>
+                  <span className="font-body text-xs text-glow-blue">
+                    − {formatPrice(descuento)}
+                  </span>
                 </div>
               )}
-              {/* El envío depende de la dirección, que recién se pide en el checkout. Se
-                  muestra igual para que el total de acá no se lea como el precio final. */}
+
               {!soloDigital && (
                 <div className="flex justify-between">
-                  <span className="font-montserrat text-xs text-glow-navy/50">Envío</span>
-                  <span className="font-montserrat text-xs text-glow-navy/40">
+                  <span className="font-body text-xs text-glow-navy/50">
+                    Envío
+                  </span>
+                  <span className="font-body text-xs text-glow-navy/65">
                     Se calcula en el checkout
                   </span>
                 </div>
@@ -234,24 +314,34 @@ export default function CarritoPage() {
             </div>
 
             <div className="flex justify-between items-baseline">
-              <span className="font-montserrat text-xs tracking-[0.15em] uppercase text-glow-navy/60">Total</span>
-              <span className="font-cormorant text-3xl text-glow-navy">{formatPrice(totalFinal)}</span>
+              <span className="font-body text-xs tracking-[0.15em] uppercase text-glow-navy/60">
+                Total
+              </span>
+              <span className="font-display text-3xl text-glow-navy">
+                {formatPrice(totalFinal)}
+              </span>
             </div>
 
             {!soloDigital && (
-              <p className="font-montserrat text-[10px] text-glow-navy/40 -mt-3">
+              <p className="font-body text-xs text-glow-navy/65 -mt-3">
                 Sin el envío, que se suma al poner tu dirección.
               </p>
             )}
 
-            <Link href={`/checkout${cuponAplicado ? `?cupon=${cuponAplicado.codigo}&descuento=${cuponAplicado.descuento}` : ''}`}>
+            <Link
+              href={`/checkout${
+                cuponAplicado
+                  ? `?cupon=${cuponAplicado.codigo}&descuento=${cuponAplicado.descuento}`
+                  : ''
+              }`}
+            >
               <Button variant="primary" className="w-full" size="md">
-                Proceder al Checkout
+                Continuar con la compra
               </Button>
             </Link>
 
             <Link href="/productos" className="text-center">
-              <span className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/40 hover:text-glow-navy transition-colors">
+              <span className="font-body text-xs tracking-[0.2em] uppercase text-glow-navy/65 hover:text-glow-navy transition-colors">
                 Seguir Comprando
               </span>
             </Link>
