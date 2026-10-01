@@ -45,7 +45,16 @@ async function getProductos(categoria?: string): Promise<Producto[]> {
   }
 
   const { data } = await query
-  return (data || []) as Producto[]
+  const productos = (data || []) as Producto[]
+
+  // Los productos sin stock quedan al final.
+  // Dentro de cada grupo se conserva el orden original.
+  return productos.sort((a, b) => {
+    const aSinStock = a.stock === 0
+    const bSinStock = b.stock === 0
+
+    return Number(aSinStock) - Number(bSinStock)
+  })
 }
 
 export default async function ProductosPage({
