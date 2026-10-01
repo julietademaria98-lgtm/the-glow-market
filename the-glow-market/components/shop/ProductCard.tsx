@@ -30,9 +30,10 @@ export default function ProductCard({
   const hoverImage =
     producto.imagenes?.find((img, i) => !img.es_principal && i > 0)?.url
 
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
+  const sinStock = producto.stock === 0
+
+  const handleAddToCart = () => {
+    if (sinStock) return
 
     addItem({
       id: producto.id,
@@ -57,74 +58,78 @@ export default function ProductCard({
         ease: [0.22, 1, 0.36, 1],
       }}
       className="group product-card-container glow-product-card"
+      style={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
     >
-      <Link href={`/productos/${producto.slug}`} className="block">
-        <div className="relative aspect-square overflow-hidden bg-white">
+      <Link
+        href={`/productos/${producto.slug}`}
+        aria-label={producto.nombre}
+        className="relative block aspect-square overflow-hidden bg-white"
+        style={{
+          height: 'auto',
+          flexShrink: 0,
+        }}
+      >
+        <Image
+          src={mainImage}
+          alt={producto.nombre}
+          fill
+          className="object-cover product-card-image transition-opacity duration-500"
+          sizes="(max-width: 768px) 50vw, 25vw"
+        />
+
+        {hoverImage && (
           <Image
-            src={mainImage}
-            alt={producto.nombre}
+            src={hoverImage}
+            alt={`${producto.nombre} - vista alternativa`}
             fill
-            className="object-cover product-card-image transition-opacity duration-500"
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            className="object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            sizes="(max-width: 768px) 50vw, 25vw"
           />
+        )}
 
-          {hoverImage && (
-            <Image
-              src={hoverImage}
-              alt={`${producto.nombre} - vista alternativa`}
-              fill
-              className="object-cover absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            />
-          )}
+        {sinStock ? (
+          <span className="absolute top-3 left-3 bg-glow-navy/50 text-white font-body text-[11px] tracking-widest uppercase px-2 py-1">
+            Sin stock
+          </span>
+        ) : producto.precio_oferta ? (
+          <span className="absolute top-3 left-3 bg-glow-navy text-white font-body text-[11px] tracking-widest uppercase px-2 py-1">
+            Oferta
+          </span>
+        ) : null}
 
-          {producto.stock === 0 ? (
-            <div className="absolute top-3 left-3 bg-glow-navy/50 text-white font-body text-[11px] tracking-widest uppercase px-2 py-1">
-              Sin stock
-            </div>
-          ) : producto.precio_oferta ? (
-            <div className="absolute top-3 left-3 bg-glow-navy text-white font-body text-[11px] tracking-widest uppercase px-2 py-1">
-              Oferta
-            </div>
-          ) : null}
+        <span
+          className="absolute top-3 right-3 font-body text-[11px] tracking-widest uppercase px-2 py-1"
+          style={{
+            backgroundColor: '#E1C8CB',
+            color: '#192149',
+          }}
+        >
+          Regalos CLARINS
+        </span>
+      </Link>
 
-          <div
-            className="absolute top-3 right-3 font-body text-[11px] tracking-widest uppercase px-2 py-1"
-            style={{
-              backgroundColor: '#E1C8CB',
-              color: '#192149',
-            }}
+      <div className="flex flex-1 flex-col p-4 md:p-5">
+        <Link href={`/productos/${producto.slug}`}>
+          <h3
+            className="font-display text-glow-navy leading-tight"
+            style={{ minHeight: '2.5em', marginBottom: '12px' }}
           >
-            Regalos CLARINS
-          </div>
-
-          {producto.stock !== 0 && (
-            <div className="absolute bottom-0 left-0 right-0 translate-y-0 md:translate-y-full md:group-hover:translate-y-0 md:group-focus-within:translate-y-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]">
-              <button
-                onClick={handleAddToCart}
-                className={`w-full py-3 font-body text-xs tracking-[0.2em] uppercase transition-colors duration-300 ${
-                  added
-                    ? 'bg-glow-royal text-white'
-                    : 'bg-glow-navy text-white hover:bg-glow-blue'
-                }`}
-              >
-                {added ? '✓ Agregado' : 'Agregar al carrito'}
-              </button>
-            </div>
-          )}
-        </div>
-
-        <div className="p-4 md:p-5 space-y-2">
-          <h3 className="font-display text-base md:text-lg text-glow-navy tracking-wide leading-tight">
             {producto.nombre}
           </h3>
+        </Link>
 
-          <div className="flex items-baseline gap-2">
+        <div className="mt-auto">
+          <div className="flex flex-wrap items-baseline gap-2">
             {producto.precio_oferta ? (
               <>
                 <span className="font-body text-sm font-medium text-glow-navy">
                   {formatPrice(Number(producto.precio_oferta))}
                 </span>
+
                 <span className="font-body text-xs text-glow-navy/65 line-through">
                   {formatPrice(Number(producto.precio))}
                 </span>
@@ -135,8 +140,30 @@ export default function ProductCard({
               </span>
             )}
           </div>
+
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={sinStock}
+            className="mt-4 w-full px-3 py-3 font-body font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+            style={{
+              backgroundColor: added ? '#20699F' : '#192149',
+              color: '#FFFFFF',
+              borderRadius: '999px',
+              minHeight: '44px',
+              fontSize: '13px',
+              letterSpacing: 0,
+              textTransform: 'none',
+            }}
+          >
+            {sinStock
+              ? 'Sin stock'
+              : added
+                ? '✓ Agregado'
+                : 'Agregar al carrito'}
+          </button>
         </div>
-      </Link>
+      </div>
     </motion.div>
   )
 }
