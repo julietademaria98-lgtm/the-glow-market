@@ -1,0 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
+
+:is(.glow-market-page, .glow-product-card, .glow-product-detail) {
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'DM Sans', Arial, sans-serif;
+  font-family: var(--font-body);
+  line-height: 1.6;
+}
+
+:is(.glow-market-page, .glow-product-card, .glow-product-detail) .font-display {
+  font-family: var(--font-display);
+  letter-spacing: -.025em;
+}
+
+:is(.glow-market-page, .glow-product-card, .glow-product-detail) .font-body {
+  font-family: var(--font-body);
+}
+
+.glow-market-page :is(h1, h2, h3) {
+  letter-spacing: -.025em;
+  text-wrap: balance;
+}
+
+.glow-market-page h1 {
+  font-weight: 500;
+  line-height: 1.08;
+}
+
+.glow-market-page h2 {
+  line-height: 1.15;
+}
+
+.glow-market-page :is(a, button, input, select, textarea):focus-visible {
+  outline: 3px solid #20699F;
+  outline-offset: 4px;
+}
+
+.glow-market-page :is(button, a)[class*="bg-glow-navy"][class*="text-white"] {
+  border-radius: 999px;
+  font-family: var(--font-body);
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 600;
+}
+
+.glow-market-page nav {
+  flex-wrap: wrap;
+}
+
+.glow-product-card {
+  background: #f4efe9;
+  border: 1px solid #19214926;
+  border-radius: 22px;
+  overflow: hidden;
+  transition: box-shadow .25s, transform .25s;
+}
+
+.glow-product-card:hover {
+  box-shadow: 0 10px 28px #19214912;
+  transform: translateY(-3px);
+}
+
+.glow-product-card h3 {
+  font-size: clamp(18px, 1.6vw, 23px);
+  line-height: 1.25;
+}
+
+.glow-product-card button {
+  min-height: 44px;
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.glow-product-detail h1 {
+  font-size: clamp(36px, 4vw, 60px);
+}
+
+.glow-product-detail nav {
+  overflow-wrap: anywhere;
+}
+
+.glow-product-detail p {
+  line-height: 1.7;
+}
+
+.glow-product-detail > div > div:last-child > p {
+  font-size: 16px;
+}
+
+.glow-product-detail button {
+  font-family: var(--font-body);
+  font-size: 15px;
+}
+
+.glow-product-detail button[class*="bg-glow"] {
+  border-radius: 999px;
+}
+
+@media (max-width: 640px) {
+  .glow-product-card [class*="top-3"] {
+    top: 8px;
+    font-size: 8px;
+    letter-spacing: 0;
+    padding: 4px 5px;
+  }
+
+  .glow-product-card [class*="left-3"] {
+    left: 6px;
+  }
+
+  .glow-product-card [class*="right-3"] {
+    right: 6px;
+  }
+
+  .glow-product-detail nav {
+    font-size: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glow-market-page * {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
