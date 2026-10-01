@@ -67,7 +67,9 @@ export default function CarritoPage() {
         setCuponError(null)
       }
     } catch {
-      setCuponError('No pudimos validar el cupón. Intentá nuevamente.')
+      setCuponError(
+        'No pudimos validar el cupón. Intentá nuevamente.'
+      )
     } finally {
       setLoadingCupon(false)
     }
@@ -213,6 +215,10 @@ export default function CarritoPage() {
                 </motion.div>
               ))}
             </AnimatePresence>
+
+            <section className="mt-8 overflow-hidden rounded-3xl border border-glow-navy/10">
+              <CrossSellProducts />
+            </section>
           </div>
 
           <div className="glow-order-summary bg-white p-8 flex flex-col gap-6 h-fit lg:sticky lg:top-28">
@@ -373,10 +379,6 @@ export default function CarritoPage() {
             </Link>
           </div>
         </div>
-
-        <section className="mt-12 overflow-hidden rounded-3xl border border-glow-navy/10">
-          <CrossSellProducts />
-        </section>
       </div>
     </main>
   )
