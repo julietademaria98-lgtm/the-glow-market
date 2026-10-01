@@ -12,6 +12,7 @@ import { formatPrice } from '@/lib/utils'
 import { useHasMounted } from '@/hooks/useHasMounted'
 import StarIcon from '@/components/ui/StarIcon'
 import Button from '@/components/ui/Button'
+import CrossSellProducts from '@/components/checkout/CrossSellProducts'
 
 export default function CarritoPage() {
   const { items, removeItem, updateQuantity, total } = useCartStore()
@@ -26,15 +27,18 @@ export default function CarritoPage() {
   const [loadingCupon, setLoadingCupon] = useState(false)
 
   const subtotal = total()
+
   const soloDigital =
     items.length > 0 && items.every((item) => item.tipo === 'curso')
+
   const descuento = cuponAplicado
-    ? Math.round(subtotal * cuponAplicado.descuento / 100)
+    ? Math.round((subtotal * cuponAplicado.descuento) / 100)
     : 0
+
   const totalFinal = subtotal - descuento
 
   async function aplicarCupon() {
-    if (!codigoCupon.trim()) return
+    if (!codigoCupon.trim() || loadingCupon) return
 
     setLoadingCupon(true)
     setCuponError(null)
@@ -42,14 +46,18 @@ export default function CarritoPage() {
     try {
       const res = await fetch('/api/cupones/validar', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ codigo: codigoCupon }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          codigo: codigoCupon,
+        }),
       })
 
       const data = await res.json()
 
       if (!res.ok) {
-        setCuponError(data.error)
+        setCuponError(data.error || 'No se pudo aplicar el cupón.')
         setCuponAplicado(null)
       } else {
         setCuponAplicado({
@@ -58,6 +66,8 @@ export default function CarritoPage() {
         })
         setCuponError(null)
       }
+    } catch {
+      setCuponError('No pudimos validar el cupón. Intentá nuevamente.')
     } finally {
       setLoadingCupon(false)
     }
@@ -110,8 +120,8 @@ export default function CarritoPage() {
           </h1>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-12">
-          <div>
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-12">
+          <div className="min-w-0">
             <div className="hidden md:grid grid-cols-[minmax(0,1fr)_90px_110px_90px] gap-4 pb-3 mb-3 border-b border-glow-navy/10">
               {['Producto', 'Precio', 'Cantidad', 'Total'].map((titulo) => (
                 <span
@@ -145,7 +155,7 @@ export default function CarritoPage() {
                       />
                     </div>
 
-                    <div className="flex flex-col gap-1">
+                    <div className="flex flex-col gap-1 min-w-0">
                       <p className="font-display text-lg text-glow-navy leading-tight">
                         {item.nombre}
                       </p>
@@ -155,6 +165,7 @@ export default function CarritoPage() {
                       </p>
 
                       <button
+                        type="button"
                         onClick={() => removeItem(item.id)}
                         className="flex items-center gap-1 font-body text-xs tracking-wide uppercase text-glow-navy/65 hover:text-glow-navy transition-colors w-fit mt-2"
                       >
@@ -170,6 +181,7 @@ export default function CarritoPage() {
 
                   <div className="flex items-center gap-2 border border-glow-navy/20 w-fit px-2 py-1">
                     <button
+                      type="button"
                       aria-label="Reducir cantidad"
                       onClick={() =>
                         updateQuantity(item.id, item.quantity - 1)
@@ -184,6 +196,7 @@ export default function CarritoPage() {
                     </span>
 
                     <button
+                      type="button"
                       aria-label="Aumentar cantidad"
                       onClick={() =>
                         updateQuantity(item.id, item.quantity + 1)
@@ -236,6 +249,7 @@ export default function CarritoPage() {
                 </div>
 
                 <button
+                  type="button"
                   onClick={quitarCupon}
                   className="font-body text-xs text-glow-navy/65 hover:text-glow-navy transition-colors underline"
                 >
@@ -244,24 +258,29 @@ export default function CarritoPage() {
               </div>
             ) : (
               <div className="flex flex-col gap-2">
-                <p className="font-body text-xs tracking-[0.15em] uppercase text-glow-navy/65">
+                <label
+                  htmlFor="codigo-cupon"
+                  className="font-body text-xs tracking-[0.15em] uppercase text-glow-navy/65"
+                >
                   Código de descuento
-                </p>
+                </label>
 
                 <div className="flex gap-2">
                   <input
+                    id="codigo-cupon"
                     type="text"
                     value={codigoCupon}
                     onChange={(event) =>
                       setCodigoCupon(event.target.value.toUpperCase())
                     }
-                    onKeyDown={(event) =>
-                      event.key === 'Enter' && aplicarCupon()
-                    }
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') aplicarCupon()
+                    }}
                     className="flex-1 border border-glow-navy/20 px-3 py-2 font-body text-xs text-glow-navy outline-none focus:border-glow-navy transition-colors bg-transparent"
                   />
 
                   <button
+                    type="button"
                     onClick={aplicarCupon}
                     disabled={loadingCupon || !codigoCupon.trim()}
                     className="font-body text-xs tracking-[0.15em] uppercase bg-glow-navy text-white px-4 py-2 hover:bg-glow-navy/80 transition-colors disabled:opacity-40"
@@ -271,7 +290,10 @@ export default function CarritoPage() {
                 </div>
 
                 {cuponError && (
-                  <p className="font-body text-xs text-red-400">
+                  <p
+                    role="alert"
+                    className="font-body text-xs text-red-400"
+                  >
                     {cuponError}
                   </p>
                 )}
@@ -285,6 +307,7 @@ export default function CarritoPage() {
                 <span className="font-body text-xs text-glow-navy/50">
                   Subtotal
                 </span>
+
                 <span className="font-body text-xs text-glow-navy">
                   {formatPrice(subtotal)}
                 </span>
@@ -295,6 +318,7 @@ export default function CarritoPage() {
                   <span className="font-body text-xs text-glow-blue">
                     Descuento ({cuponAplicado.descuento}%)
                   </span>
+
                   <span className="font-body text-xs text-glow-blue">
                     − {formatPrice(descuento)}
                   </span>
@@ -306,6 +330,7 @@ export default function CarritoPage() {
                   <span className="font-body text-xs text-glow-navy/50">
                     Envío
                   </span>
+
                   <span className="font-body text-xs text-glow-navy/65">
                     Se calcula en el checkout
                   </span>
@@ -317,6 +342,7 @@ export default function CarritoPage() {
               <span className="font-body text-xs tracking-[0.15em] uppercase text-glow-navy/60">
                 Total
               </span>
+
               <span className="font-display text-3xl text-glow-navy">
                 {formatPrice(totalFinal)}
               </span>
@@ -347,6 +373,10 @@ export default function CarritoPage() {
             </Link>
           </div>
         </div>
+
+        <section className="mt-12 overflow-hidden rounded-3xl border border-glow-navy/10">
+          <CrossSellProducts />
+        </section>
       </div>
     </main>
   )
