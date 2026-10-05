@@ -189,3 +189,10 @@ export async function updateEstadoOrden(id: string, formData: FormData) {
   await db.from('ordenes').update({ estado }).eq('id', id)
   revalidatePath('/admin/ordenes')
 }
+
+export async function updateEstadoEnvio(id: string, formData: FormData) {
+  const db = await checkAdmin()
+  const estado_envio = formData.get('estado_envio') as string
+  await db.from('ordenes').update({ estado_envio }).eq('id', id)
+  revalidatePath('/admin/ordenes')
+}
