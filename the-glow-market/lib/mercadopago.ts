@@ -1,12 +1,14 @@
 import { MercadoPagoConfig, Preference, Payment } from 'mercadopago'
 import type { CartItem } from '@/types'
 
-const client = new MercadoPagoConfig({
-  accessToken: process.env.MP_ACCESS_TOKEN!,
-})
+function getClient() {
+  return new MercadoPagoConfig({
+    accessToken: process.env.MP_ACCESS_TOKEN!,
+  })
+}
 
 export async function createPreference(items: CartItem[], orderId: string) {
-  const preference = new Preference(client)
+  const preference = new Preference(getClient())
 
   const response = await preference.create({
     body: {
@@ -38,6 +40,6 @@ export async function createPreference(items: CartItem[], orderId: string) {
 }
 
 export async function getPayment(paymentId: string) {
-  const payment = new Payment(client)
+  const payment = new Payment(getClient())
   return payment.get({ id: paymentId })
 }

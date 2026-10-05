@@ -1,7 +1,5 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 interface OrderItem {
   nombre: string
   cantidad: number
@@ -80,6 +78,7 @@ export async function sendOrderConfirmation({
     </p>
   `
 
+  const resend = new Resend(process.env.RESEND_API_KEY)
   await resend.emails.send({
     from: 'The Glow Market <hola@theglowmarket.com.ar>',
     to,
