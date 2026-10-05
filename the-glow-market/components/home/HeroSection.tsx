@@ -1,62 +1,175 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import Image from 'next/image'
+import Link from 'next/link'
 import StarIcon from '@/components/ui/StarIcon'
 
 export default function HeroSection() {
   return (
-    <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden bg-glow-navy">
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url('/images/hero-01.jpg')` }}
-      />
-      <div className="absolute inset-0" style={{ backgroundColor: 'rgba(25, 33, 73, 0.20)' }} />
+    <section>
+      <div className="glow-hero-wrap">
+        {/* Left copy */}
+        <div className="glow-hero-copy">
+          <p className="glow-eyebrow-sm">The Glow Market · Own your glow</p>
+          <h1 className="glow-hero-h1">
+            Tu mundo.<br /><em>Tu glow.</em>
+          </h1>
+          <p className="glow-hero-lead">
+            Neceseres de diseño y cursos de automaquillaje para acompañarte todos los días.
+          </p>
+          <div className="glow-hero-btns">
+            <Link href="/productos" className="glow-btn-pill-navy">Descubrí el Market</Link>
+            <Link href="/cursos" className="glow-btn-pill-outline">Cursos online ↗</Link>
+          </div>
+          <div className="glow-hero-sig">
+            <StarIcon size={15} className="text-glow-navy" />
+            <span>Pocos productos. Más vos.</span>
+          </div>
+        </div>
 
-      {/* Content */}
-      <div className="relative z-10 flex flex-col items-center text-center px-6 gap-6 md:gap-8">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        >
+        {/* Right photo */}
+        <div className="glow-hero-photo">
           <Image
-            src="/images/Recurso 21Logo (1).png"
+            src="/images/hero-01.jpg"
             alt="The Glow Market"
-            width={600}
-            height={300}
-            className="w-[280px] md:w-[420px] lg:w-[560px] object-contain"
+            fill
+            className="object-cover"
             priority
+            sizes="(max-width: 840px) 100vw, 52vw"
           />
-        </motion.div>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="font-montserrat text-[11px] md:text-xs tracking-[0.5em] uppercase text-white/70"
-        >
-          Own Your Glow
-        </motion.p>
+          <div className="glow-hero-seal">
+            Own<br /><em>your glow.</em>
+          </div>
+        </div>
       </div>
 
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 1.4 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-      >
-        <span className="font-montserrat text-[9px] tracking-[0.3em] uppercase text-white/40">
-          Scroll
-        </span>
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <StarIcon size={14} className="text-white/40" />
-        </motion.div>
-      </motion.div>
+      <style>{`
+        .glow-hero-wrap {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          align-items: center;
+          gap: 5%;
+          padding: 136px 5% 64px;
+          max-width: 1600px;
+          margin: 0 auto;
+        }
+        .glow-eyebrow-sm {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: #192149;
+        }
+        .glow-hero-h1 {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: clamp(62px, 7.5vw, 108px);
+          line-height: 0.96;
+          letter-spacing: -0.05em;
+          color: #192149;
+          margin: 22px 0;
+          font-weight: 400;
+        }
+        .glow-hero-h1 em { font-style: italic; font-weight: 400; }
+        .glow-hero-lead {
+          font-family: 'Montserrat', sans-serif;
+          font-size: clamp(15px, 1.5vw, 21px);
+          line-height: 1.6;
+          max-width: 460px;
+          color: rgba(25,33,73,0.75);
+        }
+        .glow-hero-btns {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          margin-top: 36px;
+        }
+        .glow-btn-pill-navy {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 9999px;
+          background: #192149;
+          padding: 15px 32px;
+          font-family: 'Montserrat', sans-serif;
+          font-size: 13px;
+          font-weight: 600;
+          letter-spacing: 0.04em;
+          color: white;
+          text-decoration: none;
+          transition: background 0.3s;
+        }
+        .glow-btn-pill-navy:hover { background: #1A4C81; }
+        .glow-btn-pill-outline {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 9999px;
+          border: 1.5px solid #192149;
+          padding: 15px 32px;
+          font-family: 'Montserrat', sans-serif;
+          font-size: 13px;
+          font-weight: 600;
+          letter-spacing: 0.04em;
+          color: #192149;
+          text-decoration: none;
+          transition: background 0.3s, color 0.3s;
+        }
+        .glow-btn-pill-outline:hover { background: #192149; color: white; }
+        .glow-hero-sig {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-top: 32px;
+          font-family: 'Montserrat', sans-serif;
+          font-size: 12px;
+          color: rgba(25,33,73,0.45);
+          letter-spacing: 0.06em;
+        }
+        .glow-hero-photo {
+          position: relative;
+          min-height: 620px;
+          border-radius: 180px 180px 18px 18px;
+          overflow: hidden;
+          align-self: stretch;
+        }
+        .glow-hero-seal {
+          position: absolute;
+          right: 22px;
+          bottom: 26px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          width: 140px;
+          height: 140px;
+          border: 1px solid rgba(25,33,73,0.45);
+          border-radius: 50%;
+          background: #E1C8CB;
+          color: #192149;
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 22px;
+          line-height: 1.25;
+          font-weight: 400;
+          transform: rotate(8deg);
+          text-align: center;
+          z-index: 2;
+          pointer-events: none;
+        }
+        .glow-hero-seal em { font-style: italic; }
+        @media (max-width: 840px) {
+          .glow-hero-wrap {
+            grid-template-columns: 1fr;
+            padding: 110px 6% 48px;
+            gap: 40px;
+          }
+          .glow-hero-photo {
+            min-height: 460px;
+            border-radius: 130px 130px 18px 18px;
+          }
+          .glow-hero-seal { width: 110px; height: 110px; font-size: 18px; }
+        }
+      `}</style>
     </section>
   )
 }

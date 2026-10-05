@@ -1,5 +1,7 @@
 'use client'
 
+import '@/components/checkout/checkout-glow.css'
+
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -12,6 +14,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import StarIcon from '@/components/ui/StarIcon'
 import Button from '@/components/ui/Button'
+import CrossSellProducts from '@/components/checkout/CrossSellProducts'
 
 const baseSchema = {
   nombre: z.string().min(2, 'Requerido'),
@@ -79,7 +82,7 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <main className="min-h-screen bg-glow-cream pt-24 flex items-center justify-center">
+      <main className="glow-checkout-page min-h-screen bg-glow-cream pt-24 flex items-center justify-center">
         <div className="text-center flex flex-col items-center gap-6 px-6">
           <StarIcon size={40} className="text-glow-navy/20" />
           <p className="font-cormorant text-3xl text-glow-navy/40">
@@ -95,7 +98,7 @@ export default function CheckoutPage() {
 
   if (checkingAuth) {
     return (
-      <main className="min-h-screen bg-glow-cream flex items-center justify-center">
+      <main className="glow-checkout-page min-h-screen bg-glow-cream flex items-center justify-center">
         <div className="w-6 h-6 border-2 border-glow-navy border-t-transparent rounded-full animate-spin" />
       </main>
     )
@@ -103,7 +106,7 @@ export default function CheckoutPage() {
 
   if (hasCurso && !user) {
     return (
-      <main className="min-h-screen bg-glow-cream pt-24 flex items-center justify-center px-6">
+      <main className="glow-checkout-page min-h-screen bg-glow-cream pt-24 flex items-center justify-center px-6">
         <div className="w-full max-w-md">
           <div className="text-center mb-10">
             <div className="flex items-center justify-center gap-2 mb-6">
@@ -166,7 +169,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <main className="min-h-screen bg-glow-cream pt-24">
+    <main className="glow-checkout-page min-h-screen bg-glow-cream pt-24">
       <div className="max-w-[1200px] mx-auto px-6 py-12">
         <div className="flex items-center gap-3 mb-10">
           <StarIcon size={12} className="text-glow-navy" />
@@ -219,6 +222,8 @@ export default function CheckoutPage() {
                 </div>
               </div>
             </div>
+
+            <CrossSellProducts />
 
             {!soloDigital && (
               <div>

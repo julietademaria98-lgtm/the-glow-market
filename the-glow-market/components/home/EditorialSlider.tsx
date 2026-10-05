@@ -2,12 +2,9 @@
 
 import { useRef, useEffect, useState } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
 
 interface SliderImage {
   url: string
-  slug: string
-  nombre: string
 }
 
 export default function EditorialSlider({ images }: { images: SliderImage[] }) {
@@ -16,14 +13,13 @@ export default function EditorialSlider({ images }: { images: SliderImage[] }) {
   const posRef = useRef(0)
   const rafRef = useRef<number>(0)
 
-  // duplicate images for infinite loop
   const items = [...images, ...images, ...images]
 
   useEffect(() => {
     const track = trackRef.current
     if (!track) return
 
-    const speed = 0.5 // px per frame
+    const speed = 0.5
     const totalWidth = track.scrollWidth / 3
 
     const animate = () => {
@@ -54,20 +50,19 @@ export default function EditorialSlider({ images }: { images: SliderImage[] }) {
           style={{ width: 'max-content', willChange: 'transform' }}
         >
           {items.map((img, i) => (
-            <Link
+            <div
               key={i}
-              href={`/productos/${img.slug}`}
-              className="relative flex-shrink-0 overflow-hidden block group"
+              className="relative flex-shrink-0 overflow-hidden"
               style={{ width: '320px', height: '420px' }}
             >
               <Image
                 src={img.url}
-                alt={img.nombre}
+                alt=""
                 fill
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                className="object-cover"
                 sizes="320px"
               />
-            </Link>
+            </div>
           ))}
         </div>
       </div>
