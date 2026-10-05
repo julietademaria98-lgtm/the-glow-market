@@ -7,11 +7,6 @@ import { sendOrderConfirmation } from '@/lib/email'
 import type { MPWebhookData } from '@/types'
 import { createHmac } from 'crypto'
 
-const adminClient = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
 function verifyWebhookSignature(request: Request, rawBody: string, dataId: string): boolean {
   const secret = process.env.MP_WEBHOOK_SECRET
   if (!secret) return true
@@ -34,6 +29,10 @@ function verifyWebhookSignature(request: Request, rawBody: string, dataId: strin
 }
 
 export async function POST(request: Request) {
+  const adminClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
   try {
     const rawBody = await request.text()
     const body: MPWebhookData = JSON.parse(rawBody)
