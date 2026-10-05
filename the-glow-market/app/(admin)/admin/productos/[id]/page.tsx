@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import { updateProducto } from '@/lib/admin/actions'

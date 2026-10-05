@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { updateCurso, updateLeccion, grantAccesoFromForm, revokeAcceso } from '@/lib/admin/actions'
 import type { Curso, Leccion } from '@/types'

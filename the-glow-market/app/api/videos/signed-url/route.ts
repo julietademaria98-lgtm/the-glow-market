@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'

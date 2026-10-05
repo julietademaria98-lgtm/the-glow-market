@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { createProducto } from '@/lib/admin/actions'
 import ProductForm from '@/components/admin/ProductForm'
 import Link from 'next/link'
