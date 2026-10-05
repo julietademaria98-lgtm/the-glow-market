@@ -1,7 +1,11 @@
 'use client'
 
+import './market.css'
+
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
 import { formatPrice } from '@/lib/utils'
@@ -9,7 +13,7 @@ import type { Producto } from '@/types'
 import StarIcon from '@/components/ui/StarIcon'
 import AddToCartButton from './AddToCartButton'
 import Button from '@/components/ui/Button'
-import Link from 'next/link'
+import { useCartStore } from '@/store/cartStore'
 
 interface ProductDetailProps {
   producto: Producto
@@ -18,39 +22,58 @@ interface ProductDetailProps {
 const ACCORDIONS = [
   {
     id: 'detalles',
-    label: '📐 Detalles',
+    label: 'Detalles',
     render: (p: Producto) => (
-      <ul className="space-y-2 font-montserrat text-xs text-glow-navy/70 leading-relaxed">
-        {p.material && <li><span className="text-glow-navy font-medium">Material:</span> {p.material}</li>}
-        {p.dimensiones && <li><span className="text-glow-navy font-medium">Dimensiones:</span> {p.dimensiones}</li>}
-        {p.peso && <li><span className="text-glow-navy font-medium">Peso:</span> {p.peso}</li>}
+      <ul className="space-y-2 font-body text-xs text-glow-navy/70 leading-relaxed">
+        {p.material && (
+          <li>
+            <span className="text-glow-navy font-medium">Material:</span>{' '}
+            {p.material}
+          </li>
+        )}
+
+        {p.dimensiones && (
+          <li>
+            <span className="text-glow-navy font-medium">Dimensiones:</span>{' '}
+            {p.dimensiones}
+          </li>
+        )}
+
+        {p.peso && (
+          <li>
+            <span className="text-glow-navy font-medium">Peso:</span>{' '}
+            {p.peso}
+          </li>
+        )}
+
         {p.colores && p.colores.length > 0 && (
-          <li><span className="text-glow-navy font-medium">Colores:</span> {p.colores.join(', ')}</li>
+          <li>
+            <span className="text-glow-navy font-medium">Colores:</span>{' '}
+            {p.colores.join(', ')}
+          </li>
         )}
       </ul>
     ),
   },
   {
     id: 'cuidados',
-    label: '✨ Cuidados',
+    label: 'Cuidados',
     render: () => (
-      <ul className="space-y-2 font-montserrat text-xs text-glow-navy/70 leading-relaxed">
-        <li>Guardar en estuche cuando no se use para evitar oxidación.</li>
-        <li>Evitar contacto con agua, perfumes y cremas.</li>
-        <li>Limpiar con paño suave y seco.</li>
-        <li>No usar durante actividades físicas intensas.</li>
+      <ul className="space-y-2 font-body text-xs text-glow-navy/70 leading-relaxed">
+        <li>Guardar lejos del sol directo para evitar oxidación.</li>
+        <li>Evitar contacto en el exterior con perfumes y cremas.</li>
+        <li>Limpiar con paño suave y húmedo por dentro.</li>
       </ul>
     ),
   },
   {
     id: 'envio',
-    label: '📦 Envío',
+    label: 'Envío',
     render: () => (
-      <ul className="space-y-2 font-montserrat text-xs text-glow-navy/70 leading-relaxed">
-        <li>Envíos a todo el país por correo argentino o Andreani.</li>
+      <ul className="space-y-2 font-body text-xs text-glow-navy/70 leading-relaxed">
+        <li>Envíos a todo el país por Andreani.</li>
         <li>Tiempo estimado: 3 a 7 días hábiles.</li>
-        <li>Envío gratis en compras mayores a $30.000.</li>
-        <li>Retiro en CABA disponible previa coordinación.</li>
+        <li>Retiro en CABA (Núñez) o Tigre con coordinación previa.</li>
       </ul>
     ),
   },
@@ -58,27 +81,57 @@ const ACCORDIONS = [
 
 export default function ProductDetail({ producto }: ProductDetailProps) {
   const imagenes = producto.imagenes || []
-  const mainImage = imagenes.find((img) => img.es_principal) || imagenes[0]
+  const mainImage =
+    imagenes.find((img) => img.es_principal) || imagenes[0]
 
-  const [activeImage, setActiveImage] = useState(mainImage?.url || '/placeholder-product.jpg')
+  const [activeImage, setActiveImage] = useState(
+    mainImage?.url || '/placeholder-product.jpg'
+  )
   const [openAccordion, setOpenAccordion] = useState<string | null>(null)
 
+  const router = useRouter()
+  const addItem = useCartStore((state) => state.addItem)
+  const closeCart = useCartStore((state) => state.closeCart)
+
+  const handleComprarAhora = () => {
+    addItem({
+      id: producto.id,
+      slug: producto.slug,
+      nombre: producto.nombre,
+      precio: Number(producto.precio_oferta ?? producto.precio),
+      imagen_url: activeImage,
+    })
+
+    closeCart()
+    router.push('/checkout')
+  }
+
   return (
-    <div className="max-w-[1400px] mx-auto px-6 py-12 md:py-20">
-      {/* Breadcrumb */}
-      <nav className="font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/40 mb-10 flex gap-2">
-        <Link href="/" className="hover:text-glow-navy transition-colors">Inicio</Link>
+    <div className="glow-product-detail max-w-[1400px] mx-auto px-6 py-12 md:py-20">
+      <nav className="font-body text-xs tracking-[0.15em] uppercase text-glow-navy/65 mb-10 flex gap-2">
+        <Link
+          href="/"
+          className="hover:text-glow-navy transition-colors"
+        >
+          Inicio
+        </Link>
+
         <span>/</span>
-        <Link href="/productos" className="hover:text-glow-navy transition-colors">Tienda</Link>
+
+        <Link
+          href="/productos"
+          className="hover:text-glow-navy transition-colors"
+        >
+          Tienda
+        </Link>
+
         <span>/</span>
         <span className="text-glow-navy">{producto.nombre}</span>
       </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-12 md:gap-16">
-        {/* LEFT: Images */}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] gap-12 md:gap-16">
         <div className="flex flex-col gap-4">
-          {/* Main image */}
-          <div className="relative aspect-[4/5] overflow-hidden bg-white">
+          <div className="rounded-t-[100px] rounded-b-2xl relative aspect-[4/5] overflow-hidden bg-white">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeImage}
@@ -100,7 +153,6 @@ export default function ProductDetail({ producto }: ProductDetailProps) {
             </AnimatePresence>
           </div>
 
-          {/* Thumbnails */}
           {imagenes.length > 1 && (
             <div className="flex gap-3 overflow-x-auto pb-1">
               {imagenes.map((img) => (
@@ -126,69 +178,77 @@ export default function ProductDetail({ producto }: ProductDetailProps) {
           )}
         </div>
 
-        {/* RIGHT: Info */}
         <div className="flex flex-col gap-6">
-          {/* Star + nombre */}
           <div className="flex flex-col gap-3">
             <StarIcon size={14} className="text-glow-navy" />
-            <h1 className="font-cormorant text-3xl md:text-4xl text-glow-navy font-light tracking-wide leading-tight">
+
+            <h1 className="font-display text-3xl md:text-4xl text-glow-navy font-light tracking-wide leading-tight">
               {producto.nombre}
             </h1>
           </div>
 
-          {/* Precio */}
           <div className="flex items-baseline gap-3">
             {producto.precio_oferta ? (
               <>
-                <span className="font-montserrat text-2xl font-medium text-glow-navy">
+                <span className="font-body text-2xl font-medium text-glow-navy">
                   {formatPrice(Number(producto.precio_oferta))}
                 </span>
-                <span className="font-montserrat text-base text-glow-navy/40 line-through">
+
+                <span className="font-body text-base text-glow-navy/65 line-through">
                   {formatPrice(Number(producto.precio))}
                 </span>
               </>
             ) : (
-              <span className="font-montserrat text-2xl font-medium text-glow-navy">
+              <span className="font-body text-2xl font-medium text-glow-navy">
                 {formatPrice(Number(producto.precio))}
               </span>
             )}
           </div>
 
-          {/* Separador */}
           <div className="h-px bg-glow-navy/10" />
 
-          {/* Descripción */}
           {producto.descripcion && (
-            <p className="font-montserrat text-sm text-glow-navy/70 leading-relaxed">
+            <p className="font-body text-sm text-glow-navy/70 leading-relaxed whitespace-pre-line">
               {producto.descripcion}
             </p>
           )}
 
-          {/* Acordeones */}
           <div className="flex flex-col divide-y divide-glow-navy/10">
             {ACCORDIONS.map(({ id, label, render }) => (
               <div key={id}>
                 <button
-                  onClick={() => setOpenAccordion(openAccordion === id ? null : id)}
+                  onClick={() =>
+                    setOpenAccordion(openAccordion === id ? null : id)
+                  }
                   className="w-full flex items-center justify-between py-4 text-left"
                 >
-                  <span className="font-montserrat text-xs tracking-[0.15em] uppercase text-glow-navy">
+                  <span className="font-body text-xs tracking-[0.15em] uppercase text-glow-navy">
                     {label}
                   </span>
+
                   <motion.span
-                    animate={{ rotate: openAccordion === id ? 180 : 0 }}
+                    animate={{
+                      rotate: openAccordion === id ? 180 : 0,
+                    }}
                     transition={{ duration: 0.3 }}
                   >
-                    <ChevronDown size={14} className="text-glow-navy" />
+                    <ChevronDown
+                      size={14}
+                      className="text-glow-navy"
+                    />
                   </motion.span>
                 </button>
+
                 <AnimatePresence>
                   {openAccordion === id && (
                     <motion.div
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                      transition={{
+                        duration: 0.4,
+                        ease: [0.22, 1, 0.36, 1],
+                      }}
                       className="overflow-hidden"
                     >
                       <div className="pb-5">{render(producto)}</div>
@@ -199,22 +259,25 @@ export default function ProductDetail({ producto }: ProductDetailProps) {
             ))}
           </div>
 
-          {/* CTA Buttons */}
           <div className="flex flex-col gap-3 mt-2">
             <AddToCartButton
               producto={producto}
               mainImageUrl={activeImage}
             />
-            <Link href="/checkout">
-              <Button variant="outline" className="w-full" size="md">
-                Comprar Ahora
-              </Button>
-            </Link>
+
+            <Button
+              variant="outline"
+              className="w-full"
+              size="md"
+              onClick={handleComprarAhora}
+              disabled={producto.stock === 0}
+            >
+              Comprar Ahora
+            </Button>
           </div>
 
-          {/* Stock info */}
           {producto.stock <= 5 && producto.stock > 0 && (
-            <p className="font-montserrat text-xs text-glow-royal tracking-wide">
+            <p className="font-body text-xs text-glow-royal tracking-wide">
               ¡Solo quedan {producto.stock} unidades!
             </p>
           )}

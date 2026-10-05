@@ -9,7 +9,7 @@ export default function ProductGrid({ productos }: ProductGridProps) {
   if (productos.length === 0) {
     return (
       <div className="text-center py-20">
-        <p className="font-cormorant text-2xl text-glow-navy/40">
+        <p className="font-display text-2xl text-glow-navy/65">
           No hay productos disponibles
         </p>
       </div>
@@ -17,9 +17,9 @@ export default function ProductGrid({ productos }: ProductGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-glow-cream/10">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
       {productos.map((producto, index) => (
-        <div key={producto.id} className="bg-glow-cream p-4 md:p-6">
+        <div key={producto.id} className="min-w-0">
           <ProductCard producto={producto} index={index} />
         </div>
       ))}
