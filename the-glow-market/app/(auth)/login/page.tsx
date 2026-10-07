@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createClient } from '@/lib/supabase/client'
-import StarIcon from '@/components/ui/StarIcon'
+import './login-glow.css'
 import Button from '@/components/ui/Button'
 
 const loginSchema = z.object({
@@ -63,29 +63,14 @@ function LoginForm() {
   }
 
   return (
-    <main className="min-h-screen bg-glow-cream flex items-center justify-center px-6">
+    <main className="glow-login min-h-screen bg-glow-cream flex items-center justify-center px-6">
       <div className="w-full max-w-md">
-        <div className="text-center mb-10">
-          <Link href="/">
-            <span className="font-cormorant text-2xl tracking-widest text-glow-navy font-light">
-              THE <span className="text-3xl font-normal">GLOW</span> MARKET
-            </span>
-          </Link>
-          <div className="flex items-center justify-center gap-2 mt-3">
-            <StarIcon size={8} className="text-glow-navy" />
-            <p className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
-              Acceso a Cursos
-            </p>
-            <StarIcon size={8} className="text-glow-navy" />
-          </div>
-        </div>
-
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="bg-white p-8 md:p-10 flex flex-col gap-5"
+          className="glow-login-card p-8 md:p-10 flex flex-col gap-5"
         >
           <h1 className="font-cormorant text-3xl text-glow-navy font-light tracking-wide">
-            Iniciar Sesión
+            Iniciar sesión
           </h1>
 
           {serverError && (
@@ -95,10 +80,12 @@ function LoginForm() {
           )}
 
           <div className="flex flex-col gap-1.5">
-            <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
+            <label htmlFor="login-email" className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
               Email
             </label>
             <input
+              id="login-email"
+              autoComplete="email"
               type="email"
               {...register('email')}
               className="border border-glow-navy/20 focus:border-glow-navy outline-none px-4 py-3 font-montserrat text-sm text-glow-navy bg-transparent transition-colors duration-300 placeholder:text-glow-navy/30"
@@ -110,10 +97,12 @@ function LoginForm() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
+            <label htmlFor="login-password" className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
               Contraseña
             </label>
             <input
+              id="login-password"
+              autoComplete="current-password"
               type="password"
               {...register('password')}
               className="border border-glow-navy/20 focus:border-glow-navy outline-none px-4 py-3 font-montserrat text-sm text-glow-navy bg-transparent transition-colors duration-300 placeholder:text-glow-navy/30"
@@ -155,7 +144,7 @@ function LoginForm() {
         <dialog
           ref={recoveryDialog}
           aria-labelledby="recovery-title"
-          className="w-[calc(100%-2rem)] max-w-lg rounded-3xl bg-[#F4EFE9] text-glow-navy p-6 md:p-10 backdrop:bg-black/40"
+          className="glow-recovery w-[calc(100%-2rem)] max-w-lg rounded-3xl bg-[#F4EFE9] text-glow-navy p-6 md:p-10 backdrop:bg-black/40"
         >
           <div className="flex justify-end">
             <button type="button" aria-label="Cerrar" onClick={() => recoveryDialog.current?.close()} className="text-2xl w-11 h-11">×</button>
