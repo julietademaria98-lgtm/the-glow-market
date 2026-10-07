@@ -1,145 +1,96 @@
 export const dynamic = 'force-dynamic'
 
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createHmac, timingSafeEqual, randomUUID } from 'crypto'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getPayment } from '@/lib/mercadopago'
 import { sendOrderConfirmation } from '@/lib/email'
-import type { MPWebhookData } from '@/types'
-import { createHmac } from 'crypto'
 
-function verifyWebhookSignature(request: Request, rawBody: string, dataId: string): boolean {
+function validSignature(request: Request, dataId: string) {
   const secret = process.env.MP_WEBHOOK_SECRET
+  // Mercado Pago se consulta siempre en el servidor, aun sin secreto configurado.
   if (!secret) return true
-
-  const xSignature = request.headers.get('x-signature')
-  const xRequestId = request.headers.get('x-request-id')
-
-  if (!xSignature) return false
-
-  const parts = Object.fromEntries(xSignature.split(',').map(p => p.split('=')))
-  const ts = parts['ts']
-  const v1 = parts['v1']
-
-  if (!ts || !v1) return false
-
-  const signedTemplate = `id:${dataId};request-id:${xRequestId};ts:${ts};`
-  const expectedSignature = createHmac('sha256', secret).update(signedTemplate).digest('hex')
-
-  return expectedSignature === v1
+  const parts = Object.fromEntries((request.headers.get('x-signature') || '').split(',').map(p => p.trim().split('=')))
+  const requestId = request.headers.get('x-request-id')
+  if (!parts.ts || !/^[a-f0-9]{64}$/i.test(parts.v1 || '') || !requestId) return false
+  const digest = createHmac('sha256', secret)
+    .update(`id:${dataId.toLowerCase()};request-id:${requestId};ts:${parts.ts};`).digest()
+  return timingSafeEqual(digest, Buffer.from(parts.v1, 'hex'))
 }
 
 export async function POST(request: Request) {
-  const adminClient = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  const db = createAdminClient()
+  let orderId: string | undefined
+  const lease = randomUUID()
+  let claimed = false
   try {
-    const rawBody = await request.text()
-    const body: MPWebhookData = JSON.parse(rawBody)
-
-    if (!verifyWebhookSignature(request, rawBody, body.data?.id)) {
-      return NextResponse.json({ error: 'Firma inválida' }, { status: 401 })
+    const body = await request.json()
+    if (body.type !== 'payment') return NextResponse.json({ ok: true })
+    const paymentId = String(body.data?.id || '')
+    const signedId = new URL(request.url).searchParams.get('data.id') || paymentId
+    if (!paymentId || signedId !== paymentId || !validSignature(request, signedId)) {
+      return NextResponse.json({ error: 'Notificación inválida' }, { status: 401 })
     }
-
-    if (body.type !== 'payment') {
-      return NextResponse.json({ ok: true })
-    }
-
-    const paymentId = body.data.id
     const payment = await getPayment(paymentId)
-
-    if (!payment || payment.status !== 'approved') {
-      return NextResponse.json({ ok: true })
+    if (payment.status !== 'approved') return NextResponse.json({ ok: true })
+    orderId = payment.external_reference || undefined
+    if (!orderId) throw new Error('Pago sin orden')
+    const { data: order, error } = await db.from('ordenes').select('*').eq('id', orderId).single()
+    if (error || !order) throw new Error('Orden no encontrada')
+    if (payment.currency_id !== 'ARS' || Math.round(Number(payment.transaction_amount) * 100) !== Math.round(Number(order.total) * 100)) {
+      throw new Error('El importe del pago no coincide con la orden')
     }
-
-    const orderId = payment.external_reference
-
-    const { data: orden, error: ordenError } = await adminClient
-      .from('ordenes')
-      .update({
-        estado: 'aprobado',
-        mp_payment_id: String(paymentId),
-      })
-      .eq('id', orderId)
-      .select()
-      .single()
-
-    if (ordenError || !orden) {
-      console.error('Error actualizando orden:', ordenError)
-      return NextResponse.json({ error: 'Error actualizando orden' }, { status: 500 })
+    if (order.mp_payment_id && order.mp_payment_id !== paymentId) throw new Error('Orden asociada a otro pago')
+    const { data: acquired, error: claimError } = await db.rpc('claim_paid_order', { p_order: orderId, p_lease: lease })
+    if (claimError) throw claimError
+    if (!acquired) {
+      const { data: done } = await db.from('payment_fulfillments').select('email_sent_at').eq('order_id', orderId).single()
+      // Si otro worker está en proceso, pedir reintento en lugar de perder la notificación.
+      return NextResponse.json({ ok: !!done?.email_sent_at }, { status: done?.email_sent_at ? 200 : 503 })
     }
-
-    // Descontar stock de productos
-    if (orden.items) {
-      for (const item of orden.items) {
-        const { data: producto } = await adminClient
-          .from('productos')
-          .select('id, stock')
-          .eq('id', item.id)
-          .single()
-
-        if (producto && producto.stock > 0) {
-          const nuevoStock = Math.max(0, producto.stock - (item.cantidad || 1))
-          await adminClient
-            .from('productos')
-            .update({ stock: nuevoStock })
-            .eq('id', producto.id)
-        }
-      }
+    claimed = true
+    const { data: job, error: jobError } = await db.from('payment_fulfillments').select('*').eq('order_id', orderId).single()
+    if (jobError) throw jobError
+    // El destinatario es el correo del checkout, no el del titular de Mercado Pago.
+    const email = String(order.datos_envio?.email || '').trim().toLowerCase()
+    if (!email) throw new Error('La orden no tiene email de compra')
+    let accessUrl = job.access_url as string | null
+    let userId = job.account_id as string | null
+    if (!accessUrl || !userId) {
+      // Supabase crea el usuario si es nuevo o reutiliza el existente. No cambia su contraseña.
+      const { data: link, error: linkError } = await db.auth.admin.generateLink({ type: 'magiclink', email })
+      if (linkError || !link.user || !link.properties?.hashed_token) throw linkError || new Error('No se pudo crear acceso')
+      userId = link.user.id
+      const url = new URL('/acceso-compra', process.env.NEXT_PUBLIC_URL || 'https://theglowmarket.com.ar')
+      url.hash = new URLSearchParams({ token_hash: link.properties.hashed_token, email }).toString()
+      accessUrl = url.toString()
+      const { error: saveError } = await db.from('payment_fulfillments')
+        .update({ access_url: accessUrl, account_id: userId }).eq('order_id', orderId).eq('lease_id', lease)
+      if (saveError) throw saveError
     }
-
-    // Si hay user_id, verificar si compró algún curso y dar acceso
-    if (orden.user_id && orden.items) {
-      for (const item of orden.items) {
-        const { data: curso } = await adminClient
-          .from('cursos')
-          .select('id')
-          .eq('id', item.id)
-          .single()
-
-        if (curso) {
-          await adminClient
-            .from('accesos_curso')
-            .upsert({
-              user_id: orden.user_id,
-              curso_id: curso.id,
-              activo: true,
-            })
-        }
-      }
-    }
-
-    // Enviar email de confirmación
-    try {
-      const { data: usuario } = await adminClient.auth.admin.getUserById(orden.user_id || '')
-      const email = usuario?.user?.email || payment.payer?.email
-
-      if (email) {
-        const nombreCliente = usuario?.user?.user_metadata?.nombre || email.split('@')[0]
-
-        const cursosIds = new Set(
-          (await adminClient.from('cursos').select('id')).data?.map((c: any) => c.id) || []
-        )
-        const hasCurso = (orden.items || []).some((item: any) => cursosIds.has(item.id))
-        const hasProductoFisico = (orden.items || []).some((item: any) => !cursosIds.has(item.id))
-
-        await sendOrderConfirmation({
-          to: email,
-          nombreCliente,
-          ordenId: orden.id,
-          items: orden.items || [],
-          total: orden.total || 0,
-          hasCurso,
-          hasProductoFisico,
-        })
-      }
-    } catch (emailError) {
-      console.error('Error enviando email:', emailError)
-    }
-
+    const { error: fulfillError } = await db.rpc('fulfill_paid_order', {
+      p_order: orderId, p_lease: lease, p_user: userId, p_payment: paymentId,
+    })
+    if (fulfillError) throw fulfillError
+    const { data: courses, error: coursesError } = await db.from('cursos').select('id').in('id', order.items.map((i: { id: string }) => i.id))
+    if (coursesError) throw coursesError
+    const courseIds = new Set(courses?.map(c => c.id))
+    await sendOrderConfirmation({
+      to: email, nombreCliente: order.datos_envio?.nombre || email.split('@')[0],
+      ordenId: order.id, items: order.items, total: order.total,
+      hasCurso: courseIds.size > 0,
+      hasProductoFisico: order.items.some((i: { id: string }) => !courseIds.has(i.id)),
+      accessUrl,
+    })
+    const { error: sentError } = await db.from('payment_fulfillments')
+      .update({ email_sent_at: new Date().toISOString(), access_url: null, locked_until: null })
+      .eq('order_id', orderId).eq('lease_id', lease)
+    if (sentError) throw sentError
     return NextResponse.json({ ok: true })
-  } catch (error) {
-    console.error('Error en webhook:', error)
-    return NextResponse.json({ error: 'Error interno' }, { status: 500 })
+  } catch {
+    // No registrar enlaces de acceso ni datos personales en logs.
+    console.error('No se pudo completar la confirmación de compra', { orderId })
+    if (claimed && orderId) await db.from('payment_fulfillments').update({ locked_until: null }).eq('order_id', orderId).eq('lease_id', lease)
+    return NextResponse.json({ error: 'Confirmación pendiente de reintento' }, { status: 500 })
   }
 }

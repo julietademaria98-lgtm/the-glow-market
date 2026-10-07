@@ -12,6 +12,7 @@ interface SendOrderConfirmationParams {
   ordenId: string
   items: OrderItem[]
   total: number
+  accessUrl?: string
   hasCurso?: boolean
   hasProductoFisico?: boolean
 }
@@ -22,9 +23,12 @@ export async function sendOrderConfirmation({
   ordenId,
   items,
   total,
+  accessUrl,
   hasCurso = false,
   hasProductoFisico = true,
 }: SendOrderConfirmationParams) {
+  const escape = (value: string) => value.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!))
+  nombreCliente = escape(nombreCliente)
   const subject = hasCurso && !hasProductoFisico
     ? '¡Tu curso está listo! ✨ The Glow Market'
     : '¡Tu pedido está confirmado! ✨ The Glow Market'
@@ -33,7 +37,7 @@ export async function sendOrderConfirmation({
     .map((item) => `
       <tr>
         <td style="padding: 12px 0; border-bottom: 1px solid #e8e0d8; font-family: 'Georgia', serif; color: #1a2340; font-size: 14px;">
-          ${item.nombre} x${item.cantidad}
+          ${escape(item.nombre)} x${item.cantidad}
         </td>
         <td style="padding: 12px 0; border-bottom: 1px solid #e8e0d8; text-align: right; font-family: 'Georgia', serif; color: #1a2340; font-size: 14px;">
           $${(item.precio * item.cantidad).toLocaleString('es-AR')}
@@ -49,9 +53,9 @@ export async function sendOrderConfirmation({
       <p style="font-family: 'Georgia', serif; font-size: 22px; font-weight: 300; color: #ffffff; margin: 0 0 20px 0;">
         Accedé cuando quieras, de por vida.
       </p>
-      <a href="https://theglowmarket.com.ar/mi-curso"
+      <a href="${escape(accessUrl || 'https://theglowmarket.com.ar/mi-curso')}"
         style="display: inline-block; background: #e8b4b8; color: #1a2340; font-family: 'Georgia', serif; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; padding: 14px 32px; text-decoration: none;">
-        Ir a mi curso →
+        Crear o recuperar contraseña →
       </a>
     </div>
   ` : ''
@@ -79,7 +83,7 @@ export async function sendOrderConfirmation({
   `
 
   const resend = new Resend(process.env.RESEND_API_KEY)
-  await resend.emails.send({
+  const { error } = await resend.emails.send({
     from: 'The Glow Market <hola@theglowmarket.com.ar>',
     to,
     subject,
@@ -114,6 +118,7 @@ export async function sendOrderConfirmation({
         Pedido #${ordenId.slice(0, 8).toUpperCase()}
       </p>
 
+      ${accessUrl ? `<p style="font-size:14px;line-height:1.7;color:#192149">Tu usuario es <strong>${escape(to)}</strong>. Tu cuenta ya está creada; si ya tenías una, conservás la misma.<br/><a href="${escape(accessUrl)}">Hacé clic acá y creá tu contraseña</a><br/>Este enlace es personal y vence. Si necesitás otro, usá la opción «Entrar sin contraseña» en la web.</p>` : ''}
       ${cursoSection}
       ${productosSection}
     </div>
@@ -128,5 +133,6 @@ export async function sendOrderConfirmation({
 </body>
 </html>
     `,
-  })
+  }, { idempotencyKey: `order-confirmation/${ordenId}` })
+  if (error) throw new Error('No se pudo enviar la confirmación')
 }

@@ -21,7 +21,19 @@ function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const rawRedirect = searchParams.get('redirect') || '/'
-  const redirectTo = rawRedirect.startsWith('/') ? rawRedirect : '/'
+  const redirectTo = rawRedirect.startsWith('/') && !rawRedirect.startsWith('//') ? rawRedirect : '/'
+
+  const [linkEmail, setLinkEmail] = useState('')
+  const [linkMessage, setLinkMessage] = useState('')
+  const [linkLoading, setLinkLoading] = useState(false)
+  async function sendLink() {
+    setLinkLoading(true)
+    try {
+      const { error } = await createClient().auth.signInWithOtp({ email: linkEmail.trim().toLowerCase(), options: { shouldCreateUser: false, emailRedirectTo: `${window.location.origin}/reset-password` } })
+      setLinkMessage(error ? 'Si ya compraste, revisá el mail ingresado o intentá nuevamente en unos minutos.' : 'Si hay una cuenta con ese mail, recibirás un enlace para entrar.')
+    } catch { setLinkMessage('No pudimos enviar el enlace. Intentá nuevamente.') }
+    finally { setLinkLoading(false) }
+  }
 
   const [serverError, setServerError] = useState<string | null>(null)
 
@@ -67,6 +79,13 @@ function LoginForm() {
           </div>
         </div>
 
+        <div className="bg-white p-8 mb-4 space-y-4">
+          <h2 className="font-cormorant text-3xl text-glow-navy">Entrar sin contraseña</h2>
+          <p className="text-sm text-glow-navy">Usá el mail con el que compraste.</p>
+          <input aria-label="Email de compra" type="email" value={linkEmail} onChange={e => setLinkEmail(e.target.value)} className="border p-3 w-full" placeholder="tu@email.com" />
+          <Button type="button" onClick={sendLink} loading={linkLoading} disabled={!linkEmail.includes('@')}>Enviarme un enlace</Button>
+          {linkMessage && <p role="status" className="text-sm">{linkMessage}</p>}
+        </div>
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="bg-white p-8 md:p-10 flex flex-col gap-5"
