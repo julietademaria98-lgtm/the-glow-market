@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState } from 'react'
+import { Suspense, useState, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
@@ -23,6 +23,7 @@ function LoginForm() {
   const rawRedirect = searchParams.get('redirect') || '/'
   const redirectTo = rawRedirect.startsWith('/') && !rawRedirect.startsWith('//') ? rawRedirect : '/'
 
+  const recoveryDialog = useRef<HTMLDialogElement>(null)
   const [linkEmail, setLinkEmail] = useState('')
   const [linkMessage, setLinkMessage] = useState('')
   const [linkLoading, setLinkLoading] = useState(false)
@@ -30,7 +31,7 @@ function LoginForm() {
     setLinkLoading(true)
     try {
       const { error } = await createClient().auth.signInWithOtp({ email: linkEmail.trim().toLowerCase(), options: { shouldCreateUser: false, emailRedirectTo: `${window.location.origin}/reset-password` } })
-      setLinkMessage(error ? 'Si ya compraste, revisá el mail ingresado o intentá nuevamente en unos minutos.' : 'Si hay una cuenta con ese mail, recibirás un enlace para entrar.')
+      setLinkMessage(error ? 'Si ya compraste, revisá el mail ingresado o intentá nuevamente en unos minutos.' : 'Si hay una cuenta con ese mail, recibirás un enlace para crear o recuperar tu contraseña.')
     } catch { setLinkMessage('No pudimos enviar el enlace. Intentá nuevamente.') }
     finally { setLinkLoading(false) }
   }
@@ -79,13 +80,6 @@ function LoginForm() {
           </div>
         </div>
 
-        <div className="bg-white p-8 mb-4 space-y-4">
-          <h2 className="font-cormorant text-3xl text-glow-navy">Entrar sin contraseña</h2>
-          <p className="text-sm text-glow-navy">Usá el mail con el que compraste.</p>
-          <input aria-label="Email de compra" type="email" value={linkEmail} onChange={e => setLinkEmail(e.target.value)} className="border p-3 w-full" placeholder="tu@email.com" />
-          <Button type="button" onClick={sendLink} loading={linkLoading} disabled={!linkEmail.includes('@')}>Enviarme un enlace</Button>
-          {linkMessage && <p role="status" className="text-sm">{linkMessage}</p>}
-        </div>
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="bg-white p-8 md:p-10 flex flex-col gap-5"
@@ -129,12 +123,13 @@ function LoginForm() {
               <p className="font-montserrat text-[10px] text-red-400">{errors.password.message}</p>
             )}
             <div className="flex justify-end">
-              <Link
-                href="/forgot-password"
-                className="font-montserrat text-[10px] text-glow-navy/40 hover:text-glow-navy transition-colors"
+              <button
+                type="button"
+                onClick={() => { setLinkMessage(''); recoveryDialog.current?.showModal() }}
+                className="font-montserrat text-base font-semibold text-glow-navy underline underline-offset-4 py-3 hover:opacity-80"
               >
-                ¿Olvidaste tu contraseña?
-              </Link>
+                Recuperar contraseña
+              </button>
             </div>
           </div>
 
@@ -157,6 +152,23 @@ function LoginForm() {
             </Link>
           </p>
         </form>
+        <dialog
+          ref={recoveryDialog}
+          aria-labelledby="recovery-title"
+          className="w-[calc(100%-2rem)] max-w-lg rounded-3xl bg-[#F4EFE9] text-glow-navy p-6 md:p-10 backdrop:bg-black/40"
+        >
+          <div className="flex justify-end">
+            <button type="button" aria-label="Cerrar" onClick={() => recoveryDialog.current?.close()} className="text-2xl w-11 h-11">×</button>
+          </div>
+          <h2 id="recovery-title" className="font-cormorant text-4xl mb-4">Recuperar contraseña</h2>
+          <p className="font-montserrat text-sm mb-6">Ingresá el email con el que compraste y te enviamos un enlace para crear o recuperar tu contraseña.</p>
+          <form onSubmit={e => { e.preventDefault(); if (!linkLoading) void sendLink() }} className="flex flex-col gap-4">
+            <label htmlFor="recovery-email" className="font-montserrat text-sm">Email</label>
+            <input id="recovery-email" type="email" required autoComplete="email" value={linkEmail} onChange={e => setLinkEmail(e.target.value)} className="border border-glow-navy/30 rounded-xl p-3 w-full bg-transparent" placeholder="tu@email.com" />
+            <Button type="submit" loading={linkLoading} disabled={linkLoading} className="w-full rounded-full">Enviarme el enlace</Button>
+            {linkMessage && <p role="status" className="font-montserrat text-sm">{linkMessage}</p>}
+          </form>
+        </dialog>
       </div>
     </main>
   )
