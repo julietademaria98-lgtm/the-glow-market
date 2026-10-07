@@ -1,32 +1,15 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import StarIcon from '@/components/ui/StarIcon'
 import Button from '@/components/ui/Button'
 import Link from 'next/link'
 
 function SuccessContent() {
   const searchParams = useSearchParams()
-  const router = useRouter()
   const isPending = searchParams.get('pending') === 'true'
   const orderId = searchParams.get('order')
-  const [countdown, setCountdown] = useState(5)
-
-  useEffect(() => {
-    if (isPending) return
-    const interval = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval)
-          router.push('/mi-curso')
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-    return () => clearInterval(interval)
-  }, [isPending, router])
 
   return (
     <main className="min-h-screen bg-glow-cream flex items-center justify-center px-6">
@@ -44,7 +27,7 @@ function SuccessContent() {
         <p className="font-montserrat text-sm text-glow-navy/60 leading-relaxed">
           {isPending
             ? 'Tu pago está siendo procesado. Te enviaremos un email cuando se confirme.'
-            : 'Tu pedido fue confirmado. Recibirás un email con los detalles.'}
+            : 'Cuando Mercado Pago confirme tu pago, recibirás la confirmación en el mail de tu compra. Si compraste un curso, tu cuenta se crea automáticamente y te enviamos el enlace para entrar.'}
         </p>
 
         {orderId && (
@@ -53,16 +36,10 @@ function SuccessContent() {
           </p>
         )}
 
-        {!isPending && (
-          <p className="font-montserrat text-xs text-glow-navy/40">
-            Redirigiendo a tu curso en {countdown}s...
-          </p>
-        )}
-
         <div className="flex flex-col sm:flex-row gap-3 mt-2">
-          <Link href="/mi-curso">
+          <Link href="/login">
             <Button variant="primary" size="md">
-              Ir a mi curso
+              Ya recibí mi acceso
             </Button>
           </Link>
           <Link href="/productos">
