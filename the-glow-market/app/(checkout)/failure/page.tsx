@@ -1,11 +1,12 @@
+import '@/components/ui/glow-secondary.css'
 import Link from 'next/link'
 import StarIcon from '@/components/ui/StarIcon'
 import Button from '@/components/ui/Button'
 
 export default function FailurePage() {
   return (
-    <main className="min-h-screen bg-glow-cream flex items-center justify-center px-6">
-      <div className="text-center flex flex-col items-center gap-6 max-w-md">
+    <main className="glow-secondary glow-secondary-message min-h-screen bg-glow-cream flex items-center justify-center px-6">
+      <div className="glow-secondary-card text-center flex flex-col items-center gap-6 max-w-md">
         <StarIcon size={40} className="text-glow-navy/30" />
 
         <h1 className="font-cormorant text-5xl text-glow-navy font-light tracking-wide">

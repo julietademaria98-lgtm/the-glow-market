@@ -1,9 +1,11 @@
 'use client'
 
+import '@/components/ui/glow-secondary.css'
+
+
 import { useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import StarIcon from '@/components/ui/StarIcon'
 import Button from '@/components/ui/Button'
 
 export default function ForgotPasswordPage() {
@@ -24,24 +26,11 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <main className="min-h-screen bg-glow-cream flex items-center justify-center px-6">
+    <main className="glow-secondary glow-secondary-form min-h-screen bg-glow-cream flex items-center justify-center px-6">
       <div className="w-full max-w-md">
-        <div className="text-center mb-10">
-          <Link href="/">
-            <span className="font-cormorant text-2xl tracking-widest text-glow-navy font-light">
-              THE <span className="text-3xl font-normal">GLOW</span> MARKET
-            </span>
-          </Link>
-          <div className="flex items-center justify-center gap-2 mt-3">
-            <StarIcon size={8} className="text-glow-navy" />
-            <p className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
-              Recuperar contraseña
-            </p>
-            <StarIcon size={8} className="text-glow-navy" />
-          </div>
-        </div>
 
-        <div className="bg-white p-8 md:p-10 flex flex-col gap-5">
+
+        <div className="glow-secondary-card bg-white p-8 md:p-10 flex flex-col gap-5">
           <h1 className="font-cormorant text-3xl text-glow-navy font-light tracking-wide">
             ¿Olvidaste tu contraseña?
           </h1>

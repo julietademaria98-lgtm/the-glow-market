@@ -1,5 +1,8 @@
 'use client'
 
+import '@/components/ui/glow-secondary.css'
+
+
 import { useState } from 'react'
 import Image from 'next/image'
 import StarIcon from '@/components/ui/StarIcon'
@@ -30,7 +33,7 @@ export default function ComingSoonPage() {
   }
 
   return (
-    <main className="min-h-screen bg-glow-navy flex flex-col items-center justify-center px-6 text-center gap-8">
+    <main className="glow-secondary glow-secondary-soon min-h-screen bg-glow-navy flex flex-col items-center justify-center px-6 text-center gap-8">
 
       {/* Logo circular */}
       <Image

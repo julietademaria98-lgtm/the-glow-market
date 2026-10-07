@@ -1,6 +1,7 @@
+import '@/components/ui/glow-secondary.css'
 export default function PrivacidadPage() {
   return (
-    <main className="min-h-screen bg-glow-cream pt-24">
+    <main className="glow-secondary glow-secondary-legal min-h-screen bg-glow-cream pt-24">
       <div className="max-w-[800px] mx-auto px-6 py-16">
         <h1 className="font-cormorant text-4xl md:text-5xl text-glow-navy font-light tracking-wide mb-2">
           Política de Privacidad

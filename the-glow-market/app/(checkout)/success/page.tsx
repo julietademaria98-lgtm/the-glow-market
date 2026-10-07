@@ -1,5 +1,8 @@
 'use client'
 
+import '@/components/ui/glow-secondary.css'
+
+
 import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import StarIcon from '@/components/ui/StarIcon'
@@ -12,8 +15,8 @@ function SuccessContent() {
   const orderId = searchParams.get('order')
 
   return (
-    <main className="min-h-screen bg-glow-cream flex items-center justify-center px-6">
-      <div className="text-center flex flex-col items-center gap-6 max-w-md">
+    <main className="glow-secondary glow-secondary-success min-h-screen bg-glow-cream flex items-center justify-center px-6">
+      <div className="glow-secondary-card text-center flex flex-col items-center gap-6 max-w-md">
         <div className="flex items-center justify-center gap-2">
           <StarIcon size={16} className="text-glow-navy" />
           <StarIcon size={24} className="text-glow-navy" />

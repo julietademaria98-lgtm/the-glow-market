@@ -1,5 +1,8 @@
 'use client'
 
+import '@/components/ui/glow-secondary.css'
+
+
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -59,18 +62,18 @@ function RegistroForm() {
 
   if (success) {
     return (
-      <main className="min-h-screen bg-glow-cream flex items-center justify-center px-6">
+      <main className="glow-secondary glow-secondary-form min-h-screen bg-glow-cream flex items-center justify-center px-6">
         <div className="w-full max-w-md text-center flex flex-col items-center gap-6">
           <StarIcon size={40} className="text-glow-navy" />
           <h1 className="font-cormorant text-4xl text-glow-navy font-light tracking-wide">
             ¡Cuenta creada!
           </h1>
           <p className="font-montserrat text-sm text-glow-navy/60 max-w-xs leading-relaxed">
-            Revisá tu email para confirmar tu cuenta y luego iniciá sesión para continuar con tu compra.
+            Revisá tu email para confirmar tu cuenta. Podés comprar sin iniciar sesión.
           </p>
           <Link href={`/login?redirect=${encodeURIComponent(redirectTo)}`}>
             <Button variant="primary" size="md">
-              Ir al Login
+              Iniciar sesión
             </Button>
           </Link>
         </div>
@@ -79,26 +82,13 @@ function RegistroForm() {
   }
 
   return (
-    <main className="min-h-screen bg-glow-cream flex items-center justify-center px-6">
+    <main className="glow-secondary glow-secondary-form min-h-screen bg-glow-cream flex items-center justify-center px-6">
       <div className="w-full max-w-md">
-        <div className="text-center mb-10">
-          <Link href="/">
-            <span className="font-cormorant text-2xl tracking-widest text-glow-navy font-light">
-              THE <span className="text-3xl font-normal">GLOW</span> MARKET
-            </span>
-          </Link>
-          <div className="flex items-center justify-center gap-2 mt-3">
-            <StarIcon size={8} className="text-glow-navy" />
-            <p className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
-              Crear Cuenta
-            </p>
-            <StarIcon size={8} className="text-glow-navy" />
-          </div>
-        </div>
+
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="bg-white p-8 md:p-10 flex flex-col gap-5"
+          className="glow-secondary-card bg-white p-8 md:p-10 flex flex-col gap-5"
         >
           <h1 className="font-cormorant text-3xl text-glow-navy font-light tracking-wide">
             Registrarse
@@ -161,7 +151,7 @@ function RegistroForm() {
 export default function RegistroPage() {
   return (
     <Suspense fallback={
-      <main className="min-h-screen bg-glow-cream flex items-center justify-center">
+      <main className="glow-secondary glow-secondary-form min-h-screen bg-glow-cream flex items-center justify-center">
         <div className="w-6 h-6 border-2 border-glow-navy border-t-transparent rounded-full animate-spin" />
       </main>
     }>
