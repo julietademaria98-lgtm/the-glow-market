@@ -1,5 +1,8 @@
 'use client'
 
+import '@/components/ui/glow-secondary.css'
+
+
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
@@ -25,8 +28,8 @@ export default function AccesoCompra() {
       setLoading(false)
     }
   }
-  return <main className="min-h-screen bg-glow-cream flex items-center justify-center px-6">
-    <div className="max-w-md rounded-3xl bg-[#F4EFE9] p-8 text-glow-navy text-center space-y-6">
+  return <main className="glow-secondary glow-secondary-message min-h-screen bg-glow-cream flex items-center justify-center px-6">
+    <div className="glow-secondary-card max-w-md rounded-3xl bg-[#F4EFE9] p-8 text-glow-navy text-center space-y-6">
       <h1 className="font-cormorant text-4xl">Creá tu contraseña.</h1>
       <div className="text-left space-y-3">
         <label htmlFor="purchase-email" className="block text-sm">Usuario</label>

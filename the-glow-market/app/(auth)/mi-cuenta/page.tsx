@@ -1,3 +1,4 @@
+import '@/components/ui/glow-secondary.css'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
@@ -35,10 +36,10 @@ export default async function MiCuentaPage() {
   const { accesos, ordenes } = await getMiCuentaData(user.id)
 
   return (
-    <main className="min-h-screen bg-glow-cream pt-24 pb-16">
+    <main className="glow-secondary glow-secondary-account min-h-screen bg-glow-cream pt-24 pb-16">
       <div className="max-w-3xl mx-auto px-6">
 
-        <div className="mb-12">
+        <div className="glow-secondary-heading mb-12">
           <span className="font-montserrat text-[10px] tracking-[0.3em] uppercase text-glow-navy/40">
             Mi Cuenta
           </span>
@@ -58,7 +59,7 @@ export default async function MiCuentaPage() {
             </h2>
           </div>
           {accesos.length === 0 ? (
-            <div className="border border-glow-navy/10 p-8 text-center">
+            <div className="glow-account-tile border border-glow-navy/10 p-8 text-center">
               <p className="font-cormorant text-xl text-glow-navy/40 mb-4">
                 Todavía no tenés cursos
               </p>
@@ -77,7 +78,7 @@ export default async function MiCuentaPage() {
                 return (
                   <div
                     key={acceso.id}
-                    className="border border-glow-navy/10 p-6 flex items-center justify-between gap-4 hover:border-glow-navy/20 transition-colors"
+                    className="glow-account-tile border border-glow-navy/10 p-6 flex items-center justify-between gap-4 hover:border-glow-navy/20 transition-colors"
                   >
                     <div>
                       <p className="font-cormorant text-xl text-glow-navy font-light">
@@ -110,7 +111,7 @@ export default async function MiCuentaPage() {
             </h2>
           </div>
           {ordenes.length === 0 ? (
-            <div className="border border-glow-navy/10 p-8 text-center">
+            <div className="glow-account-tile border border-glow-navy/10 p-8 text-center">
               <p className="font-cormorant text-xl text-glow-navy/40 mb-4">
                 Todavía no realizaste pedidos
               </p>
@@ -124,7 +125,7 @@ export default async function MiCuentaPage() {
           ) : (
             <div className="flex flex-col gap-4">
               {ordenes.map((orden) => (
-                <div key={orden.id} className="border border-glow-navy/10 p-6">
+                <div key={orden.id} className="glow-account-tile border border-glow-navy/10 p-6">
                   <div className="flex items-start justify-between gap-4 mb-4">
                     <div>
                       <p className="font-montserrat text-[10px] tracking-[0.15em] uppercase text-glow-navy/40">

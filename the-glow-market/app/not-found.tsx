@@ -1,9 +1,10 @@
+import '@/components/ui/glow-secondary.css'
 import Link from 'next/link'
 import StarIcon from '@/components/ui/StarIcon'
 
 export default function NotFound() {
   return (
-    <main className="min-h-screen bg-glow-cream flex flex-col items-center justify-center px-6 text-center gap-8">
+    <main className="glow-secondary glow-secondary-notfound min-h-screen bg-glow-cream flex flex-col items-center justify-center px-6 text-center gap-8">
 
       <div className="flex flex-col items-center gap-4">
         <div className="flex items-center gap-3">

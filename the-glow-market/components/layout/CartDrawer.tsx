@@ -1,5 +1,7 @@
 'use client'
 
+import '@/components/ui/glow-secondary.css'
+
 import { useCartStore } from '@/store/cartStore'
 import { X, Plus, Minus, Trash2 } from 'lucide-react'
 import Image from 'next/image'
@@ -32,7 +34,7 @@ export default function CartDrawer() {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed right-0 top-0 h-full w-full max-w-md bg-glow-cream z-50 flex flex-col shadow-2xl"
+            className="glow-secondary glow-secondary-drawer fixed right-0 top-0 h-full w-full max-w-md bg-glow-cream z-50 flex flex-col shadow-2xl"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-8 py-6 border-b border-glow-navy/10">
