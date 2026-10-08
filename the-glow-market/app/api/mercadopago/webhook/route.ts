@@ -5,6 +5,7 @@ import { createHmac, timingSafeEqual, randomUUID } from 'crypto'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getPayment } from '@/lib/mercadopago'
 import { sendOrderConfirmation } from '@/lib/email'
+import { sendNinaWelcome } from '@/lib/nina-welcome'
 
 function validSignature(request: Request, dataId: string) {
   const secret = process.env.MP_WEBHOOK_SECRET
@@ -72,16 +73,30 @@ export async function POST(request: Request) {
       p_order: orderId, p_lease: lease, p_user: userId, p_payment: paymentId,
     })
     if (fulfillError) throw fulfillError
-    const { data: courses, error: coursesError } = await db.from('cursos').select('id').in('id', order.items.map((i: { id: string }) => i.id))
+    const { data: courses, error: coursesError } = await db.from('cursos').select('id, slug').in('id', order.items.map((i: { id: string }) => i.id))
     if (coursesError) throw coursesError
     const courseIds = new Set(courses?.map(c => c.id))
-    await sendOrderConfirmation({
-      to: email, nombreCliente: order.datos_envio?.nombre || email.split('@')[0],
-      ordenId: order.id, items: order.items, total: order.total,
-      hasCurso: courseIds.size > 0,
-      hasProductoFisico: order.items.some((i: { id: string }) => !courseIds.has(i.id)),
-      accessUrl,
-    })
+    if (!job.confirmation_sent_at) {
+      await sendOrderConfirmation({
+        to: email, nombreCliente: order.datos_envio?.nombre || email.split('@')[0],
+        ordenId: order.id, items: order.items, total: order.total,
+        hasCurso: courseIds.size > 0,
+        hasProductoFisico: order.items.some((i: { id: string }) => !courseIds.has(i.id)),
+        accessUrl,
+      })
+      const { error: confirmationError } = await db.from('payment_fulfillments')
+        .update({ confirmation_sent_at: new Date().toISOString() })
+        .eq('order_id', orderId).eq('lease_id', lease)
+      if (confirmationError) throw confirmationError
+    }
+    const ninaCourse = courses?.find(c => c.slug === 'day-to-night-glow')
+    if (ninaCourse && !job.nina_welcome_sent_at) {
+      await sendNinaWelcome({ to: email, ordenId: order.id, courseId: ninaCourse.id })
+      const { error: welcomeError } = await db.from('payment_fulfillments')
+        .update({ nina_welcome_sent_at: new Date().toISOString() })
+        .eq('order_id', orderId).eq('lease_id', lease)
+      if (welcomeError) throw welcomeError
+    }
     const { error: sentError } = await db.from('payment_fulfillments')
       .update({ email_sent_at: new Date().toISOString(), access_url: null, locked_until: null })
       .eq('order_id', orderId).eq('lease_id', lease)
