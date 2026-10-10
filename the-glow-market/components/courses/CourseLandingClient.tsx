@@ -7,8 +7,8 @@ import AddToCartCurso from '@/components/courses/AddToCartCurso'
 import SocialProofPopup from '@/components/courses/SocialProofPopup'
 import type { Curso } from '@/types'
 
-const bodyFont = DM_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--course-body-font', display: 'swap' })
-const titleFont = Playfair_Display({ subsets: ['latin'], weight: ['500', '600', '700'], style: ['normal', 'italic'], variable: '--course-title-font', display: 'swap' })
+const bodyFont = DM_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--course-body-font', display: 'swap', preload: false })
+const titleFont = Playfair_Display({ subsets: ['latin'], weight: ['500', '600', '700'], style: ['normal', 'italic'], variable: '--course-title-font', display: 'swap', preload: false })
 
 // Video de Nina alojado en Supabase.
 const TRANSFORMATION_VIDEO_URL = 'https://daevvoumyxwgwqfbafvn.supabase.co/storage/v1/object/public/product-images/antes-despues.MOV'
