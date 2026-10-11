@@ -77,7 +77,7 @@ export default function LessonSidebar({
               return (
                 <Link
                   key={leccion.id}
-                  href={`/mi-curso/${leccion.id}`}
+                  href={`/mi-curso/${leccion.id}#video-section`}
                   className={`flex items-start gap-3 px-6 py-3.5 transition-all duration-200 border-l-2 ${
                     isActive
                       ? 'bg-white/10 border-glow-blush'

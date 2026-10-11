@@ -103,7 +103,7 @@ export default async function LeccionPage({ params }: Props) {
           </nav>
         </div>
 
-        <div className="px-6 md:px-10">
+        <div id="video-section" className="px-6 md:px-10">
           <VideoPlayer lessonId={leccion.id} title={leccion.titulo} />
         </div>
 
