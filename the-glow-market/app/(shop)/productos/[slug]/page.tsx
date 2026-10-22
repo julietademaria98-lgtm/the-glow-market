@@ -1,3 +1,4 @@
+import { catalogData } from '@/lib/catalog-result'
 import '@/components/shop/market.css'
 
 import { createClient } from '@/lib/supabase/server'
@@ -16,14 +17,14 @@ interface Props {
 async function getProducto(slug: string): Promise<Producto | null> {
   const supabase = await createClient()
 
-  const { data } = await supabase
+  const result = await supabase
     .from('productos')
     .select('*, imagenes:producto_imagenes(*)')
     .eq('slug', slug)
     .eq('activo', true)
-    .single()
+    .maybeSingle()
 
-  return data as Producto | null
+  return catalogData(result, 'producto') as Producto | null
 }
 
 async function getRelacionados(
@@ -32,7 +33,7 @@ async function getRelacionados(
 ): Promise<Producto[]> {
   const supabase = await createClient()
 
-  const { data } = await supabase
+  const result = await supabase
     .from('productos')
     .select('*, imagenes:producto_imagenes(*)')
     .eq('categoria', categoria)
@@ -40,7 +41,7 @@ async function getRelacionados(
     .neq('id', excludeId)
     .limit(4)
 
-  return (data || []) as Producto[]
+  return (catalogData(result, 'relacionados') || []) as Producto[]
 }
 
 export async function generateMetadata({

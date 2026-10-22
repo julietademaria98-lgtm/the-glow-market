@@ -1,3 +1,4 @@
+import { catalogData } from '@/lib/catalog-result'
 import '@/components/shop/market.css'
 
 import { createClient } from '@/lib/supabase/server'
@@ -44,8 +45,8 @@ async function getProductos(categoria?: string): Promise<Producto[]> {
     query = query.eq('categoria', categoria)
   }
 
-  const { data } = await query
-  const productos = (data || []) as Producto[]
+  const result = await query
+  const productos = (catalogData(result, 'productos') || []) as Producto[]
 
   // Los productos sin stock quedan al final.
   // Dentro de cada grupo se conserva el orden original.
