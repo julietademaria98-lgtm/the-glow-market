@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { catalogData } from '@/lib/catalog-result'
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
