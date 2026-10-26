@@ -907,8 +907,8 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
 .hero-purchase .course-foot{font-size:20px;line-height:1.8;margin:28px 0 0;opacity:1}
 .hero-purchase strong,.course-lead-strong{font-weight:700;background:linear-gradient(transparent 72%,#e1c8cb 72%);box-decoration-break:clone;-webkit-box-decoration-break:clone;padding-bottom:2px}
 @media(max-width:600px){
-.course-hero{gap:0;padding-bottom:0}
-.course-hero-copy{padding-bottom:24px}
+.course-hero{gap:0;padding-bottom:0;align-items:stretch}
+.course-hero-copy{width:100%;max-width:100%;align-self:stretch;padding-bottom:24px}
 .course-hero-video{width:88%;margin:0 auto}
 .hero-purchase{margin:18px 0 24px;padding:0 18px}
 .hero-purchase .course-cta{font-size:16px;padding:18px 28px}
