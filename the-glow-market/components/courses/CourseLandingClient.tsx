@@ -1,7 +1,5 @@
 'use client'
 
-import { useState } from 'react'
-import Image from 'next/image'
 import { DM_Sans, Playfair_Display } from 'next/font/google'
 import AddToCartCurso from '@/components/courses/AddToCartCurso'
 import SocialProofPopup from '@/components/courses/SocialProofPopup'
@@ -45,87 +43,26 @@ const FAQ = [
 ]
 
 export default function CourseLandingClient({ curso }: { curso: Curso }) {
-  const [isNight, setIsNight] = useState(false)
-
-  const imgUrl = 'https://daevvoumyxwgwqfbafvn.supabase.co/storage/v1/object/public/product-images/nina-glow-fondo-claro.png'
   const pink = '#E1C8CB'
 
   return (
-    <main className={`course-landing ${bodyFont.variable} ${titleFont.variable}${isNight ? ' night' : ''}`}>
+    <main className={`course-landing ${bodyFont.variable} ${titleFont.variable}`}>
       <SocialProofPopup cursoNombre={curso.titulo} />
 
       {/* Hero */}
       <div className="course-hero">
         <div className="course-hero-copy">
           <p className="course-eyebrow">Por Nina Amateis · Sponsored by Clarins</p>
-          <h1 className="course-h1">
-            Day to<br />
-            <em className="course-h1-em">night glow.</em>
-          </h1>
-          <p className="course-lead">
-            Aprendé a maquillarte de manera profesional{' '}
-            <strong className="course-lead-strong">en menos de 30 minutos.</strong>
-          </p>
-          <p className="course-sub">
-            Pocos productos. Piel divina. Maquillaje de día a noche en pocos pasos.
-          </p>
-          <div style={{ margin: '20px 0' }}>
-            <a href="#inscripcion" className="course-cta">
-              Quiero hacer el curso
-            </a>
-          </div>
-          <p className="course-foot">100% online &nbsp;/&nbsp; A tu ritmo &nbsp;/&nbsp; Para siempre</p>
+          <h1 className="course-h1">Day to<br /><em className="course-h1-em">night glow.</em></h1>
+          <p className="course-lead">Aprendé con Nina a crear <strong className="course-lead-strong">tu look de día</strong> y <strong className="course-lead-strong">transformarlo para la noche</strong>, paso a paso.</p>
         </div>
-
-        <div className="course-hero-visual">
-          {imgUrl ? (
-            <Image
-              src={imgUrl}
-              alt="Nina Amateis con los productos del curso Day to Night Glow"
-              fill
-              className="course-hero-img"
-              priority
-              sizes="(max-width: 600px) 88vw, 50vw"
-            />
-          ) : (
-            <div className="course-hero-placeholder">
-              <p>Aprendé a brillar<br />todos los días.</p>
-            </div>
-          )}
-          <div className="course-hero-gradient" />
-
-          {/* Day / Night toggle */}
-          <div className="course-mode">
-            {(['day', 'night'] as const).map((m) => (
-              <button
-                key={m}
-                type="button"
-                aria-pressed={(m === 'night') === isNight}
-                className={`course-mode-btn${(m === 'night') === isNight ? ' active' : ''}`}
-                onClick={() => setIsNight(m === 'night')}
-              >
-                {m === 'day' ? '☀ Day' : '☾ Night'}
-              </button>
-            ))}
-          </div>
-
-          {/* Seal */}
-          <div className="course-seal">
-            TU RUTINA EN
-            <b className="course-seal-b">&lt; 30</b>
-            MINUTOS
-          </div>
-
-          {/* Caption */}
-          <div className="course-caption">
-            <div>
-              <small className="course-caption-small">MENOS PASOS. MÁS VOS.</small>
-              <br />
-              <strong className="course-caption-title">
-                {isNight ? 'Lista para que siga la noche.' : 'Tu glow de todos los días.'}
-              </strong>
-            </div>
-          </div>
+        <div className="course-hero-video">
+          <video autoPlay muted loop playsInline controls preload="metadata" src={TRANSFORMATION_VIDEO_URL} aria-label="Antes y después del maquillaje de Nina" />
+        </div>
+        <div className="hero-purchase">
+          <a href="#inscripcion" className="course-cta">Quiero hacer el curso</a>
+          <p className="purchase-clarity">No necesitás experiencia.<br />Podés usar el maquillaje que ya tenés.</p>
+          <p className="course-foot"><strong>100% online</strong> &nbsp;/&nbsp; <strong>A tu ritmo</strong> &nbsp;/&nbsp; <strong>Para siempre</strong></p>
         </div>
       </div>
 
@@ -136,23 +73,8 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
         </span>
       </div>
 
-      {/* Antes y después de Nina. */}
-      <section className="course-section course-transformation" aria-labelledby="course-transformation-title">
-        <div className="course-transformation-media">
-          {TRANSFORMATION_VIDEO_URL ? (
-            <video autoPlay muted loop playsInline preload="auto" src={TRANSFORMATION_VIDEO_URL}
-              aria-label="Nina antes del curso y con el maquillaje llevado a noche" />
-          ) : (
-            <div className="course-video-pending"><span>✦</span><p>El glow, paso a paso.</p></div>
-          )}
-        </div>
-        <div className="course-transformation-copy">
-          <p className="course-eyebrow">Day to night glow</p>
-          <h2 className="course-h2" id="course-transformation-title">Así empezás.<br /><em>Así quedás llevándolo a noche.</em></h2>
-          <p className="course-transformation-description">De tu piel al natural a un makeup de noche, paso a paso y con pocos productos.</p>
-          <a className="course-cta" href="#inscripcion">Quiero aprender</a>
-        </div>
-      </section>
+      {/* Testimonios proporcionados por la clienta. */}
+      <section className="preview-stories" aria-labelledby="stories-title"><p className="stories-eyebrow">EL CAMBIO, EN PRIMERA PERSONA</p><h2 id="stories-title">Pequeños pasos.<br /><em>Otra confianza.</em></h2><div className="stories-grid"><figure className="story story-pink"><span className="story-mark" aria-hidden="true">“</span><blockquote>Tenía un neceser repleto de productos y siempre usaba lo mismo. Me encantó aprender para qué sirve cada producto y animarme a un look más de noche.</blockquote><figcaption>Victoria · +40 años</figcaption></figure><figure className="story story-blue"><span className="story-mark" aria-hidden="true">“</span><blockquote>Me encantó aprender a pasar del look de día al de noche sin empezar todo de nuevo. ¡Para las que vamos a la oficina todo el día es clave!</blockquote><figcaption>Josefina · 29 años</figcaption></figure><figure className="story story-navy"><span className="story-mark" aria-hidden="true">“</span><blockquote>Pensaba que maquillarme era complicado. Ver el paso a paso y poder repetirlo a mi ritmo me sirvió muchísimo. ¡Gracias, Nina!</blockquote><figcaption>Eugenia · 55 años</figcaption></figure></div></section>
 
       {/* Intro quote */}
       <section className="course-section course-intro">
@@ -161,9 +83,6 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           “Este curso lo armé para vos, mujeres reales que quieren salir prolijas y se cansaron de probar <span className="course-quote-ending">productos que no usan.”</span>
         </blockquote>
         <p className="course-author">NINA AMATEIS</p>
-        <p className="course-method">
-          Te enseño el método que uso todos los días para tener piel divina y un maquillaje que no se va.
-        </p>
       </section>
 
       {/* Para vos */}
@@ -978,7 +897,26 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
 .course-intro::before{content:'✦';display:block;color:#E1C8CB;font-size:38px;line-height:1;margin:0 auto 24px}
 .course-intro .course-eyebrow,.course-intro .course-author{color:#E1C8CB}
 .course-intro .course-quote,.course-intro .course-method{color:#E9E2DA}
-      `}</style>
+
+.course-hero{height:auto;min-height:0;align-items:center;padding-bottom:48px;row-gap:24px}
+.course-hero-video{min-width:0;align-self:center;margin:20px 6% 20px 0;border-radius:16px;overflow:hidden}
+.course-hero-video video{display:block;width:100%;height:auto;object-fit:contain}
+.hero-purchase{grid-column:1 / -1;width:100%;text-align:center;padding:0 20px 16px}
+.hero-purchase .course-cta{font-size:19px;padding:20px 36px}
+.purchase-clarity{font-size:19px;line-height:1.65;margin:14px 0 0}
+.hero-purchase .course-foot{font-size:20px;line-height:1.8;margin:28px 0 0;opacity:1}
+.hero-purchase strong,.course-lead-strong{font-weight:700;background:linear-gradient(transparent 72%,#e1c8cb 72%);box-decoration-break:clone;-webkit-box-decoration-break:clone;padding-bottom:2px}
+@media(max-width:600px){
+.course-hero{gap:0;padding-bottom:0}
+.course-hero-copy{padding-bottom:24px}
+.course-hero-video{width:88%;margin:0 auto}
+.hero-purchase{margin:18px 0 24px;padding:0 18px}
+.hero-purchase .course-cta{font-size:16px;padding:18px 28px}
+.purchase-clarity{font-size:14px;margin-top:12px}
+.hero-purchase .course-foot{font-size:14px;margin-top:20px}
+}
+.preview-stories{max-width:1320px;margin:0 auto;padding:70px 5% 25px;text-align:center;color:#192149}.stories-eyebrow{font-size:11px;letter-spacing:3px;font-weight:600;margin:0 0 20px}.preview-stories h2{font-family:var(--course-title-font),Georgia,serif;font-size:46px;font-weight:500;line-height:1.15;margin:0}.stories-disclaimer{font-size:12px;line-height:1.5;margin:20px auto 30px;max-width:610px}.stories-grid{margin-top:30px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}.story{margin:0;padding:25px 28px 30px;border-radius:32px;text-align:left;display:flex;flex-direction:column;position:relative}.story:after{content:'';position:absolute;bottom:-11px;left:42px;width:25px;height:25px;transform:rotate(45deg);background:inherit;border-radius:4px}.story-pink{background:#e1c8cb;color:#192149}.story-blue{background:#1a4c81;color:#fff}.story-navy{background:#192149;color:#e9e2da}.story-mark{font-family:Georgia,serif;font-size:65px;line-height:.8;opacity:.65}.story blockquote{font-size:19px;line-height:1.6;margin:10px 0 24px}.story figcaption{font-size:11px;letter-spacing:.3px;margin-top:auto;opacity:.85}@media(max-width:600px){.preview-stories{padding:45px 24px 10px}.preview-stories h2{font-size:35px}.stories-grid{grid-template-columns:1fr;gap:28px}.story{padding:26px;border-radius:27px}.story blockquote{font-size:18px}.stories-disclaimer{font-size:12px}}
+`}</style>
     </main>
   )
 }
