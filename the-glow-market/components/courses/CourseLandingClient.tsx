@@ -235,7 +235,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           <div className="gl-price-card">
             <span className="gl-price-pill">Cupos limitados · 30 a precio de lanzamiento</span>
             <p className="gl-old-price">{fmt(precioOriginal)}</p>
-            <p className="gl-big-price">{fmt(precio)}</p>
+            <p className="gl-big-price"><span className="gl-peso">$</span>{fmt(precio).replace('$', '')}</p>
             <p className="gl-cuotas">3 cuotas sin interés de <strong>{fmt(cuota)}</strong></p>
             <p className="gl-acceso"><strong>Pago único y acceso de por vida</strong></p>
             <button className={`gl-buy-btn${added ? ' gl-buy-btn--ok' : ''}`} onClick={handleComprar}>
@@ -409,6 +409,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           font-weight: 400; line-height: 1; margin: 0 0 16px; color: var(--ink);
           letter-spacing: -2px;
         }
+        .gl-peso { font-family: var(--bf); font-size: 0.55em; vertical-align: 0.18em; letter-spacing: 0; }
         .gl-cuotas { font-size: 17px; margin: 0 0 12px; }
         .gl-acceso {
           font-size: 15px; margin: 0 0 28px;
