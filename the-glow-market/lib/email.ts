@@ -147,38 +147,58 @@ export async function sendGuiaEmail({ to, nombre, token }: { to: string; nombre:
     from: 'Nina de The Glow Market <hola@theglowmarket.com.ar>',
     to,
     subject: 'Tus 7 infaltables ya están acá ✦',
-    html: `
-<!DOCTYPE html>
+    html: `<!DOCTYPE html>
 <html lang="es">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#d9d0c7;font-family:Arial,sans-serif">
-<div style="max-width:580px;margin:0 auto;padding:32px 20px">
-  <div style="background:#e9e2da;border-radius:6px;overflow:hidden">
-    <div style="background:#e9e2da;border-bottom:1px solid #cfc5bb;padding:24px;text-align:center">
-      <p style="margin:0;font-family:Arial,sans-serif;font-size:11px;letter-spacing:0.3em;color:#192149;text-transform:uppercase">
-        THE <span style="font-family:Georgia,serif;font-size:24px;font-weight:400">GLOW</span> MARKET
-      </p>
-    </div>
-    <div style="padding:40px 40px 32px;display:flex;flex-direction:column;gap:20px">
-      <p style="margin:0;font-size:12px;font-weight:700;letter-spacing:0.2em;color:#192149">✦ TU GUÍA GRATIS</p>
-      <h1 style="margin:0;font-family:Georgia,serif;font-weight:400;font-size:32px;line-height:1.2;color:#192149">Hola ${primerNombre}, <em>acá tenés tus 7 infaltables.</em></h1>
-      <p style="margin:0;font-size:16px;line-height:1.65;color:#192149">Armé esta guía para que dejes de comprar productos que no usás. Son los 7 que tenés que tener sí o sí en tu neceser, para la mañana, la tarde y la noche.</p>
-      <div style="background:#192149;border-radius:12px;padding:28px;margin:8px 0">
-        <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:0.2em;color:#e1c8cb">GUÍA GRATUITA · NINA AMATEIS</p>
-        <p style="margin:0 0 16px;font-family:Georgia,serif;font-size:28px;line-height:1.15;color:#e9e2da">Los 7 infaltables <em>de Nina</em></p>
-        <a href="${link}" style="display:inline-block;background:#e1c8cb;color:#192149;text-decoration:none;font-size:16px;font-weight:700;padding:16px 36px;border-radius:999px">Ver mi guía</a>
-      </div>
-      <div style="border-top:1px solid #cfc5bb;padding-top:20px">
-        <p style="margin:0;font-size:16px;line-height:1.65;color:#192149">¿Y después? Tener los productos es la mitad. En mi curso <strong>Day to Night Glow</strong> te enseño a usarlos para que el maquillaje te acompañe de la mañana a la noche.</p>
-      </div>
-      <a href="${BASE_URL}/cursos/day-to-night-glow" style="display:inline-block;border:1.5px solid #192149;color:#192149;text-decoration:none;font-size:15px;font-weight:500;padding:14px 32px;border-radius:999px;text-align:center">Conocer el curso</a>
-      <p style="margin:8px 0 0;font-size:16px;font-family:Georgia,serif;font-style:italic;color:#192149">Un beso, Nina</p>
-    </div>
-    <div style="background:#e1c8cb;padding:14px;text-align:center;font-size:12px;line-height:1.6;color:#192149">
-      The Glow Market · theglowmarket.com.ar · <a href="${unsubLink}" style="color:#192149">Darme de baja</a>
-    </div>
-  </div>
-</div>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tus 7 infaltables</title>
+</head>
+<body style="margin:0;padding:0;background-color:#d9d0c7;font-family:Arial,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#d9d0c7">
+  <tr><td align="center" style="padding:32px 20px">
+    <table width="580" cellpadding="0" cellspacing="0" border="0" style="max-width:580px;background-color:#e9e2da;border-radius:6px;overflow:hidden">
+
+      <!-- Header -->
+      <tr><td style="background-color:#e9e2da;border-bottom:1px solid #cfc5bb;padding:24px;text-align:center">
+        <p style="margin:0;font-family:Arial,sans-serif;font-size:11px;letter-spacing:0.3em;color:#192149;text-transform:uppercase">THE <span style="font-family:Georgia,serif;font-size:22px;font-weight:400">GLOW</span> MARKET</p>
+      </td></tr>
+
+      <!-- Body -->
+      <tr><td style="padding:40px 40px 32px">
+        <p style="margin:0 0 16px;font-size:12px;font-weight:700;letter-spacing:0.2em;color:#192149">✦ TU GUÍA GRATIS</p>
+        <h1 style="margin:0 0 20px;font-family:Georgia,serif;font-weight:400;font-size:30px;line-height:1.2;color:#192149">Hola ${primerNombre}, <em>acá tenés tus 7 infaltables.</em></h1>
+        <p style="margin:0 0 28px;font-size:16px;line-height:1.65;color:#192149">Armé esta guía para que dejes de comprar productos que no usás. Son los 7 que tenés que tener sí o sí en tu neceser, para la mañana, la tarde y la noche.</p>
+
+        <!-- CTA card -->
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px">
+          <tr><td style="background-color:#192149;border-radius:12px;padding:28px;text-align:center">
+            <p style="margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:0.2em;color:#e1c8cb;text-transform:uppercase">GUÍA GRATUITA · NINA AMATEIS</p>
+            <p style="margin:0 0 20px;font-family:Georgia,serif;font-size:26px;line-height:1.2;color:#e9e2da;font-weight:400">Los 7 infaltables <em>de Nina</em></p>
+            <a href="${link}" style="display:inline-block;background-color:#e1c8cb;color:#192149;text-decoration:none;font-family:Arial,sans-serif;font-size:16px;font-weight:700;padding:16px 40px;border-radius:999px">Ver mi guía</a>
+          </td></tr>
+        </table>
+
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #cfc5bb;margin-bottom:24px">
+          <tr><td style="padding-top:24px">
+            <p style="margin:0 0 20px;font-size:16px;line-height:1.65;color:#192149">¿Y después? Tener los productos es la mitad. En mi curso <strong>Day to Night Glow</strong> te enseño a usarlos para que el maquillaje te acompañe de la mañana a la noche.</p>
+            <table cellpadding="0" cellspacing="0" border="0">
+              <tr><td style="border:1.5px solid #192149;border-radius:999px">
+                <a href="${BASE_URL}/cursos/day-to-night-glow" style="display:inline-block;color:#192149;text-decoration:none;font-family:Arial,sans-serif;font-size:15px;font-weight:500;padding:13px 32px">Conocer el curso</a>
+              </td></tr>
+            </table>
+          </td></tr>
+        </table>
+
+        <p style="margin:0;font-size:16px;font-family:Georgia,serif;font-style:italic;color:#192149">Un beso, Nina</p>
+      </td></tr>
+
+      <!-- Footer -->
+      <tr><td style="background-color:#e1c8cb;padding:16px;text-align:center;font-family:Arial,sans-serif;font-size:12px;line-height:1.6;color:#192149">
+        The Glow Market &middot; theglowmarket.com.ar &middot; <a href="${unsubLink}" style="color:#192149">Darme de baja</a>
+      </td></tr>
+
+    </table>
+  </td></tr>
+</table>
 </body>
 </html>`,
   })
