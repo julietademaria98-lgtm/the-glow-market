@@ -6,8 +6,8 @@ import AddToCartCurso from '@/components/courses/AddToCartCurso'
 import SocialProofPopup from '@/components/courses/SocialProofPopup'
 import type { Curso } from '@/types'
 
-const bodyFont = DM_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--bf', display: 'swap', preload: false })
-const titleFont = Playfair_Display({ subsets: ['latin'], weight: ['400', '500'], style: ['normal', 'italic'], variable: '--tf', display: 'swap', preload: false })
+const bodyFont = DM_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-body', display: 'swap', preload: false })
+const titleFont = Playfair_Display({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-title', display: 'swap', preload: false })
 
 const VIDEO_URL = 'https://daevvoumyxwgwqfbafvn.supabase.co/storage/v1/object/public/product-images/antes-despues.MOV'
 const NINA_IMG = 'https://daevvoumyxwgwqfbafvn.supabase.co/storage/v1/object/public/product-images/nina-glow-fondo-claro.png'
@@ -249,8 +249,8 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           --pink: #e1c8cb;
           --blue: #1a4c81;
           --mid: #20699f;
-          --bf: var(--bf, 'DM Sans', Arial, sans-serif);
-          --tf: var(--tf, 'Playfair Display', Georgia, serif);
+          --bf: var(--font-body, 'DM Sans', Arial, sans-serif);
+          --tf: var(--font-title, 'Playfair Display', Georgia, serif);
           font-family: var(--bf);
           background: var(--paper);
           color: var(--ink);
