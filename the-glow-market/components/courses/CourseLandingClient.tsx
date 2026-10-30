@@ -1,8 +1,9 @@
 'use client'
 
 import Image from 'next/image'
+import { useState } from 'react'
 import { DM_Sans, Playfair_Display } from 'next/font/google'
-import AddToCartCurso from '@/components/courses/AddToCartCurso'
+import { useCartStore } from '@/store/cartStore'
 import SocialProofPopup from '@/components/courses/SocialProofPopup'
 import type { Curso } from '@/types'
 
@@ -41,6 +42,26 @@ const FAQ = [
 ]
 
 export default function CourseLandingClient({ curso }: { curso: Curso }) {
+  const [added, setAdded] = useState(false)
+  const addItem = useCartStore((state) => state.addItem)
+  const precio = Number(curso.precio_oferta ?? curso.precio)
+  const precioOriginal = Number(curso.precio)
+  const cuota = Math.ceil(precio / 3)
+  const fmt = (n: number) => `$${n.toLocaleString('es-AR')}`
+
+  const handleComprar = () => {
+    addItem({
+      id: curso.id,
+      slug: curso.slug,
+      nombre: curso.titulo,
+      precio,
+      imagen_url: curso.imagen_url || '',
+      tipo: 'curso',
+    })
+    setAdded(true)
+    setTimeout(() => setAdded(false), 2000)
+  }
+
   return (
     <main className={`glow-landing ${bodyFont.variable} ${titleFont.variable}`}>
       <SocialProofPopup cursoNombre={curso.titulo} />
@@ -213,7 +234,13 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           </div>
           <div className="gl-price-card">
             <span className="gl-price-pill">Cupos limitados · 30 a precio de lanzamiento</span>
-            <AddToCartCurso curso={curso} />
+            <p className="gl-old-price">{fmt(precioOriginal)}</p>
+            <p className="gl-big-price">{fmt(precio)}</p>
+            <p className="gl-cuotas">3 cuotas sin interés de <strong>{fmt(cuota)}</strong></p>
+            <p className="gl-acceso"><strong>Pago único y acceso de por vida</strong></p>
+            <button className={`gl-buy-btn${added ? ' gl-buy-btn--ok' : ''}`} onClick={handleComprar}>
+              {added ? '✓ Agregado al carrito' : 'Quiero hacer el curso'}
+            </button>
             <div className="gl-mp-trust">
               <img src="/mercadopago-logo.png" alt="Mercado Pago" className="gl-mp-logo" />
               <p className="gl-fine">Pagás seguro con Mercado Pago</p>
@@ -366,16 +393,40 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
         .gl-includes li { padding: 12px 0; border-bottom: 1px solid rgba(25,33,73,.13); font-size: 15px; }
         .gl-includes li::before { content: '✓'; margin-right: 12px; font-weight: 700; }
         .gl-price-card {
-          background: #f8f4ef; border-radius: 24px; padding: 42px;
-          text-align: center; box-shadow: 0 20px 50px rgba(25,33,73,.07);
+          background: #f8f4ef; border-radius: 24px; padding: 44px 48px;
+          text-align: center; box-shadow: 0 20px 50px rgba(25,33,73,.08);
         }
         .gl-price-pill {
-          display: inline-block; background: var(--pink); padding: 7px 16px;
-          border-radius: 40px; font-size: 12px; margin-bottom: 20px;
+          display: inline-block; background: rgba(25,33,73,.08); padding: 8px 20px;
+          border-radius: 40px; font-size: 13px; margin-bottom: 24px; color: var(--ink);
         }
-        .gl-mp-trust { display: flex; flex-direction: column; align-items: center; margin-top: 16px; }
-        .gl-mp-logo { height: 52px; width: auto; }
-        .gl-fine { font-size: 12px; margin: 6px 0 0; opacity: .7; }
+        .gl-old-price {
+          font-size: 20px; text-decoration: line-through; opacity: .45;
+          margin: 0 0 8px; font-family: var(--bf);
+        }
+        .gl-big-price {
+          font-family: var(--tf); font-size: clamp(56px, 6vw, 80px);
+          font-weight: 400; line-height: 1; margin: 0 0 16px; color: var(--ink);
+          letter-spacing: -2px;
+        }
+        .gl-cuotas { font-size: 17px; margin: 0 0 12px; }
+        .gl-acceso {
+          font-size: 15px; margin: 0 0 28px;
+          text-decoration: underline; text-decoration-color: var(--pink);
+          text-underline-offset: 4px; text-decoration-thickness: 2px;
+        }
+        .gl-buy-btn {
+          display: block; width: 100%; padding: 20px;
+          background: var(--ink); color: #fff; border: none; cursor: pointer;
+          border-radius: 50px; font-size: 16px; font-weight: 600;
+          font-family: var(--bf); letter-spacing: .3px;
+          transition: background .2s;
+        }
+        .gl-buy-btn:hover { background: var(--blue); }
+        .gl-buy-btn--ok { background: #2d6a2d; }
+        .gl-mp-trust { display: flex; flex-direction: column; align-items: center; margin-top: 24px; }
+        .gl-mp-logo { height: 56px; width: auto; }
+        .gl-fine { font-size: 13px; margin: 8px 0 0; opacity: .6; }
 
         /* ── FAQ ── */
         .gl-faq { }
