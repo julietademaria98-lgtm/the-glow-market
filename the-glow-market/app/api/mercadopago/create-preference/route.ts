@@ -15,13 +15,14 @@ const schema = z.object({
     ciudad: z.string().max(100).optional(), direccion: z.string().max(300).optional(),
     codigo_postal: z.string().max(20).optional(), notas: z.string().max(1000).optional(),
   }),
+  cuponCodigo: z.string().trim().toUpperCase().max(40).optional().nullable(),
 })
 
 export async function POST(request: Request) {
   try {
     const parsed = schema.safeParse(await request.json())
     if (!parsed.success) return NextResponse.json({ error: 'Revisá los datos de contacto y el carrito.' }, { status: 400 })
-    const { items: requested, datosEnvio } = parsed.data
+    const { items: requested, datosEnvio, cuponCodigo } = parsed.data
     if (new Set(requested.map(i => i.id)).size !== requested.length) return NextResponse.json({ error: 'Hay productos repetidos en el carrito.' }, { status: 400 })
     const db = createAdminClient()
     const ids = requested.map(i => i.id)
@@ -54,6 +55,27 @@ export async function POST(request: Request) {
     if (items.some(i => i.tipo === 'producto') && (!datosEnvio.direccion || !datosEnvio.ciudad || !datosEnvio.provincia || !datosEnvio.codigo_postal)) {
       return NextResponse.json({ error: 'Completá la dirección de envío.' }, { status: 400 })
     }
+
+    // Validar y aplicar cupón (solo para pedidos de productos, sin cursos)
+    let cuponDescuento = 0
+    let cuponValidado: string | null = null
+    let cuponUsosActuales = 0
+    if (cuponCodigo) {
+      const hasCurso = items.some(i => i.tipo === 'curso')
+      if (hasCurso) return NextResponse.json({ error: 'El cupón es válido solo para neceseres, no para cursos.' }, { status: 400 })
+      const { data: cupon } = await db.from('cupones').select('*').eq('codigo', cuponCodigo).eq('activo', true).single()
+      if (!cupon) return NextResponse.json({ error: 'Cupón inválido o vencido.' }, { status: 400 })
+      if (cupon.usos_maximos && cupon.usos_actuales >= cupon.usos_maximos) return NextResponse.json({ error: 'Este cupón ya fue utilizado.' }, { status: 400 })
+      cuponDescuento = Number(cupon.descuento_porcentaje)
+      cuponValidado = cupon.codigo
+      cuponUsosActuales = Number(cupon.usos_actuales)
+      for (const item of items) {
+        if (item.tipo === 'producto') {
+          item.precio = Math.round(item.precio * (1 - cuponDescuento / 100))
+        }
+      }
+    }
+
     // El usuario se asocia tras el pago al EMAIL DE COMPRA, incluso si hay otra sesión abierta.
     const { data: order, error } = await db.from('ordenes').insert({
       user_id: null, estado: 'pendiente', total: items.reduce((sum, i) => sum + i.precio * i.quantity, 0),
@@ -64,6 +86,9 @@ export async function POST(request: Request) {
     const preference = await createPreference(items, order.id)
     const { error: saveError } = await db.from('ordenes').update({ mp_preference_id: preference.id }).eq('id', order.id)
     if (saveError) throw saveError
+    if (cuponValidado) {
+      await db.from('cupones').update({ usos_actuales: cuponUsosActuales + 1 }).eq('codigo', cuponValidado)
+    }
     return NextResponse.json({ preference_id: preference.id, init_point: preference.init_point, sandbox_init_point: preference.sandbox_init_point })
   } catch {
     return NextResponse.json({ error: 'No pudimos iniciar el pago. Intentá nuevamente.' }, { status: 500 })

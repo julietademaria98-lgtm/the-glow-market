@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { DM_Sans, Playfair_Display } from 'next/font/google'
 import { useCartStore } from '@/store/cartStore'
 import SocialProofPopup from '@/components/courses/SocialProofPopup'
+import GuiaForm from '@/components/courses/GuiaForm'
 import type { Curso } from '@/types'
 
 const bodyFont = DM_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-body', display: 'swap', preload: false })
@@ -33,6 +34,7 @@ const FAQ = [
   { q: '¿Cuánto dura el curso?', a: 'Los 4 módulos suman unos 25 minutos de video. Y una vez que aprendés el método, tu rutina te lleva pocos minutos.' },
   { q: '¿Cuándo lo puedo ver?', a: 'Apenas confirmás tu compra, te llega un mail con tu acceso. Podés empezar al minuto, desde la compu o el celular.' },
   { q: '¿Necesito crear una cuenta antes de comprar?', a: 'No. Comprás primero y creás tu cuenta gratis después, con el mismo email que usaste en la compra. En cuanto inicies sesión, el curso se activa solo.' },
+  { q: '¿Qué pasa si no me sale algún paso?', a: 'Escribís tu duda en la comunidad privada de alumnas y te respondo. Podés mandar una foto de tu look y te digo qué ajustar.' },
   { q: '¿Necesito comprar todos los productos Clarins?', a: 'No. El curso te sirve aunque uses productos que ya tenés. Recomendamos Clarins porque son los que funcionan con este método, y las alumnas tienen un beneficio exclusivo.' },
   { q: '¿Tengo acceso para siempre?', a: 'Sí. Una vez que comprás el curso, lo tenés disponible para siempre, con todas las actualizaciones que vayamos sumando.' },
   { q: '¿Sirve si nunca me maquillé?', a: 'Sí. El método arranca desde cero, preparando la piel, y está pensado para quien nunca se maquilló.' },
@@ -77,10 +79,11 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
             <em><span className="gl-mark">sin empezar de cero.</span></em>
           </h1>
           <p className="gl-intro">
-            Con el Método Day to Night vas a aprender, en 4 pasos simples, cómo maquillarte a la mañana con un look natural, retocarte a la tarde y pasar a la noche sin desarmar nada.
+            Con el Método Day to Night vas a aprender, en 4 pasos simples, cómo maquillarte a la mañana con un look natural, retocarte a la tarde y transformarlo para la noche en pocos minutos.
           </p>
-          <div style={{ marginTop: 32, marginBottom: 16 }}>
+          <div style={{ marginTop: 32, marginBottom: 16, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '16px' }}>
             <a className="gl-btn" href="#inscripcion">Quiero hacer el curso</a>
+            <a className="gl-link-guia" href="#guia-gratis">Recibí la guía gratis →</a>
           </div>
           <p className="gl-perks">
             <span className="gl-mark">100% online</span>{' '}&nbsp;/{' '}&nbsp;
@@ -96,7 +99,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
             <source src={VIDEO_URL} type="video/mp4" />
           </video>
           <div className="gl-clarins-brand">
-            <span>Esponsoreado por</span>
+            <span>En alianza con</span>
             <img src="/clarins-logo.webp" alt="Clarins Paris" className="gl-clarins-logo" />
           </div>
         </div>
@@ -218,6 +221,22 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
         </div>
       </section>
 
+      {/* ── 7b · GUÍA GRATIS ── */}
+      <section className="gl-guia-section" id="guia-gratis">
+        <div className="gl-wrap gl-guia-inner">
+          <div className="gl-guia-copy">
+            <span className="gl-eyebrow" style={{ color: '#e1c8cb' }}>✦ GUÍA GRATIS</span>
+            <h2 className="gl-h2" style={{ color: '#e9e2da' }}>
+              Los 7 infaltables de Nina: <em>qué tener en tu neceser.</em>
+            </h2>
+            <p style={{ color: '#c9c3be', fontSize: 18, lineHeight: 1.65, margin: 0 }}>
+              ¿No sabés por dónde empezar ni qué comprarte? Dejame tu nombre y tu mail y te mando al instante mi guía con los 7 productos que tenés que tener sí o sí.
+            </p>
+          </div>
+          <GuiaForm />
+        </div>
+      </section>
+
       {/* ── 8 · PRECIO + CHECKOUT ── */}
       <section className="gl-price-section" id="inscripcion">
         <div className="gl-wrap gl-price-layout">
@@ -244,6 +263,10 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
             <div className="gl-mp-trust">
               <img src="/mercadopago-logo.png" alt="Mercado Pago" className="gl-mp-logo" />
               <p className="gl-fine">Pagás seguro con Mercado Pago</p>
+            </div>
+            <div className="gl-soporte">
+              <span aria-hidden="true">✦</span>
+              <p><strong>No te quedás sola.</strong> Si tenés dudas durante el curso, te respondo en la comunidad privada.</p>
             </div>
           </div>
         </div>
@@ -428,6 +451,29 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
         .gl-mp-trust { display: flex; flex-direction: column; align-items: center; margin-top: 24px; }
         .gl-mp-logo { height: 56px; width: auto; }
         .gl-fine { font-size: 13px; margin: 8px 0 0; opacity: .6; }
+
+        /* ── LINK GUÍA HERO ── */
+        .gl-link-guia {
+          color: var(--ink); font-size: 16px; font-weight: 500;
+          text-decoration: underline; text-underline-offset: 5px; padding: 4px 0;
+        }
+        .gl-link-guia:hover { color: var(--blue); }
+
+        /* ── GUÍA GRATIS ── */
+        .gl-guia-section { background: var(--ink); }
+        .gl-guia-inner {
+          display: flex; flex-wrap: wrap; gap: 48px; align-items: center;
+        }
+        .gl-guia-copy { flex: 1 1 380px; min-width: 0; }
+        .gl-guia-copy .gl-h2 { color: #e9e2da; }
+
+        /* ── SOPORTE ── */
+        .gl-soporte {
+          display: flex; gap: 12px; align-items: flex-start; text-align: left;
+          background: rgba(25,33,73,.06); border-radius: 12px; padding: 16px 20px;
+          margin-top: 16px;
+        }
+        .gl-soporte p { margin: 0; font-size: 15px; line-height: 1.5; }
 
         /* ── FAQ ── */
         .gl-faq { }

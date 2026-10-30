@@ -1,5 +1,7 @@
 import { Resend } from 'resend'
 
+const BASE_URL = process.env.NEXT_PUBLIC_URL ?? 'https://theglowmarket.com.ar'
+
 interface OrderItem {
   nombre: string
   cantidad: number
@@ -132,4 +134,95 @@ export async function sendOrderConfirmation({
     `,
   }, { idempotencyKey: `order-confirmation/${ordenId}` })
   if (error) throw new Error('No se pudo enviar la confirmación')
+}
+
+// ── Guía gratis "Los 7 infaltables de Nina" ──────────────────────────────────
+
+export async function sendGuiaEmail({ to, nombre, token }: { to: string; nombre: string; token: string }) {
+  const primerNombre = nombre.split(' ')[0]
+  const link = `${BASE_URL}/infaltables?t=${token}`
+  const unsubLink = `${BASE_URL}/api/guia/unsub?t=${token}`
+  const resend = new Resend(process.env.RESEND_API_KEY)
+  const { error } = await resend.emails.send({
+    from: 'Nina de The Glow Market <hola@theglowmarket.com.ar>',
+    to,
+    subject: 'Tus 7 infaltables ya están acá ✦',
+    html: `
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#d9d0c7;font-family:Arial,sans-serif">
+<div style="max-width:580px;margin:0 auto;padding:32px 20px">
+  <div style="background:#e9e2da;border-radius:6px;overflow:hidden">
+    <div style="background:#e9e2da;border-bottom:1px solid #cfc5bb;padding:24px;text-align:center">
+      <p style="margin:0;font-family:Arial,sans-serif;font-size:11px;letter-spacing:0.3em;color:#192149;text-transform:uppercase">
+        THE <span style="font-family:Georgia,serif;font-size:24px;font-weight:400">GLOW</span> MARKET
+      </p>
+    </div>
+    <div style="padding:40px 40px 32px;display:flex;flex-direction:column;gap:20px">
+      <p style="margin:0;font-size:12px;font-weight:700;letter-spacing:0.2em;color:#192149">✦ TU GUÍA GRATIS</p>
+      <h1 style="margin:0;font-family:Georgia,serif;font-weight:400;font-size:32px;line-height:1.2;color:#192149">Hola ${primerNombre}, <em>acá tenés tus 7 infaltables.</em></h1>
+      <p style="margin:0;font-size:16px;line-height:1.65;color:#192149">Armé esta guía para que dejes de comprar productos que no usás. Son los 7 que tenés que tener sí o sí en tu neceser, para la mañana, la tarde y la noche.</p>
+      <div style="background:#192149;border-radius:12px;padding:28px;margin:8px 0">
+        <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:0.2em;color:#e1c8cb">GUÍA GRATUITA · NINA AMATEIS</p>
+        <p style="margin:0 0 16px;font-family:Georgia,serif;font-size:28px;line-height:1.15;color:#e9e2da">Los 7 infaltables <em>de Nina</em></p>
+        <a href="${link}" style="display:inline-block;background:#e1c8cb;color:#192149;text-decoration:none;font-size:16px;font-weight:700;padding:16px 36px;border-radius:999px">Ver mi guía</a>
+      </div>
+      <div style="border-top:1px solid #cfc5bb;padding-top:20px">
+        <p style="margin:0;font-size:16px;line-height:1.65;color:#192149">¿Y después? Tener los productos es la mitad. En mi curso <strong>Day to Night Glow</strong> te enseño a usarlos para que el maquillaje te acompañe de la mañana a la noche.</p>
+      </div>
+      <a href="${BASE_URL}/cursos/day-to-night-glow" style="display:inline-block;border:1.5px solid #192149;color:#192149;text-decoration:none;font-size:15px;font-weight:500;padding:14px 32px;border-radius:999px;text-align:center">Conocer el curso</a>
+      <p style="margin:8px 0 0;font-size:16px;font-family:Georgia,serif;font-style:italic;color:#192149">Un beso, Nina</p>
+    </div>
+    <div style="background:#e1c8cb;padding:14px;text-align:center;font-size:12px;line-height:1.6;color:#192149">
+      The Glow Market · theglowmarket.com.ar · <a href="${unsubLink}" style="color:#192149">Darme de baja</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>`,
+  })
+  if (error) throw new Error('No se pudo enviar la guía')
+}
+
+// ── Cupón 15% OFF por reseña ──────────────────────────────────────────────────
+
+export async function sendCuponEmail({ to, nombre, codigo }: { to: string; nombre: string; codigo: string }) {
+  const primerNombre = nombre.split(' ')[0]
+  const resend = new Resend(process.env.RESEND_API_KEY)
+  const { error } = await resend.emails.send({
+    from: 'Nina de The Glow Market <hola@theglowmarket.com.ar>',
+    to,
+    subject: 'Tu 15% OFF está acá ✦',
+    html: `
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#d9d0c7;font-family:Arial,sans-serif">
+<div style="max-width:580px;margin:0 auto;padding:32px 20px">
+  <div style="background:#e9e2da;border-radius:6px;overflow:hidden">
+    <div style="background:#e9e2da;border-bottom:1px solid #cfc5bb;padding:24px;text-align:center">
+      <p style="margin:0;font-family:Arial,sans-serif;font-size:11px;letter-spacing:0.3em;color:#192149;text-transform:uppercase">
+        THE <span style="font-family:Georgia,serif;font-size:24px;font-weight:400">GLOW</span> MARKET
+      </p>
+    </div>
+    <div style="padding:40px 40px 32px">
+      <p style="margin:0 0 16px;font-size:12px;font-weight:700;letter-spacing:0.2em;color:#192149">✦ ¡GRACIAS POR TU RESEÑA, ${primerNombre.toUpperCase()}!</p>
+      <h1 style="margin:0 0 24px;font-family:Georgia,serif;font-weight:400;font-size:32px;line-height:1.2;color:#192149">Acá está tu <em>15% OFF.</em></h1>
+      <div style="border:1.5px dashed #192149;border-radius:12px;padding:22px 24px;background:#e9e2da;margin-bottom:24px">
+        <p style="margin:0 0 4px;font-size:12px;font-weight:700;letter-spacing:0.18em;color:#192149">TU CÓDIGO</p>
+        <p style="margin:0;font-family:Georgia,serif;font-size:36px;letter-spacing:0.08em;color:#192149">${codigo}</p>
+      </div>
+      <p style="margin:0 0 24px;font-size:16px;line-height:1.6;color:#192149">Usalo en tu próxima compra en theglowmarket.com.ar. Válido para neceseres, 30 días.</p>
+      <a href="${BASE_URL}/productos" style="display:inline-block;background:#24508a;color:#fff;text-decoration:none;font-size:16px;font-weight:500;padding:16px 36px;border-radius:999px">Ir al Market</a>
+    </div>
+    <div style="background:#e1c8cb;padding:14px;text-align:center;font-size:12px;line-height:1.6;color:#192149">
+      The Glow Market · theglowmarket.com.ar
+    </div>
+  </div>
+</div>
+</body>
+</html>`,
+  })
+  if (error) throw new Error('No se pudo enviar el cupón')
 }

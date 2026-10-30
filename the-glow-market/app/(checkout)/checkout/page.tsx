@@ -56,7 +56,13 @@ export default function CheckoutPage() {
   const { items, total } = useCartStore()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [cuponInput, setCuponInput] = useState('')
+  const [cuponCodigo, setCuponCodigo] = useState<string | null>(null)
+  const [cuponDescuento, setCuponDescuento] = useState(0)
+  const [cuponError, setCuponError] = useState<string | null>(null)
+  const [cuponLoading, setCuponLoading] = useState(false)
   const soloDigital = items.length > 0 && items.every((i) => i.tipo === 'curso')
+  const soloProductos = items.length > 0 && items.every((i) => i.tipo !== 'curso')
 
   const {
     register,
@@ -82,6 +88,31 @@ export default function CheckoutPage() {
     )
   }
 
+  const aplicarCupon = async () => {
+    const codigo = cuponInput.trim().toUpperCase()
+    if (!codigo) return
+    setCuponLoading(true)
+    setCuponError(null)
+    try {
+      const res = await fetch('/api/cupones/validar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ codigo }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Código inválido')
+      if (!soloProductos) throw new Error('Este cupón es válido solo para neceseres (sin cursos)')
+      setCuponCodigo(data.codigo)
+      setCuponDescuento(data.descuento)
+    } catch (err: unknown) {
+      setCuponError(err instanceof Error ? err.message : 'Código inválido')
+      setCuponCodigo(null)
+      setCuponDescuento(0)
+    } finally {
+      setCuponLoading(false)
+    }
+  }
+
   const onSubmit = async (datosEnvio: CheckoutForm) => {
     setLoading(true)
     setError(null)
@@ -90,7 +121,7 @@ export default function CheckoutPage() {
       const res = await fetch('/api/mercadopago/create-preference', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, datosEnvio }),
+        body: JSON.stringify({ items, datosEnvio, cuponCodigo }),
       })
 
       const data = await res.json()
@@ -264,9 +295,63 @@ export default function CheckoutPage() {
 
             <div className="h-px bg-glow-navy/10" />
 
-            <div className="flex justify-between items-baseline">
-              <span className="font-montserrat text-xs tracking-[0.15em] uppercase text-glow-navy/60">Total</span>
-              <span className="font-cormorant text-3xl text-glow-navy">{formatPrice(total())}</span>
+            {/* Cupón de descuento */}
+            {soloProductos && (
+              <div className="flex flex-col gap-2">
+                <label className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-glow-navy/60">
+                  Cupón de descuento
+                </label>
+                {cuponCodigo ? (
+                  <div className="flex items-center justify-between bg-glow-cream border border-glow-navy/20 px-4 py-3">
+                    <span className="font-montserrat text-sm text-glow-navy font-medium">{cuponCodigo} — {cuponDescuento}% OFF</span>
+                    <button type="button" onClick={() => { setCuponCodigo(null); setCuponDescuento(0); setCuponInput('') }} className="font-montserrat text-xs text-glow-navy/50 hover:text-glow-navy transition-colors">✕</button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={cuponInput}
+                      onChange={e => setCuponInput(e.target.value.toUpperCase())}
+                      placeholder="GLOW15-XXXXXX"
+                      className={INPUT_CLASS + ' flex-1'}
+                      onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), aplicarCupon())}
+                    />
+                    <button
+                      type="button"
+                      onClick={aplicarCupon}
+                      disabled={cuponLoading}
+                      className="font-montserrat text-xs tracking-widest uppercase border border-glow-navy/30 px-4 hover:bg-glow-navy hover:text-white transition-colors disabled:opacity-50"
+                    >
+                      {cuponLoading ? '…' : 'OK'}
+                    </button>
+                  </div>
+                )}
+                {cuponError && <p className="font-montserrat text-[10px] text-red-400">{cuponError}</p>}
+              </div>
+            )}
+
+            <div className="flex flex-col gap-1">
+              {cuponCodigo && cuponDescuento > 0 && (
+                <>
+                  <div className="flex justify-between items-baseline">
+                    <span className="font-montserrat text-xs text-glow-navy/60">Subtotal</span>
+                    <span className="font-montserrat text-sm text-glow-navy">{formatPrice(total())}</span>
+                  </div>
+                  <div className="flex justify-between items-baseline">
+                    <span className="font-montserrat text-xs text-glow-royal">Descuento {cuponDescuento}%</span>
+                    <span className="font-montserrat text-sm text-glow-royal">−{formatPrice(total() * cuponDescuento / 100)}</span>
+                  </div>
+                  <div className="h-px bg-glow-navy/10 my-1" />
+                </>
+              )}
+              <div className="flex justify-between items-baseline">
+                <span className="font-montserrat text-xs tracking-[0.15em] uppercase text-glow-navy/60">Total</span>
+                <span className="font-cormorant text-3xl text-glow-navy">
+                  {cuponCodigo && cuponDescuento > 0
+                    ? formatPrice(total() * (1 - cuponDescuento / 100))
+                    : formatPrice(total())}
+                </span>
+              </div>
             </div>
 
             <Button

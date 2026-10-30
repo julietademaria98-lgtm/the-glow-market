@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { Download, ExternalLink } from 'lucide-react'
 import { getDescargablesByModulo } from '@/lib/descargables'
 import { getProductosByModulo } from '@/lib/productos'
+import ReviewForm from '@/components/courses/ReviewForm'
 
 interface Props {
   params: { lessonId: string }
@@ -78,6 +79,11 @@ export default async function LeccionPage({ params }: Props) {
     leccion.modulo
   )
   const productos = getProductosByModulo(leccion.modulo_orden)
+
+  // Check if already reviewed (for Módulo 4)
+  const { data: existingReview } = leccion.modulo_orden === 4
+    ? await supabase.from('reviews').select('cupon_codigo').eq('user_id', user!.id).single()
+    : { data: null }
 
   return (
     <main className="glow-space glow-classroom min-h-screen bg-glow-navy/20 flex flex-col lg:flex-row pt-16">
@@ -201,6 +207,27 @@ export default async function LeccionPage({ params }: Props) {
                   </a>
                 ))}
               </div>
+            </div>
+          </div>
+        )}
+
+        {leccion.modulo_orden === 4 && (
+          <div className="px-6 md:px-10 pb-16 max-w-3xl">
+            <div className="border-t border-glow-navy/10 pt-8">
+              {existingReview ? (
+                <div style={{ background: '#f4efea', borderRadius: 20, padding: '48px 6%', display: 'flex', flexDirection: 'column', gap: 20, alignItems: 'center', textAlign: 'center' }}>
+                  <p style={{ margin: 0, fontSize: 13, fontWeight: 700, letterSpacing: '0.2em', color: '#192149' }}>✦ ¡YA DEJASTE TU RESEÑA!</p>
+                  <h2 style={{ margin: 0, fontFamily: 'var(--font-title, Georgia, serif)', fontWeight: 400, fontSize: 36, lineHeight: 1.1, color: '#192149' }}>
+                    Tu código: <em style={{ background: 'linear-gradient(transparent 62%, #e1c8cb 62%)' }}>{existingReview.cupon_codigo}</em>
+                  </h2>
+                  <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, color: '#192149' }}>Usalo en tu próxima compra de neceseres en theglowmarket.com.ar.</p>
+                  <a href="/productos" style={{ background: '#24508a', color: '#fff', textDecoration: 'none', fontSize: 16, fontWeight: 500, padding: '18px 40px', borderRadius: 999 }}>
+                    Ir al Market
+                  </a>
+                </div>
+              ) : (
+                <ReviewForm userId={user.id} />
+              )}
             </div>
           </div>
         )}
