@@ -23,7 +23,7 @@ export default async function ResenasAdminPage() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
         <div>
           <p style={{ margin: 0, fontWeight: 600, fontSize: 15 }}>{r.nombre as string}</p>
-          {r.instagram && <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>{r.instagram as string}</p>}
+          {!!r.instagram && <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>{r.instagram as string}</p>}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           {'★'.repeat(r.rating as number).padEnd(5, '☆').split('').map((s, i) => (
