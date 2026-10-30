@@ -157,10 +157,6 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           <h2 className="gl-h2">Quién es <em>Nina</em></h2>
           <p>Soy Nina Amateis, influencer y makeup artist. Hace +10 años comparto maquillaje, moda y lifestyle con una comunidad de casi 300 mil mujeres en Instagram.</p>
           <p>En todo este tiempo vi que la mayoría no necesita más productos ni tutoriales eternos: necesita un método simple para maquillarse en el día a día. Por eso armé el Método Day to Night.</p>
-          {/* ASSET PENDIENTE: reemplazar por <img src="/nina-ig-screenshot.png" alt="@ninaamateis en Instagram" /> */}
-          <div className="gl-ig-pending">
-            Captura del perfil @ninaamateis · Pendiente de recibir
-          </div>
           <blockquote className="gl-quote">
             "Este curso lo armé para vos, mujeres reales que quieren salir prolijas y se cansaron de probar productos que no usan."
           </blockquote>
