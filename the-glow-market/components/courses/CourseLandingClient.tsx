@@ -74,10 +74,9 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           >
             <source src={VIDEO_URL} type="video/mp4" />
           </video>
-          {/* ASSET PENDIENTE: reemplazar div por <img src="/clarins-logo.png" alt="Clarins" /> cuando llegue el logo */}
           <div className="gl-clarins-brand">
             <span>Esponsoreado por</span>
-            <div className="gl-clarins-placeholder">CLARINS</div>
+            <img src="/clarins-logo.svg" alt="Clarins Paris" className="gl-clarins-logo" />
           </div>
         </div>
       </section>
@@ -215,9 +214,8 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           <div className="gl-price-card">
             <span className="gl-price-pill">Cupos limitados · 30 a precio de lanzamiento</span>
             <AddToCartCurso curso={curso} />
-            {/* ASSET PENDIENTE: reemplazar div por <img src="/mercadopago-logo.png" alt="Mercado Pago" /> */}
             <div className="gl-mp-trust">
-              <div className="gl-mp-placeholder">MERCADO PAGO</div>
+              <img src="/mercadopago-logo.svg" alt="Mercado Pago" className="gl-mp-logo" />
               <p className="gl-fine">Pagás seguro con Mercado Pago</p>
             </div>
           </div>
@@ -287,11 +285,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
         }
         .gl-clarins-brand { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 18px; }
         .gl-clarins-brand span { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
-        .gl-clarins-placeholder {
-          font-family: Georgia, serif; font-size: 18px; letter-spacing: 3px;
-          color: #b0182c; font-weight: 700; padding: 4px 8px;
-          border: 1px solid #b0182c; border-radius: 3px;
-        }
+        .gl-clarins-logo { height: 54px; width: auto; }
 
         /* ── TICKER ── */
         .gl-ribbon { background: var(--pink); overflow: hidden; padding: 20px 0; }
@@ -380,11 +374,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           border-radius: 40px; font-size: 12px; margin-bottom: 20px;
         }
         .gl-mp-trust { display: flex; flex-direction: column; align-items: center; margin-top: 16px; }
-        .gl-mp-placeholder {
-          display: flex; align-items: center; justify-content: center;
-          background: #009ee3; color: #fff; font-size: 11px; font-weight: 700;
-          letter-spacing: 1px; border-radius: 6px; width: 140px; height: 44px;
-        }
+        .gl-mp-logo { height: 52px; width: auto; }
         .gl-fine { font-size: 12px; margin: 6px 0 0; opacity: .7; }
 
         /* ── FAQ ── */

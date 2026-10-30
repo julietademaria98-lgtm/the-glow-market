@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 80" width="220" height="80">
+  <!-- MercadoPago logo -->
+  <!-- Oval icon -->
+  <ellipse cx="38" cy="40" rx="34" ry="34" fill="#009EE3"/>
+  <!-- Handshake white icon (simplified) -->
+  <g fill="white">
+    <!-- Left hand -->
+    <path d="M 16 44 C 16 44 20 36 26 36 C 28 36 30 37 30 37 L 36 33 C 37 32 39 33 39 35 L 34 39 C 36 39 38 40 38 42 L 32 46 C 32 46 30 48 28 48 L 20 48 Z"/>
+    <!-- Right hand -->
+    <path d="M 60 44 C 60 44 56 36 50 36 C 48 36 46 37 46 37 L 40 33 C 39 32 37 33 37 35 L 42 39 C 40 39 38 40 38 42 L 44 46 C 44 46 46 48 48 48 L 56 48 Z"/>
+  </g>
+  <!-- mercado pago text -->
+  <text x="82" y="35" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#2D3277" letter-spacing="-0.5">mercado</text>
+  <text x="82" y="60" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#2D3277" letter-spacing="-0.5">pago</text>
+</svg>
