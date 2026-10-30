@@ -73,8 +73,8 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
             Curso online de maquillaje · Por Nina Amateis, makeup artist
           </span>
           <h1 className="gl-h1">
-            Resaltá tu look en pocos minutos{' '}
-            <em>y que te dure <span className="gl-mark">todo el día.</span></em>
+            Un makeup del día a la noche,{' '}
+            <em><span className="gl-mark">sin empezar de cero.</span></em>
           </h1>
           <p className="gl-intro">
             Con el Método Day to Night vas a aprender, en 4 pasos simples, cómo maquillarte a la mañana con un look natural, retocarte a la tarde y pasar a la noche sin desarmar nada.
