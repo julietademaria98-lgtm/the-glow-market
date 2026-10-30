@@ -76,7 +76,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
           </video>
           <div className="gl-clarins-brand">
             <span>Esponsoreado por</span>
-            <img src="/clarins-logo.svg" alt="Clarins Paris" className="gl-clarins-logo" />
+            <img src="/clarins-logo.webp" alt="Clarins Paris" className="gl-clarins-logo" />
           </div>
         </div>
       </section>
@@ -215,7 +215,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
             <span className="gl-price-pill">Cupos limitados · 30 a precio de lanzamiento</span>
             <AddToCartCurso curso={curso} />
             <div className="gl-mp-trust">
-              <img src="/mercadopago-logo.svg" alt="Mercado Pago" className="gl-mp-logo" />
+              <img src="/mercadopago-logo.png" alt="Mercado Pago" className="gl-mp-logo" />
               <p className="gl-fine">Pagás seguro con Mercado Pago</p>
             </div>
           </div>
