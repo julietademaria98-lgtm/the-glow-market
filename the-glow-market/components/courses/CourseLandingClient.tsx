@@ -80,7 +80,7 @@ export default function CourseLandingClient({ curso }: { curso: Curso }) {
             Con el Método Day to Night vas a aprender, en 4 pasos simples, cómo maquillarte a la mañana con un look natural, retocarte a la tarde y pasar a la noche sin desarmar nada.
           </p>
           <div style={{ marginTop: 32, marginBottom: 16 }}>
-            <a className="gl-btn" href="#precio">Quiero hacer el curso</a>
+            <a className="gl-btn" href="#inscripcion">Quiero hacer el curso</a>
           </div>
           <p className="gl-perks">
             <span className="gl-mark">100% online</span>{' '}&nbsp;/{' '}&nbsp;
