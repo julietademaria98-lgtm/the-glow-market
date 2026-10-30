@@ -7,7 +7,7 @@ import SocialProofPopup from '@/components/courses/SocialProofPopup'
 import type { Curso } from '@/types'
 
 const bodyFont = DM_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-body', display: 'swap', preload: false })
-const titleFont = Playfair_Display({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-title', display: 'swap', preload: false })
+const titleFont = Playfair_Display({ subsets: ['latin'], weight: ['400', '500'], style: ['normal', 'italic'], variable: '--font-title', display: 'swap', preload: false })
 
 const VIDEO_URL = 'https://daevvoumyxwgwqfbafvn.supabase.co/storage/v1/object/public/product-images/antes-despues.MOV'
 const NINA_IMG = 'https://daevvoumyxwgwqfbafvn.supabase.co/storage/v1/object/public/product-images/nina-glow-fondo-claro.png'
